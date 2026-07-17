@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Admin Portal — fotowisuda.ai</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "surface-background": "#0A0C10",
+                            "surface-card": "#161B22",
+                            "surface-container": "#1e2024",
+                            "border-subtle": "#30363D",
+                            "text-primary": "#F0F6FC",
+                            "text-secondary": "#8B949E",
+                            "electric-cyan": "#00D1FF",
+                            "vivid-purple": "#9D5BFF"
+                        }
+                    }
+                }
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        @keyframes adminGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .admin-glowing-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #06b6d4, #6366f1, #a855f7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: adminGradientFlow 5s ease infinite;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+        }
+
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(168, 85, 247, 0.2); }
+            50% { border-color: rgba(168, 85, 247, 0.5); }
+        }
+
+        .card-enter {
+            animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .btn-hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-hover-lift:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-slate-950 text-slate-100 overflow-hidden">
+
+    <!-- ============================================================
+         TEXT-ONLY SIDEBAR (desktop: always visible; mobile: overlay)
+         ============================================================ -->
+    <aside id="sidebar" class="hidden md:flex w-60 bg-slate-950/40 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 h-screen sticky top-0 z-30 transition-transform duration-300">
+        <nav class="flex flex-col gap-8">
+            <!-- SYSTEM CONTROLS -->
+            <div>
+                <p class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-4">System Controls</p>
+                <a href="/admin" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">Admin Home</a>
+                <a href="/filter-gallery-admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Admin</a>
+                <a href="/filter-gallery-factory" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
+                <a href="/admin-creations" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Creations</a>
+            </div>
+        </nav>
+        <!-- Sidebar footer -->
+        <div class="pt-6 border-t border-slate-800/60">
+            <p class="text-[9px] text-slate-600 tracking-wider font-medium">fotowisuda.ai &mdash; Admin</p>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar overlay (backdrop) -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden" onclick="closeSidebar()"></div>
+
+    <!-- ============================================================
+         MOBILE HEADER BAR (visible only < md)
+         ============================================================ -->
+    <div class="md:hidden fixed top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
+        <span class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase">fotowisuda.ai</span>
+        <button id="menu-toggle" onclick="toggleSidebar()" class="text-xs font-bold text-slate-400 hover:text-white tracking-widest uppercase transition-all">Menu</button>
+    </div>
+
+    <!-- ============================================================
+         MAIN WORKSPACE
+         ============================================================ -->
+    <main class="flex-grow flex items-center justify-center p-6 relative overflow-hidden mt-12 md:mt-0">
+
+        <!-- Ambient background glows -->
+        <div class="absolute top-[-15%] right-[-15%] w-[600px] h-[600px] bg-purple-600/8 blur-[150px] rounded-full pointer-events-none"></div>
+        <div class="absolute bottom-[-15%] left-[-15%] w-[500px] h-[500px] bg-cyan-500/6 blur-[150px] rounded-full pointer-events-none"></div>
+        <div class="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-vivid-purple/4 blur-[120px] rounded-full pointer-events-none"></div>
+
+        <!-- Main Card -->
+        <div class="card-enter relative z-10 bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-8 max-w-lg w-full text-center flex flex-col items-center gap-6 shadow-2xl"
+             style="box-shadow: 0 0 60px rgba(168, 85, 247, 0.05), 0 0 0 1px rgba(168, 85, 247, 0.06);">
+
+            <!-- Status Badge -->
+            <span class="px-3 py-1.5 bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold text-purple-400 rounded-full flex items-center gap-2"
+                  style="animation: pulseBorder 3s ease-in-out infinite;">
+                <span class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-ping"></span>
+                <span>SYSTEM ADMINISTRATOR</span>
+            </span>
+
+            <!-- Gradient Icon -->
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-cyan-500/20 border border-purple-500/20 flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-2xl text-purple-400"></i>
+            </div>
+
+            <!-- Headline -->
+            <div class="flex flex-col gap-2">
+                <h1 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight">
+                    Welcome Admin
+                </h1>
+                <p class="text-text-secondary text-sm leading-relaxed max-w-sm mx-auto">
+                    Selamat datang di Portal Utama Kontrol Sistem fotowisuda.ai.
+                </p>
+            </div>
+
+            <!-- Admin Navigational Button -->
+            <div class="w-full flex justify-center mt-2">
+                <a href="/filter-gallery-admin" class="flex items-center justify-center gap-3 w-full max-w-xs h-[48px] bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg shadow-purple-600/20 active:scale-95 text-xs tracking-wider uppercase border border-purple-400/20">
+                    <i class="fa-solid fa-sliders text-sm"></i>
+                    <span>Kelola Galeri Filter</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="absolute bottom-6 left-0 right-0 text-center pointer-events-none z-10">
+            <p class="text-[10px] text-slate-500/60 tracking-wider font-medium">
+                fotowisuda.ai &bull; Admin Portal v1.0 &bull; Secure Local Session
+            </p>
+        </div>
+
+    </main>
+
+    <!-- ============================================================
+         MOBILE SIDEBAR TOGGLE SCRIPT
+         ============================================================ -->
+    <script>
+        function openSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('hidden')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        }
+    </script>
+
+</body>
+</html>

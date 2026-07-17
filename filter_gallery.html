@@ -1,0 +1,916 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <script>
+        if (!localStorage.getItem('active_user_email')) {
+            window.location.href = '/';
+        }
+    </script>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Filter Gallery â€” fotowisuda.ai</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary": "#430089", "on-tertiary-fixed": "#171c23", "tertiary-fixed-dim": "#c2c7d0",
+                            "on-surface-variant": "#bbc9cf", "text-secondary": "#8B949E", "tertiary-fixed": "#dee2ec",
+                            "surface-container": "#1e2024", "inverse-surface": "#e2e2e8", "secondary-container": "#6205c3",
+                            "outline": "#859399", "surface-dim": "#111318", "on-error": "#690005",
+                            "on-error-container": "#ffdad6", "on-tertiary": "#2c3138", "inverse-on-surface": "#2f3035",
+                            "on-background": "#e2e2e8", "outline-variant": "#3c494e", "primary-fixed": "#b7eaff",
+                            "on-tertiary-fixed-variant": "#42474f", "tertiary": "#d8dce6", "surface-variant": "#333539",
+                            "surface-container-lowest": "#0c0e12", "vivid-purple": "#9D5BFF",
+                            "on-secondary-fixed": "#280057", "on-primary-container": "#00566a", "background": "#111318",
+                            "error": "#ffb4ab", "secondary-fixed-dim": "#d6baff", "surface-container-high": "#282a2e",
+                            "on-tertiary-container": "#494e57", "surface-background": "#0A0C10", "secondary-fixed": "#ecdcff",
+                            "primary-container": "#00d1ff", "surface-tint": "#4cd6ff", "surface-card": "#161B22",
+                            "primary-fixed-dim": "#4cd6ff", "secondary": "#d6baff", "on-surface": "#e2e2e8",
+                            "on-secondary-container": "#cba9ff", "surface-container-low": "#1a1c20", "surface-bright": "#37393e",
+                            "on-primary-fixed-variant": "#004e60", "electric-cyan": "#00D1FF",
+                            "tertiary-container": "#bcc0ca", "border-subtle": "#30363D", "surface": "#111318",
+                            "inverse-primary": "#00677f", "primary": "#a4e6ff", "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC", "on-primary-fixed": "#001f28", "on-primary": "#003543",
+                            "error-container": "#93000a", "on-secondary-fixed-variant": "#6000bf"
+                        },
+                        "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                        "spacing": { "margin-desktop": "32px", "gutter": "24px", "base-unit": "4px", "container-max-width": "1440px", "margin-mobile": "16px" },
+                        "fontFamily": { "headline-xl": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Geist"], "label-md": ["Geist"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"] },
+                        "fontSize": {
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .grid-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .grid-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 209, 255, 0.12);
+        }
+        .grid-card.hidden {
+            display: none !important;
+        }
+        #filters-grid {
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+        /* Execution modal */
+        .modal-overlay { background: rgba(10, 12, 16, 0.85); backdrop-filter: blur(8px); }
+        .modal-panel {
+            background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate-in { animation: modalIn 0.3s ease-out forwards; }
+        .upload-preview-img { object-fit: cover; width: 100%; height: 100%; border-radius: 1rem; }
+        .upload-zone-filled { border-style: solid !important; padding: 0 !important; }
+    </style>
+<script src="/sidebar.js"></script>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle-btn" class="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] p-8">
+        <div class="mb-8">
+            <h2 class="font-headline-lg text-white mb-2">Filter Gallery</h2>
+            <p class="text-text-secondary text-sm">Browse our curated collection of background filters. Select any image to preview and use its scene.</p>
+        </div>
+
+        <!-- Filter Pills -->
+        <!-- Category Filters -->
+        <div id="filter-pills" class="flex flex-wrap gap-2 mb-3">
+            <button class="filter-pill px-4 py-2 bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20 rounded-full text-sm font-medium transition-all hover:bg-electric-cyan/20 active" data-filter="all">All</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Studio">Studio</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Indoor">Indoor</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Outdoor">Outdoor</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Poster Film">Poster Film</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Animation">Animation</button>
+        </div>
+
+        <!-- Lighting Filters -->
+        <div class="text-[9px] font-bold text-slate-500 tracking-widest uppercase mb-1.5 px-1 mt-4 pt-3 border-t border-slate-800/40">Lighting &amp; Ambient Styles</div>
+        <div id="lighting-filter-pills" class="flex flex-wrap gap-2 mb-6">
+            <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Soft Light">Soft Light</button>
+            <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Strobist">Strobist</button>
+            <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Natural Ambient">Natural Ambient</button>
+        </div>
+
+        <!-- Image Grid -->
+        <div id="filters-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
+            <!-- Populated dynamically -->
+        </div>
+
+        <!-- Loading state -->
+        <div id="grid-loading" class="flex items-center justify-center py-20">
+            <div class="flex flex-col items-center gap-4 text-text-secondary">
+                <div class="w-10 h-10 border-2 border-electric-cyan/30 border-t-electric-cyan rounded-full animate-spin"></div>
+                <span class="text-sm">Loading gallery images...</span>
+            </div>
+        </div>
+
+        <!-- Empty / All-Hidden state -->
+        <div id="grid-empty" class="hidden flex items-center justify-center py-20">
+            <div class="text-center space-y-3">
+                <span class="material-symbols-outlined text-5xl text-text-secondary">imagesmode</span>
+                <p class="text-text-secondary">Tidak ada filter yang tersedia saat ini.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================
+         MODAL â€” Execution Panel
+         ============================================================ -->
+    <div id="execution-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        <div class="modal-panel relative z-10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto hide-scrollbar p-8 modal-animate-in">
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-headline-md text-white" id="modal-dynamic-title">Background Filter</h3>
+                <button onclick="closeModal()" class="p-2 rounded-lg hover:bg-surface-container transition-colors">
+                    <span class="material-symbols-outlined text-text-secondary">close</span>
+                </button>
+            </div>
+
+            <!-- Filter Cover Preview â€” Before/After -->
+            <div class="mb-6">
+                <p class="text-[10px] uppercase tracking-widest text-text-secondary mb-2">Filter Cover Preview</p>
+                <div class="-mx-8 grid grid-cols-2 gap-2.5">
+                    <!-- BEFORE -->
+                    <div class="aspect-[2/3] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-l-none overflow-hidden relative flex items-center justify-center">
+                        <img id="modal-before-preview" src="" alt="Before"
+                             class="w-full h-full object-cover hidden" />
+                        <span id="modal-before-placeholder" class="material-symbols-outlined text-3xl text-text-secondary">person</span>
+                        <div class="absolute top-2 left-2 bg-slate-950/75 border border-slate-700/50 text-[10px] font-bold text-slate-300 px-2 py-1 rounded-md uppercase tracking-wider backdrop-blur-sm">
+                            BEFORE
+                        </div>
+                    </div>
+                    <!-- AFTER -->
+                    <div class="aspect-[2/3] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-r-none overflow-hidden relative flex items-center justify-center">
+                        <img id="modal-cover-preview" src="" alt="Filter cover preview"
+                             class="w-full h-full object-cover hidden" />
+                        <span id="modal-cover-placeholder" class="material-symbols-outlined text-3xl text-text-secondary">image</span>
+                        <div class="absolute top-2 left-2 bg-purple-950/80 border border-purple-500/40 text-[10px] font-bold text-purple-300 px-2 py-1 rounded-md uppercase tracking-wider shadow-lg shadow-purple-500/10 backdrop-blur-sm">
+                            AFTER
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Upload Dropzone -->
+            <div class="mb-6">
+                <div class="text-center mb-3">
+                    <p class="font-bold text-sm tracking-wide text-white">THE GRADUATE</p>
+                    <p class="text-xs text-slate-400 font-medium mt-1">Image Reference 1</p>
+                </div>
+                <div id="modal-upload-zone"
+                     class="border-2 border-dashed border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-electric-cyan/50 transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden min-h-[140px]"
+                     onclick="document.getElementById('modal-file-input').click()">
+                    <div id="modal-upload-placeholder" class="flex flex-col items-center gap-2">
+                        <span class="material-symbols-outlined text-3xl text-text-secondary group-hover:text-electric-cyan transition-colors">upload_file</span>
+                        <div class="text-center">
+                            <p class="text-text-primary font-bold text-sm">Click to upload subject photo</p>
+                            <p class="text-text-secondary text-xs">PNG, JPG or WEBP (Max. 10MB)</p>
+                        </div>
+                    </div>
+                    <img id="modal-upload-preview" class="upload-preview-img absolute inset-0 hidden" alt="Subject preview" />
+                    <button id="modal-upload-remove"
+                            class="absolute top-3 right-3 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
+                            onclick="event.stopPropagation(); removeModalSubject()" title="Remove">
+                        <span class="material-symbols-outlined text-sm text-error">close</span>
+                    </button>
+                    <input type="file" id="modal-file-input" accept="image/*" class="hidden" onchange="handleModalFileSelect(event)">
+                </div>
+            </div>
+
+            <!-- Aspect Ratio Selection -->
+            <div class="mb-6">
+                <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80 block mb-3">
+                    Aspect Ratio
+                </label>
+                <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden" id="modal-ratio-container">
+                    <div class="absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-electric-cyan rounded-lg z-0 transition-transform duration-300 ease-out" id="modalRatioHighlight"></div>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300" data-ratio="2:3">2:3</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
+                </div>
+                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 1696 Ã— 2528 px</p>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="modal-generate-btn"
+                    class="w-full bg-electric-cyan text-surface-background font-black py-4 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110">
+                <span class="material-symbols-outlined font-bold" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                <span class="uppercase tracking-tighter">Generate</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        const API_BASE = window.location.origin;
+        const STORAGE_KEY = 'filter_visibility_states';
+
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        function getAspectClass(record) {
+            const dims = (record.dimensions || '').toString();
+            const match = dims.match(/(\d+)\s*[Ã—x]\s*(\d+)/i);
+            if (match) {
+                const w = parseInt(match[1], 10);
+                const h = parseInt(match[2], 10);
+                for (const [ratio, sizes] of Object.entries(ASPECT_RATIO_DIMENSIONS)) {
+                    if (sizes.width === w && sizes.height === h) {
+                        return 'aspect-[' + ratio.replace(':', '/') + ']';
+                    }
+                }
+                const r = w / h;
+                if (r > 1.2) return 'aspect-[4/3]';
+                if (r > 0.7) return 'aspect-[4/5]';
+                return 'aspect-[2/3]';
+            }
+            return 'aspect-[2/3]';
+        }
+
+        const state = {
+            records: [],
+            selectedRecord: null,
+            modalSubjectFile: null,
+            modalRatio: '2:3',
+            modalDimensions: ASPECT_RATIO_DIMENSIONS['2:3']
+        };
+
+        // =====================================================
+        // LOCALSTORAGE â€” read visibility from admin toggles
+        // =====================================================
+
+        function getActiveFilters() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function isFilterVisible(filterId) {
+            const active = getActiveFilters();
+            if (!active.hasOwnProperty(filterId)) return true;
+            return active[filterId] === true;
+        }
+
+        // =====================================================
+        // IMAGE GRID LOADING
+        // =====================================================
+
+        async function loadImages() {
+            const grid = document.getElementById('filters-grid');
+            const loading = document.getElementById('grid-loading');
+            const empty = document.getElementById('grid-empty');
+
+            console.log('[Gallery] loadImages: starting fetch...');
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(function() { controller.abort(); }, 8000);
+
+                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/images?limit=100`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                console.log('[Gallery] API response status:', resp.status);
+                if (!resp.ok) throw new Error('Failed to load images â€” status ' + resp.status);
+                const data = await resp.json();
+                state.records = data.records || [];
+                console.log('[Gallery] Records loaded:', state.records.length);
+
+                if (loading) loading.classList.add('hidden');
+
+                if (state.records.length === 0) {
+                    console.log('[Gallery] No records â€” showing empty state');
+                    if (empty) empty.classList.remove('hidden');
+                    return;
+                }
+
+                let visibleCount = 0;
+
+                state.records.forEach((record, index) => {
+                    const filterId = record.generation_id || `filter-${index}`;
+
+                    // Check admin visibility toggle â€” hide if toggled OFF
+                    if (!isFilterVisible(filterId)) {
+                        return;
+                    }
+
+                    visibleCount++;
+
+                    const safeTitle = escapeHtml(record.title || record.prompt || 'Untitled');
+                    const displayTags = Array.isArray(record.tags) && record.tags.length > 0
+                        ? record.tags.join(', ')
+                        : '';
+                    const tagsAttr = displayTags ? displayTags.toLowerCase() : '';
+                    const safeTags = escapeHtml(displayTags);
+                    const tagsHtml = safeTags
+                        ? `<p class="text-[10px] text-text-secondary/70 mt-1 truncate">${safeTags}</p>`
+                        : '';
+                    const card = document.createElement('div');
+                    card.className = 'grid-card bg-surface-card border border-border-subtle rounded-2xl overflow-hidden cursor-pointer group';
+                    card.setAttribute('data-tags', tagsAttr);
+                    card.setAttribute('data-lighting', (record.lighting || '').toLowerCase());
+                    card.setAttribute('data-id', filterId);
+                    card.setAttribute('data-filter-id', filterId);
+                    card.innerHTML = `
+                        <div class="w-full ${getAspectClass(record)} overflow-hidden">
+                            <img src="${record.cover_image_path || record.image_url}"
+                                 alt="${safeTitle}"
+                                 class="w-full h-full object-cover object-top"
+                                 loading="lazy"
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect fill=%22%23161B22%22 width=%22200%22 height=%22150%22/><text fill=%22%238B949E%22 x=%22100%22 y=%2275%22 text-anchor=%22middle%22 font-size=%2212%22>No Preview</text></svg>'">
+                        </div>
+                        <div class="p-3 space-y-1">
+                            <h3 class="filter-title text-xs text-text-primary font-semibold truncate">${safeTitle}</h3>
+                            ${tagsHtml}
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
+                                <span class="text-[10px] text-electric-cyan">Click to use â†’</span>
+                            </div>
+                        </div>
+                    `;
+
+                    // Click â†’ open execution modal (same as admin)
+                    card.addEventListener('click', () => openModal(record));
+
+                    if (grid) grid.appendChild(card);
+                });
+
+                if (visibleCount === 0) {
+                    if (empty) empty.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                console.error('[Gallery] loadImages failed:', err.message || err);
+                if (loading) loading.classList.add('hidden');
+                if (empty) {
+                    empty.classList.remove('hidden');
+                    empty.innerHTML = '<div class="text-center space-y-3">' +
+                        '<span class="material-symbols-outlined text-5xl text-text-secondary">cloud_off</span>' +
+                        '<p class="text-text-secondary">Gagal terhubung ke server.</p>' +
+                        '<p class="text-xs text-slate-500">Periksa koneksi dan refresh halaman.</p>' +
+                        '</div>';
+                }
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = (str || '').slice(0, 100);
+            return div.innerHTML;
+        }
+
+        // =====================================================
+        // FILTER PILLS LOGIC â€” category + lighting
+        // =====================================================
+
+        const filterState = { category: 'all', lighting: '' };
+
+        function applyAllFilters() {
+            const cards = document.querySelectorAll('#filters-grid .grid-card');
+            cards.forEach(card => {
+                let visible = true;
+                if (filterState.category !== 'all') {
+                    const cardTags = (card.getAttribute('data-tags') || '').toLowerCase();
+                    if (!cardTags.includes(filterState.category.toLowerCase())) {
+                        visible = false;
+                    }
+                }
+                if (filterState.lighting) {
+                    const cardLighting = (card.getAttribute('data-lighting') || '').toLowerCase();
+                    if (!cardLighting.includes(filterState.lighting.toLowerCase())) {
+                        visible = false;
+                    }
+                }
+                card.classList.toggle('hidden', !visible);
+            });
+        }
+
+        // ---- "All" master-reset helpers ----
+
+        function activateAllButton() {
+            const allBtn = document.querySelector('.filter-pill[data-filter="all"]');
+            if (!allBtn) return;
+            allBtn.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+            allBtn.classList.remove('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+        }
+
+        function deactivateAllButton() {
+            const allBtn = document.querySelector('.filter-pill[data-filter="all"]');
+            if (!allBtn) return;
+            allBtn.classList.remove('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+            allBtn.classList.add('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+        }
+
+        function deactivateAllCategoryPills() {
+            document.querySelectorAll('.filter-pill').forEach(p => {
+                p.classList.remove('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                p.classList.add('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+            });
+        }
+
+        function deactivateAllLightingPills() {
+            document.querySelectorAll('.lighting-filter-pill').forEach(p => {
+                p.classList.remove('bg-amber-500/20', 'border-amber-400', 'text-amber-200', 'shadow-lg', 'shadow-amber-500/5');
+                p.classList.add('bg-amber-950/10', 'border-amber-500/20', 'text-amber-300/90');
+            });
+        }
+
+        function resetToAllState() {
+            filterState.category = 'all';
+            filterState.lighting = '';
+            deactivateAllCategoryPills();
+            deactivateAllLightingPills();
+            activateAllButton();
+            applyAllFilters();
+        }
+
+        function checkAutoActivateAll() {
+            if (filterState.category === 'all' && !filterState.lighting) {
+                activateAllButton();
+            }
+        }
+
+        function initFilterPills() {
+            // --- Category pills (including "All") ---
+            const catPills = document.querySelectorAll('.filter-pill');
+            catPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const clickedFilter = pill.getAttribute('data-filter');
+
+                    // "All" = master reset
+                    if (clickedFilter === 'all') {
+                        resetToAllState();
+                        return;
+                    }
+
+                    // Non-"All" category pill â†’ deactivate "All"
+                    deactivateAllButton();
+
+                    if (filterState.category === clickedFilter) {
+                        // Toggle OFF â€” deselect, fall back to "all"
+                        filterState.category = 'all';
+                        deactivateAllCategoryPills();
+                        checkAutoActivateAll();
+                    } else {
+                        // Select new category
+                        filterState.category = clickedFilter;
+                        deactivateAllCategoryPills();
+                        pill.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                        pill.classList.remove('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    }
+
+                    applyAllFilters();
+                });
+            });
+
+            // --- Lighting / ambient pills ---
+            const lightPills = document.querySelectorAll('.lighting-filter-pill');
+            lightPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const clicked = pill.getAttribute('data-filter');
+
+                    deactivateAllButton();
+
+                    if (filterState.lighting === clicked) {
+                        // Toggle OFF
+                        filterState.lighting = '';
+                        deactivateAllLightingPills();
+                        checkAutoActivateAll();
+                    } else {
+                        // Select new lighting
+                        filterState.lighting = clicked;
+                        deactivateAllLightingPills();
+                        pill.classList.add('bg-amber-500/20', 'border-amber-400', 'text-amber-200', 'shadow-lg', 'shadow-amber-500/5');
+                        pill.classList.remove('bg-amber-950/10', 'border-amber-500/20', 'text-amber-300/90');
+                    }
+
+                    applyAllFilters();
+                });
+            });
+        }
+
+        // =====================================================
+        // MODAL LOGIC
+        // =====================================================
+
+        function openModal(record) {
+            state.selectedRecord = record;
+            state.modalSubjectFile = null;
+
+            const modalTitle = document.getElementById('modal-dynamic-title');
+            if (modalTitle) {
+                modalTitle.textContent = record.title || 'Background Filter';
+            }
+
+            // AFTER â€” filter cover preview
+            const coverPreview = document.getElementById('modal-cover-preview');
+            const coverPlaceholder = document.getElementById('modal-cover-placeholder');
+            const coverUrl = record.cover_image_path || record.image_url;
+            if (coverPreview && coverUrl) {
+                coverPreview.src = coverUrl;
+                coverPreview.classList.remove('hidden');
+                if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
+            } else {
+                if (coverPreview) { coverPreview.classList.add('hidden'); coverPreview.src = ''; }
+                if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
+            }
+
+            // BEFORE â€” reference image or generic placeholder
+            const beforePreview = document.getElementById('modal-before-preview');
+            const beforePlaceholder = document.getElementById('modal-before-placeholder');
+            const beforeUrl = record.reference_image_1_path || record.reference_image_2_path || null;
+            if (beforePreview && beforeUrl) {
+                beforePreview.src = `${API_BASE}/${beforeUrl}`;
+                beforePreview.classList.remove('hidden');
+                if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
+            } else {
+                if (beforePreview) { beforePreview.classList.add('hidden'); beforePreview.src = ''; }
+                if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
+            }
+
+            document.getElementById('execution-modal').classList.remove('hidden');
+            document.getElementById('execution-modal').style.display = 'flex';
+
+            resetModalUpload();
+            moveModalHighlight(0);
+        }
+
+        window.closeModal = function() {
+            document.getElementById('execution-modal').classList.add('hidden');
+            document.getElementById('execution-modal').style.display = 'none';
+        };
+
+        function resetModalUpload() {
+            const preview = document.getElementById('modal-upload-preview');
+            const placeholder = document.getElementById('modal-upload-placeholder');
+            const removeBtn = document.getElementById('modal-upload-remove');
+            const zone = document.getElementById('modal-upload-zone');
+            const fileInput = document.getElementById('modal-file-input');
+            if (preview) { preview.classList.add('hidden'); preview.src = ''; }
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (removeBtn) removeBtn.classList.add('hidden');
+            if (zone) { zone.classList.remove('upload-zone-filled', 'border-electric-cyan/50'); zone.classList.add('border-dashed', 'border-border-subtle'); }
+            if (fileInput) fileInput.value = '';
+            state.modalSubjectFile = null;
+        }
+
+        window.handleModalFileSelect = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showCustomAlert('Silakan pilih file gambar yang valid (PNG, JPG, atau WEBP).'); event.target.value = ''; return; }
+            state.modalSubjectFile = file;
+
+            const preview = document.getElementById('modal-upload-preview');
+            const placeholder = document.getElementById('modal-upload-placeholder');
+            const removeBtn = document.getElementById('modal-upload-remove');
+            const zone = document.getElementById('modal-upload-zone');
+            if (preview && placeholder && removeBtn && zone) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result; preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden'); removeBtn.classList.remove('hidden');
+                    zone.classList.add('upload-zone-filled', 'border-electric-cyan/50');
+                    zone.classList.remove('border-dashed', 'border-border-subtle');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.removeModalSubject = function() { resetModalUpload(); };
+
+        // =====================================================
+        // MODAL ASPECT RATIO
+        // =====================================================
+
+        function moveModalHighlight(index) {
+            const highlight = document.getElementById('modalRatioHighlight');
+            const buttons = document.querySelectorAll('.modal-ratio-btn');
+            if (!highlight || !buttons.length) return;
+            highlight.style.transform = `translateX(${index * 100}%)`;
+            buttons.forEach((btn, idx) => {
+                if (idx === index) { btn.classList.add('text-surface-background', 'font-bold'); btn.classList.remove('text-text-secondary', 'font-medium'); }
+                else { btn.classList.remove('text-surface-background', 'font-bold'); btn.classList.add('text-text-secondary', 'font-medium'); }
+            });
+            const ratio = buttons[index].getAttribute('data-ratio');
+            state.modalRatio = ratio;
+            state.modalDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
+            if (state.modalDimensions) {
+                document.getElementById('modal-dimension-readout').textContent =
+                    `Dimensions: ${state.modalDimensions.width} Ã— ${state.modalDimensions.height} px`;
+            }
+        }
+
+        function initModalAspectRatio() {
+            document.querySelectorAll('.modal-ratio-btn').forEach((btn, idx) => {
+                btn.addEventListener('click', () => moveModalHighlight(idx));
+            });
+            moveModalHighlight(0);
+        }
+
+        // =====================================================
+        // MODAL GENERATION FLOW
+        // =====================================================
+
+        async function handleModalGenerate() {
+            // --- Login Gate ---
+            var activeEmail = localStorage.getItem('active_user_email') || '';
+            if (!activeEmail) {
+                showCustomAlert('Silakan masuk sesi (login) terlebih dahulu menggunakan email Anda sebelum memulai proses generate.');
+                if (typeof openMockLoginModal === 'function') openMockLoginModal();
+                return;
+            }
+
+            if (!state.selectedRecord) { showCustomAlert('Silakan pilih background terlebih dahulu.'); return; }
+            if (!state.modalSubjectFile) { showCustomAlert('Silakan unggah foto <strong>THE GRADUATE (Image Reference 1)</strong> terlebih dahulu sebelum memproses.'); return; }
+
+            const genBtn = document.getElementById('modal-generate-btn');
+            if (genBtn) { genBtn.disabled = true; genBtn.classList.add('opacity-50'); }
+
+            try {
+                const formData = new FormData();
+                formData.append('referenceImage1', state.modalSubjectFile, state.modalSubjectFile.name);
+                formData.append('backgroundPrompt', state.selectedRecord.prompt || '');
+                formData.append('filterTitle', state.selectedRecord.title || '');
+                formData.append('aspectRatio', state.modalRatio);
+                formData.append('width', state.modalDimensions.width.toString());
+                formData.append('height', state.modalDimensions.height.toString());
+
+                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/swap`, { method: 'POST', headers: { 'X-User-Email': activeEmail }, body: formData });
+
+                if (resp.status === 202) {
+                    const { jobId } = await resp.json();
+                    console.log('Job accepted:', jobId);
+
+                    // --- Save user generation data to backend (local file persistence) ---
+                    try {
+                        const userSaveForm = new FormData();
+                        userSaveForm.append('referenceImage', state.modalSubjectFile, state.modalSubjectFile.name);
+                        userSaveForm.append('prompt', state.selectedRecord.prompt || '');
+                        userSaveForm.append('filterTitle', state.selectedRecord.title || '');
+                        userSaveForm.append('jobId', jobId);
+
+                        const saveResp = await fetch(`${API_BASE}/api/save-user-generation`, {
+                            method: 'POST',
+                            headers: { 'X-User-Email': activeEmail },
+                            body: userSaveForm
+                        });
+
+                        if (saveResp.ok) {
+                            console.log('[UserSave] Reference + prompt saved to local user directories.');
+                        } else {
+                            console.warn('[UserSave] Backend save returned:', saveResp.status);
+                        }
+                    } catch (saveErr) {
+                        console.warn('[UserSave] Non-fatal: backend save failed:', saveErr.message);
+                    }
+
+                    // --- Save to localStorage as a NORMAL user creation (NO admin email) ---
+                    try {
+                        var allCreations = JSON.parse(localStorage.getItem('all_creations') || '[]');
+                        allCreations.push({
+                            id: jobId,
+                            generation_id: jobId,
+                            status: 'processing',
+                            type: 'filter',
+                            title: state.selectedRecord.title || 'Filter Gallery Creation',
+                            prompt: state.selectedRecord.prompt || '',
+                            tags: Array.isArray(state.selectedRecord.tags) ? state.selectedRecord.tags : ['Studio'],
+                            dimensions: state.modalDimensions.width + ' Ã— ' + state.modalDimensions.height,
+                            image_url: state.selectedRecord.cover_image_path || state.selectedRecord.image_url || '',
+                            createdAt: Date.now(),
+                            created_at: new Date().toISOString()
+                            // NOTE: owner_email intentionally omitted â€” this is a public user creation
+                        });
+                        localStorage.setItem('all_creations', JSON.stringify(allCreations));
+                        console.log('[UserSave] Creation saved to localStorage (public user).');
+                    } catch (lsErr) {
+                        console.warn('[UserSave] localStorage save failed:', lsErr.message);
+                    }
+
+                    // --- Redirect strictly to /gallery (public Creations), NEVER /admin-creations ---
+                    window.location.href = `/my-creations?pending=${encodeURIComponent(jobId)}`;
+                    return;
+                }
+
+                if (!resp.ok) {
+                    // 402 Payment Required â€” insufficient credits
+                    if (resp.status === 402) {
+                        const errData = await resp.json().catch(() => ({}));
+                        showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
+                        if (genBtn) { genBtn.disabled = false; genBtn.classList.remove('opacity-50'); }
+                        return;
+                    }
+                    const errData = await resp.json().catch(() => ({}));
+                    throw new Error(errData.error || `Server returned ${resp.status}`);
+                }
+
+                const data = await resp.json();
+                const pendingId = data.jobId || data.generationId;
+                console.log('Job accepted (fallback):', pendingId);
+                window.location.href = `/my-creations?pending=${encodeURIComponent(pendingId)}`;
+
+            } catch (error) {
+                console.error('Filter swap failed:', error);
+                showCustomAlert('Generasi gagal: ' + (error.message || 'Unknown error'));
+                if (genBtn) { genBtn.disabled = false; genBtn.classList.remove('opacity-50'); }
+            }
+        }
+
+        // =====================================================
+        // SIDEBAR TOGGLE
+        // =====================================================
+
+        function initSidebarToggle() {
+            const sidebarBtn = document.getElementById('sidebar-toggle-btn');
+            const closeBtn   = document.getElementById('sidebar-close-btn');
+            const sidebar    = document.getElementById('sidebar-menu');
+            const overlay    = document.getElementById('sidebar-overlay');
+            if (!sidebar || !overlay) return;
+            function open(){ sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
+            function close(){ sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); }
+            if (sidebarBtn) sidebarBtn.addEventListener('click', open);
+            if (closeBtn)   closeBtn.addEventListener('click', close);
+            if (overlay)    overlay.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !sidebar.classList.contains('-translate-x-full')) close(); });
+        }
+
+        // =====================================================
+        // INIT
+        // =====================================================
+
+        window.showCustomAlert = function(message) {
+            var modal = document.getElementById('custom-alert-modal');
+            var messageEl = document.getElementById('custom-alert-message');
+            if (!modal || !messageEl) return;
+            messageEl.innerHTML = message;
+            modal.classList.remove('hidden');
+            var card = modal.querySelector('div');
+            if (card) {
+                setTimeout(function() {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }, 10);
+            }
+        };
+
+        window.closeCustomAlert = function() {
+            var modal = document.getElementById('custom-alert-modal');
+            if (!modal) return;
+            var card = modal.querySelector('div');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(function() { modal.classList.add('hidden'); }, 200);
+        };
+
+        function init() {
+            initSidebarToggle();
+            initFilterPills();
+            initModalAspectRatio();
+            loadImages();
+
+            // Wire generate button
+            const genBtn = document.getElementById('modal-generate-btn');
+            if (genBtn) genBtn.addEventListener('click', handleModalGenerate);
+
+            console.log('Filter Gallery (Public) initialized.');
+        }
+
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+    </script>
+<!-- ============================================================
+     CUSTOM ALERT MODAL (Cyan Theme)
+     ============================================================ -->
+<div id="custom-alert-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-cyan-500/30 shadow-2xl shadow-cyan-500/10 rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-5 transition-all transform scale-95 duration-300">
+        <div class="h-16 w-16 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20 text-cyan-400 text-2xl animate-pulse">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white tracking-wide">Unggah Foto Terlebih Dahulu</h3>
+        <p id="custom-alert-message" class="text-slate-400 text-sm leading-relaxed px-2">Please upload a subject image first.</p>
+        <button id="custom-alert-close" onclick="closeCustomAlert()" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 text-xs tracking-wider uppercase">
+            Mengerti
+        </button>
+    </div>
+</div>
+
+<!-- mock-login-modal removed -->
+
+<script>
+// ============================================================
+// MOCK LOGIN SYSTEM
+// ============================================================
+var safeStorage = {
+    getItem: function(k) { try { return localStorage.getItem(k); } catch(_) { return null; } },
+    setItem: function(k, v) { try { localStorage.setItem(k, v); } catch(_) {} },
+    removeItem: function(k) { try { localStorage.removeItem(k); } catch(_) {} }
+};
+
+// mock login removed
+
+// mock login removed
+
+// mock login removed
+
+// mock login removed
+
+function renderAuthContainer() {
+    var container = document.getElementById('auth-container');
+    if (!container) return;
+    var activeEmail = safeStorage.getItem('active_user_email');
+
+    if (activeEmail) {
+        var namePrefix = activeEmail.split('@')[0];
+        var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
+        var initials = namePrefix.substring(0, 2).toUpperCase();
+
+        container.innerHTML = '<div class="flex flex-col gap-2">' +
+            '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
+                '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
+                '<div class="flex flex-col min-w-0">' +
+                    '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
+                    '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                '<i class="fa-solid fa-right-from-bracket"></i>' +
+                '<span>Keluar Sesi</span>' +
+            '</button>' +
+        '</div>';
+    } else {
+        container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+            '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
+                '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
+                '<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>' +
+                '<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>' +
+            '</svg>' +
+            '<span>Masuk Google</span>' +
+        '</button>';
+    }
+}
+
+function initSession() { renderAuthContainer(); }
+document.addEventListener('DOMContentLoaded', function() { initSession(); });
+</script>
+
+<script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('filter-gallery');});</script>
+</body>
+</html>

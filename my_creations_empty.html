@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>My Creations â€” fotowisuda.ai</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: { extend: { colors: {
+      "surface-background":"#0A0C10","surface-card":"#161B22","border-subtle":"#30363D",
+      "text-primary":"#F0F6FC","text-secondary":"#8B949E","electric-cyan":"#00D1FF","vivid-purple":"#9D5BFF"
+    }}}
+  };
+</script>
+<style>
+  html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0;overflow-x:hidden}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:24px}
+  @media(min-width:768px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
+  .card{background:#161B22;border:1px solid #30363D;border-radius:16px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s}
+  .card:hover{box-shadow:0 4px 20px rgba(0,209,255,0.15)}
+  .card-img-wrap{position:relative;width:100%;padding-bottom:133.33%;background:#0a0c10}
+  .card-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+  .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;text-align:center;color:#8B949E;grid-column:1/-1}
+  .empty i{font-size:48px;margin-bottom:16px;opacity:0.4}
+  .empty h3{font-size:18px;font-weight:700;color:#c4b5fd;margin:0 0 8px 0}
+  .empty p{font-size:14px;max-width:400px;line-height:1.5;margin:0 0 24px 0}
+  .empty .email{color:#00D1FF;font-weight:600}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;text-decoration:none;transition:all 0.2s}
+  .btn-primary{background:linear-gradient(135deg,#9D5BFF,#00D1FF);color:#fff}
+  .btn-primary:hover{box-shadow:0 0 24px rgba(157,91,255,0.3);transform:translateY(-1px)}
+  .btn-outline{background:transparent;border:1px solid #30363D;color:#8B949E}
+  .btn-outline:hover{border-color:#9D5BFF;color:#c4b5fd}
+  .preview-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:16px}
+  .preview-overlay.active{display:flex}
+  .preview-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(30,32,36,0.8);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+  .preview-nav:hover{background:rgba(30,32,36,1)}
+  .preview-nav.prev{left:16px} .preview-nav.next{right:16px}
+  .preview-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(30,32,36,0.8);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .preview-counter{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(30,32,36,0.8);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{width:40px;height:40px;border:3px solid #30363D;border-top-color:#9D5BFF;border-radius:50%;animation:spin 0.8s linear infinite}
+
+  /* â”€â”€ Processing Card Animations â”€â”€ */
+  @keyframes shimmer{
+    0%{transform:translateX(-100%)}
+    100%{transform:translateX(100%)}
+  }
+  @keyframes processingPulse{
+    0%,100%{border-color:#30363D;box-shadow:0 0 0 rgba(0,209,255,0)}
+    50%{border-color:rgba(0,209,255,0.35);box-shadow:0 0 16px rgba(0,209,255,0.08)}
+  }
+  @keyframes dotGlow{
+    0%,100%{opacity:0.5;transform:scale(1)}
+    50%{opacity:1;transform:scale(1.3)}
+  }
+  @keyframes gradientFlow{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+  @keyframes cardReveal{
+    0%{opacity:0;transform:scale(0.95)}
+    100%{opacity:1;transform:scale(1)}
+  }
+  @keyframes iconSpin{
+    0%{transform:rotate(0deg)}
+    100%{transform:rotate(360deg)}
+  }
+  @keyframes pendingResolve{
+    0%{opacity:1;transform:scale(1)}
+    100%{opacity:0;transform:scale(0.93) translateY(-8px)}
+  }
+
+  .processing-card{
+    background:#161B22;
+    border:1px solid #30363D;
+    border-radius:16px;
+    overflow:hidden;
+    animation:processingPulse 2.5s ease-in-out infinite;
+    pointer-events:none;
+    cursor:default;
+  }
+  .processing-card.resolving{
+    animation:pendingResolve 0.5s ease-out forwards;
+  }
+  .processing-card.error{
+    border-color:rgba(255,180,171,0.4)!important;
+    animation:none;
+  }
+  .processing-card.stale{
+    border-color:rgba(251,191,36,0.4)!important;
+    animation:none;
+    cursor:pointer;
+  }
+
+  .processing-placeholder{
+    position:relative;
+    width:100%;
+    padding-bottom:133.33%;
+    background:linear-gradient(135deg,#0c0e12,#111318,#0c0e12);
+    background-size:200% 200%;
+    animation:gradientFlow 4s ease infinite;
+    overflow:hidden;
+  }
+  .processing-placeholder .grid-bg{
+    position:absolute;inset:0;opacity:0.04;
+    background-image:radial-gradient(#00D1FF 0.5px,transparent 0.5px);
+    background-size:20px 20px;
+  }
+  .shimmer-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.04) 40%,rgba(255,255,255,0.07) 50%,rgba(255,255,255,0.04) 60%,transparent 100%);
+    animation:shimmer 2s ease-in-out infinite;
+  }
+  .processing-indicator{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:2;
+  }
+  .processing-icon-wrap{
+    width:52px;height:52px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#00D1FF,#9D5BFF,#00D1FF);
+    background-size:200% 200%;
+    animation:gradientFlow 3s ease infinite;
+    padding:2px;
+    margin-bottom:12px;
+  }
+  .processing-icon-inner{
+    width:100%;height:100%;
+    border-radius:50%;
+    background:#0c0e12;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .processing-icon-inner i{
+    font-size:20px;
+    color:#00D1FF;
+    animation:iconSpin 3s linear infinite;
+  }
+  .processing-label{
+    font-size:13px;font-weight:600;color:#00D1FF;
+    letter-spacing:0.02em;
+  }
+  .processing-sub{
+    font-size:10px;color:#8B949E;margin-top:4px;
+  }
+
+  .card-status-bar{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 12px;
+  }
+  .card-status-bar .dot{
+    width:7px;height:7px;
+    border-radius:50%;
+    background:#00D1FF;
+    animation:dotGlow 1.5s ease-in-out infinite;
+  }
+  .card-status-bar .dot.error-dot{
+    background:#ffb4ab;
+    animation:none;
+  }
+  .card-status-bar .type-label{
+    font-size:11px;color:#8B949E;font-weight:500;
+  }
+  .card-status-bar .timer{
+    font-size:10px;color:rgba(0,209,255,0.6);
+    font-family:monospace;
+    margin-left:auto;
+  }
+  .card-status-bar .fail-label{
+    font-size:10px;color:#ffb4ab;
+    margin-left:auto;
+    cursor:pointer;
+  }
+  .card-status-bar .fail-label:hover{
+    text-decoration:underline;
+  }
+</style>
+<script src="/sidebar.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header style="display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #30363D;background:#0B0F19;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button id="sidebar-toggle-btn" style="background:none;border:none;color:#8B949E;cursor:pointer;padding:4px;" onclick="toggleSidebar()">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <span style="font-size:20px;font-weight:700;color:#fff;">fotowisuda.ai</span>
+  </div>
+  <span style="font-size:11px;color:#8B949E;" id="user-badge">â€”</span>
+</header>
+
+<!-- MAIN -->
+<main style="min-height:calc(100vh - 57px);padding:24px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin:0;">My Creations</h2>
+      <p style="color:#8B949E;font-size:13px;margin:4px 0 0 0;"><span id="gallery-count" style="color:#00D1FF;font-weight:700;">â€”</span> Generations stored</p>
+    </div>
+    <button onclick="loadGallery()" style="background:#161B22;border:1px solid #30363D;color:#8B949E;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;">Refresh</button>
+  </div>
+  <div id="gallery-status" style="text-align:center;padding:32px;color:#8B949E;">
+    <div class="spinner" style="margin:0 auto 16px;"></div>
+    <p>Loading...</p>
+  </div>
+  <div class="grid" id="creations-grid"></div>
+</main>
+
+<!-- PREVIEW OVERLAY -->
+<div class="preview-overlay" id="preview-overlay" onclick="closePreview()">
+  <button class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
+  <button class="preview-nav prev" onclick="event.stopPropagation();navPreview(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+  <button class="preview-nav next" onclick="event.stopPropagation();navPreview(1)"><i class="fa-solid fa-chevron-right"></i></button>
+  <span class="preview-counter" id="preview-counter">â€”</span>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:100%;max-height:100%;" onclick="event.stopPropagation()">
+    <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:16px;">
+    <div style="display:flex;gap:12px;">
+      <a id="preview-dl" href="" download class="btn btn-primary"><i class="fa-solid fa-download"></i> Download</a>
+      <button class="btn btn-outline" onclick="deleteCurrentPreview()" style="color:#ffb4ab;border-color:rgba(255,180,171,0.3);"><i class="fa-solid fa-trash-can"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="preview-overlay" id="confirm-modal" onclick="cancelDelete()">
+  <div style="background:#161B22;border:1px solid #30363D;border-radius:20px;padding:24px;max-width:360px;width:90%;text-align:center;" onclick="event.stopPropagation()">
+    <div style="width:48px;height:48px;background:rgba(255,180,171,0.1);border:1px solid rgba(255,180,171,0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#ffb4ab;font-size:22px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 4px;">Hapus Kreasi?</h3>
+    <p style="font-size:13px;color:#8B949E;margin:0 0 20px;line-height:1.5;">Gambar ini akan dihapus secara permanen dan tidak dapat dikembalikan.</p>
+    <div style="display:flex;gap:8px;">
+      <button onclick="cancelDelete()" style="flex:1;background:transparent;border:1px solid #30363D;color:#8B949E;padding:10px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Batal</button>
+      <button onclick="confirmDelete()" style="flex:1;background:#b91c1c;border:none;color:#fff;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+
+
+<script>
+// ============================================================
+// SIMPLE, DIRECT GALLERY â€” no IIFE closures, no Tailwind tricks
+// ============================================================
+var _creations = [];
+var _previewIdx = -1;
+var _pollTimers = {};       // active polling timers per generationId
+var _stopwatchTimers = {};  // active stopwatch timers per generationId
+
+function getEmail() {
+  var e = localStorage.getItem('active_user_email') || '';
+  if (!e) { var p = new URLSearchParams(location.search); e = p.get('email') || ''; }
+  return e;
+}
+
+function renderAuth() {
+  var c = document.getElementById('auth-container');
+  if (!c) return;
+  var email = getEmail();
+  if (email) {
+    var name = email.split('@')[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    var init = name.substring(0,2).toUpperCase();
+    c.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0c10;border:1px solid #30363D;border-radius:10px;">'+
+        '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00D1FF,#9D5BFF);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">'+init+'</div>'+
+        '<div style="min-width:0;"><div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+name+'</div><div style="font-size:9px;color:#8B949E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+email+'</div></div>'+
+      '</div>'+
+      '<button onclick="doLogout()" style="width:100%;padding:8px;background:rgba(255,180,171,0.1);border:1px solid rgba(255,180,171,0.2);color:#ffb4ab;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi</button>'+
+    '</div>';
+  } else {
+    c.innerHTML = '<button onclick="openLogin()" style="width:100%;padding:10px;background:#0a0c10;border:1px solid #30363D;color:#c4b5fd;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">'+
+      '<i class="fa-solid fa-right-to-bracket"></i> Masuk Sesi</button>';
+  }
+  var badge = document.getElementById('user-badge');
+  if (badge) badge.textContent = email || 'Guest';
+}
+
+function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  if (email && email.indexOf('@')!==-1) {
+    try { localStorage.setItem('active_user_email', email); } catch(_) {}
+    closeLogin();
+    renderAuth();
+    loadGallery();
+  }
+}
+function openLogin() { var m = document.getElementById('login-modal'); if (m) m.style.display = 'flex'; }
+function closeLogin() { var m = document.getElementById('login-modal'); if (m) m.style.display = 'none'; }
+function doLogout() { try { localStorage.removeItem('active_user_email'); } catch(_) {} location.reload(); }
+
+async function loadGallery() {
+  var grid = document.getElementById('creations-grid');
+  var status = document.getElementById('gallery-status');
+  var count = document.getElementById('gallery-count');
+  if (!grid) return;
+  var email = getEmail();
+
+  if (!email) {
+    grid.innerHTML = '<div class="empty">'+
+      '<i class="fa-solid fa-lock"></i>'+
+      '<h3>Silakan Masuk Sesi</h3>'+
+      '<p>Masuk sesi terlebih dahulu menggunakan email Anda untuk melihat hasil kreasi foto wisuda.</p>'+
+      '<button class="btn btn-primary" onclick="openLogin()"><i class="fa-solid fa-right-to-bracket"></i> Masuk Sesi</button>'+
+    '</div>';
+    if (status) status.style.display = 'none';
+    if (count) count.textContent = '0';
+    return;
+  }
+
+  if (status) status.style.display = 'block';
+  try {
+    var resp = await fetch('/api/user-creations?email=' + encodeURIComponent(email));
+    var data = await resp.json();
+    _creations = data;
+    if (count) count.textContent = data.length;
+    if (status) status.style.display = 'none';
+
+    if (data.length === 0) {
+      // Clear grid — defer empty-state decision until after mergeProcessingCards()
+      grid.innerHTML = '';
+    } else {
+      var html = '';
+      for (var i = 0; i < data.length; i++) {
+        html += '<div class="card" onclick="openPreview('+i+')">'+
+          '<div class="card-img-wrap"><img src="'+data[i].url+'" alt="'+data[i].name+'" onerror="this.parentElement.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#5c6370;font-size:40px;>?</div>\'"></div>'+
+        '</div>';
+      }
+      grid.innerHTML = html;
+    }
+  } catch(e) {
+    if (status) { status.innerHTML = '<p style="color:#ffb4ab;">Error: '+e.message+'</p>'; status.style.display = 'block'; }
+  }
+
+  // â”€â”€ Merge processing items from localStorage + URL pending param â”€â”€
+    mergeProcessingCards();
+
+  // Deferred empty-state: only show if truly nothing to display
+  if (_creations.length === 0 && !grid.querySelector('.processing-card') && !grid.querySelector('.card')) {
+    var curEmail = getEmail();
+    grid.innerHTML = '<div class="empty">'+
+      '<i class="fa-solid fa-wand-magic-sparkles" style="color:#9D5BFF;"></i>'+
+      '<h3>Belum Ada Hasil Kreasi</h3>'+
+      '<p>Sesi email <span class="email">'+curEmail+'</span> berhasil tersambung secara terisolasi. Galeri Anda masih bersih! Mulai buat foto wisuda impian Anda sekarang.</p>'+
+      '<a href="/swap-bg" class="btn btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Mulai Berkreasi</a>'+
+    '</div>';
+  }
+}
+
+// ============================================================
+// PROCESSING CARD RENDERING & POLLING
+// ============================================================
+
+function getJobTypeLabel(genId) {
+  if (genId.indexOf('bgswapc_')===0)  return 'Background Change by Claude';
+  if (genId.indexOf('bgswap_')===0)   return 'Background Change';
+  if (genId.indexOf('dresswap_')===0) return 'Dress Replicate';
+  if (genId.indexOf('agfilter_')===0) return 'Filter Gallery';
+  if (genId.indexOf('gen_')===0)      return 'Filter Gallery Factory';
+  return 'Processing';
+}
+
+function getStatusEndpoint(genId) {
+  if (genId.indexOf('bgswap_')===0)   return '/api/background-swap/status/';
+  if (genId.indexOf('bgswapc_')===0)  return '/api/background-swap/status/';
+  if (genId.indexOf('dresswap_')===0) return '/api/dress-swap/status/';
+  if (genId.indexOf('agfilter_')===0) return '/api/admin-gallery-filter/status/';
+  return '/api/status/';
+}
+
+function formatTimer(ms) {
+  var totalSec = Math.floor(ms / 1000);
+  var min = Math.floor(totalSec / 60);
+  var sec = totalSec % 60;
+  var cs = Math.floor((ms % 1000) / 10);
+  return (min<10?'0'+min:min) + ':' + (sec<10?'0'+sec:sec) + '.' + (cs<10?'0'+cs:cs);
+}
+
+var _statusMessages = [
+  { atSec:0,   status:'Menganalisa struktur wajah kamuâ€¦', sub:'AI sedang mendeteksi fitur wajah dari foto referensi' },
+  { atSec:20,  status:'Menyelaraskan kebaya/toga wisudaâ€¦', sub:'Menyesuaikan pose & busana dengan latar tujuan' },
+  { atSec:60,  status:'Menata pencahayaan latar studioâ€¦', sub:'Mengomposisikan tata cahaya & bayangan natural' },
+  { atSec:120, status:'Sentuhan akhir â€” siap meluncur!', sub:'Merender hasil akhir dalam kualitas HD penuh' }
+];
+
+function getStatusMessage(elapsedMs) {
+  var sec = elapsedMs / 1000;
+  var msg = _statusMessages[0];
+  for (var i = _statusMessages.length-1; i >= 0; i--) {
+    if (sec >= _statusMessages[i].atSec) { msg = _statusMessages[i]; break; }
+  }
+  return msg;
+}
+
+function buildProcessingCardHtml(item) {
+  var genId = item.generation_id || item.id;
+  var typeLabel = item.title || getJobTypeLabel(genId);
+  return '<div class="processing-card" data-generation-id="'+genId+'" data-type="'+item.type+'">'+
+    '<div class="processing-placeholder">'+
+      '<div class="grid-bg"></div>'+
+      '<div class="shimmer-overlay"></div>'+
+      '<div class="processing-indicator">'+
+        '<div class="processing-icon-wrap" id="spinner-'+genId+'">'+
+          '<div class="processing-icon-inner">'+
+            '<i class="fa-solid fa-wand-magic-sparkles"></i>'+
+          '</div>'+
+        '</div>'+
+        '<span class="processing-label" id="status-'+genId+'">Menganalisa struktur wajah kamuâ€¦</span>'+
+        '<span class="processing-sub" id="sub-'+genId+'">AI sedang mendeteksi fitur wajah dari foto referensi</span>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card-status-bar">'+
+      '<span class="dot" id="dot-'+genId+'"></span>'+
+      '<span class="type-label">'+typeLabel+'</span>'+
+      '<span class="timer" id="timer-'+genId+'">00:00.00</span>'+
+    '</div>'+
+  '</div>';
+}
+
+function getProcessingItems() {
+  try {
+    var raw = localStorage.getItem('all_creations');
+    if (!raw) return [];
+    var queue = JSON.parse(raw);
+    var now = Date.now();
+    var STALE_MS = 10 * 60 * 1000; // 10 min
+    var active = [];
+    var changed = false;
+    for (var i = 0; i < queue.length; i++) {
+      if (queue[i].status === 'processing') {
+        // prune stale entries
+        if (queue[i].createdAt && (now - queue[i].createdAt) > STALE_MS) {
+          queue[i].status = 'failed';
+          changed = true;
+          continue;
+        }
+        active.push(queue[i]);
+      }
+    }
+    if (changed) {
+      try { localStorage.setItem('all_creations', JSON.stringify(queue)); } catch(_) {}
+    }
+    return active;
+  } catch(_) { return []; }
+}
+
+function mergeProcessingCards() {
+  var grid = document.getElementById('creations-grid');
+  if (!grid) return;
+
+  // Remove any existing processing cards (to re-render fresh)
+  var existing = grid.querySelectorAll('.processing-card');
+  for (var i = 0; i < existing.length; i++) { existing[i].remove(); }
+
+  var processingItems = getProcessingItems();
+
+  // Deduplicate: skip items already in _creations (completed)
+  var completedIds = {};
+  for (var c = 0; c < _creations.length; c++) {
+    var cid = _creations[c].id || _creations[c].generation_id;
+    if (cid) completedIds[cid] = true;
+    // also check by stripped name
+    var name = _creations[c].name || '';
+    if (name) completedIds[name] = true;
+  }
+
+  for (var p = 0; p < processingItems.length; p++) {
+    var pid = processingItems[p].generation_id || processingItems[p].id;
+    if (completedIds[pid]) continue; // already completed
+    if (_pollTimers[pid]) continue;  // already polling
+
+    var cardHtml = buildProcessingCardHtml(processingItems[p]);
+    grid.insertAdjacentHTML('afterbegin', cardHtml);
+    startProcessingPoll(pid, processingItems[p].createdAt || null);
+  }
+
+  // Handle ?pending= URL param
+  var params = new URLSearchParams(location.search);
+  var pendingId = params.get('pending');
+  if (pendingId && !_pollTimers[pendingId]) {
+    // Check if not already completed
+    if (!completedIds[pendingId]) {
+      // ensure card exists
+      if (!grid.querySelector('[data-generation-id="'+pendingId+'"]')) {
+        var pendingItem = { generation_id: pendingId, id: pendingId, type: 'unknown', title: getJobTypeLabel(pendingId) };
+        var html = buildProcessingCardHtml(pendingItem);
+        grid.insertAdjacentHTML('afterbegin', html);
+      }
+      startProcessingPoll(pendingId, null);
+    }
+  }
+
+  // Update count
+  updateGalleryCount();
+}
+
+function updateGalleryCount() {
+  var count = document.getElementById('gallery-count');
+  if (!count) return;
+  var grid = document.getElementById('creations-grid');
+  var processingCards = grid ? grid.querySelectorAll('.processing-card').length : 0;
+  var total = _creations.length + processingCards;
+  count.textContent = total;
+}
+
+function startProcessingPoll(generationId, serverCreatedAt) {
+  if (_pollTimers[generationId]) return;
+
+  var cardEl = document.querySelector('[data-generation-id="'+generationId+'"]');
+  if (!cardEl) return;
+
+  var barEl     = cardEl.querySelector('.processing-placeholder'); // we use the whole placeholder for progress visual
+  var statusEl  = document.getElementById('status-'+generationId);
+  var subEl     = document.getElementById('sub-'+generationId);
+  var spinnerEl = document.getElementById('spinner-'+generationId);
+  var dotEl     = document.getElementById('dot-'+generationId);
+  var timerEl   = document.getElementById('timer-'+generationId);
+
+  var startHr = performance.now();
+  var baseOffsetMs = serverCreatedAt ? Math.max(0, Date.now() - serverCreatedAt) : 0;
+  if (baseOffsetMs > 0 && timerEl) {
+    timerEl.textContent = formatTimer(baseOffsetMs);
+  }
+
+  // â”€â”€ Stopwatch tick (every 100ms) â”€â”€
+  _stopwatchTimers[generationId] = setInterval(function() {
+    var elapsed = baseOffsetMs + (performance.now() - startHr);
+    if (timerEl) timerEl.textContent = formatTimer(elapsed);
+  }, 100);
+
+  var POLL_INTERVAL = 3000;
+  var MAX_TIME = 360000; // 6 min
+  var pollAttempts = 0;
+
+  _pollTimers[generationId] = setInterval(function() {
+    pollAttempts++;
+    var elapsed = baseOffsetMs + (performance.now() - startHr);
+
+    // â”€â”€ Timeout check â”€â”€
+    if (elapsed > MAX_TIME) {
+      clearTimers(generationId);
+      if (statusEl) { statusEl.textContent = 'Waktu Habis'; statusEl.style.color = '#ffb4ab'; }
+      if (subEl)    { subEl.textContent = 'Proses melebihi batas 6 menit. Silakan coba lagi.'; }
+      if (dotEl)    { dotEl.classList.add('error-dot'); }
+      if (spinnerEl) spinnerEl.style.display = 'none';
+      markProcessingFailed(generationId);
+      setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); }, 8000);
+      return;
+    }
+
+    // â”€â”€ Stale check (5 min based on server time) â”€â”€
+    if (serverCreatedAt && (Date.now() - serverCreatedAt) > 300000) {
+      clearTimers(generationId);
+      if (statusEl) { statusEl.textContent = 'Gagal Memproses'; statusEl.style.color = '#fbbf24'; }
+      if (subEl)    { subEl.textContent = 'Klik untuk hapus'; }
+      if (dotEl)    { dotEl.classList.add('error-dot'); dotEl.style.background = '#fbbf24'; }
+      if (timerEl)  timerEl.textContent = '--:--.--';
+      if (spinnerEl) spinnerEl.style.display = 'none';
+      cardEl.classList.add('stale');
+      cardEl.style.cursor = 'pointer';
+      cardEl.addEventListener('click', function() {
+        cardEl.style.opacity = '0';
+        cardEl.style.transition = 'opacity 0.4s';
+        setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); updateGalleryCount(); }, 400);
+      });
+      markProcessingFailed(generationId);
+      return;
+    }
+
+    // â”€â”€ Progressive status messages â”€â”€
+    var msg = getStatusMessage(elapsed);
+    if (statusEl) statusEl.textContent = msg.status;
+    if (subEl)    subEl.textContent    = msg.sub;
+
+    // â”€â”€ Fetch real status â”€â”€
+    var endpoint = getStatusEndpoint(generationId) + generationId;
+    fetch(endpoint).then(function(r) { return r.json(); }).then(function(data) {
+      var status = data.status;
+      if (!status) return;
+
+      if (status === 'COMPLETE') {
+        clearTimers(generationId);
+        if (statusEl) statusEl.textContent = 'Selesai!';
+        if (subEl)    subEl.textContent    = 'Memuat hasil akhirâ€¦';
+        if (spinnerEl) spinnerEl.style.display = 'none';
+        if (dotEl)    { dotEl.style.background = '#22c55e'; dotEl.style.animation = 'none'; }
+
+        setTimeout(function() {
+          cardEl.classList.add('resolving');
+          setTimeout(function() {
+            if (cardEl.parentNode) cardEl.remove();
+            updateGalleryCount();
+            loadGallery();
+            // Remove from localStorage
+            removeProcessingItem(generationId);
+            // Clean URL
+            if (window.location.search.indexOf('pending=')!==-1) {
+              var u = new URL(window.location);
+              u.searchParams.delete('pending');
+              window.history.replaceState({}, '', u.toString());
+            }
+          }, 500);
+        }, 800);
+      } else if (status === 'FAILED') {
+        clearTimers(generationId);
+        if (statusEl) { statusEl.textContent = 'Gagal â€” Error Server'; statusEl.style.color = '#ffb4ab'; }
+        if (subEl)    { subEl.textContent = data.error || 'Terjadi kesalahan di server'; }
+        if (dotEl)    { dotEl.classList.add('error-dot'); }
+        if (timerEl)  timerEl.textContent = '--:--.--';
+        if (spinnerEl) spinnerEl.style.display = 'none';
+        cardEl.classList.add('error');
+        markProcessingFailed(generationId);
+        setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); updateGalleryCount(); }, 10000);
+      }
+    }).catch(function() {
+      // Network glitch â€” retry next interval
+    });
+  }, POLL_INTERVAL);
+}
+
+function clearTimers(generationId) {
+  if (_pollTimers[generationId])      { clearInterval(_pollTimers[generationId]);      delete _pollTimers[generationId]; }
+  if (_stopwatchTimers[generationId]) { clearInterval(_stopwatchTimers[generationId]); delete _stopwatchTimers[generationId]; }
+}
+
+function removeProcessingItem(generationId) {
+  try {
+    var raw = localStorage.getItem('all_creations');
+    if (!raw) return;
+    var queue = JSON.parse(raw);
+    var changed = false;
+    for (var i = queue.length-1; i >= 0; i--) {
+      if ((queue[i].generation_id || queue[i].id) === generationId && queue[i].status === 'processing') {
+        queue.splice(i, 1);
+        changed = true;
+      }
+    }
+    if (changed) { localStorage.setItem('all_creations', JSON.stringify(queue)); }
+  } catch(_) {}
+}
+
+function markProcessingFailed(generationId) {
+  try {
+    var raw = localStorage.getItem('all_creations');
+    if (!raw) return;
+    var queue = JSON.parse(raw);
+    var changed = false;
+    for (var i = 0; i < queue.length; i++) {
+      if ((queue[i].generation_id || queue[i].id) === generationId && queue[i].status === 'processing') {
+        queue[i].status = 'failed';
+        changed = true;
+      }
+    }
+    if (changed) { localStorage.setItem('all_creations', JSON.stringify(queue)); }
+  } catch(_) {}
+}
+
+function openPreview(idx) {
+  if (idx < 0 || idx >= _creations.length) return;
+  _previewIdx = idx;
+  var ov = document.getElementById('preview-overlay');
+  var img = document.getElementById('preview-img');
+  var dl = document.getElementById('preview-dl');
+  var cnt = document.getElementById('preview-counter');
+  if (!ov || !img) return;
+  img.src = _creations[idx].url;
+  if (dl) { dl.href = _creations[idx].url; dl.download = _creations[idx].id || 'creation.jpg'; }
+  if (cnt) cnt.textContent = (idx+1)+' / '+_creations.length;
+  ov.classList.add('active');
+}
+
+function closePreview() {
+  document.getElementById('preview-overlay').classList.remove('active');
+  _previewIdx = -1;
+}
+
+function navPreview(dir) {
+  if (_creations.length === 0) return;
+  _previewIdx = (_previewIdx + dir + _creations.length) % _creations.length;
+  openPreview(_previewIdx);
+}
+
+var _deleteTarget = null;
+
+function deleteCurrentPreview() {
+  if (_previewIdx < 0 || _previewIdx >= _creations.length) return;
+  var item = _creations[_previewIdx];
+  if (!item || !item.id) return;
+  _deleteTarget = item;
+  document.getElementById('confirm-modal').classList.add('active');
+}
+
+function confirmDelete() {
+  if (!_deleteTarget) return;
+  var item = _deleteTarget;
+  document.getElementById('confirm-modal').classList.remove('active');
+  fetch('/api/user-creations/' + encodeURIComponent(item.id), { method: 'DELETE' }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.deleted) {
+      _creations = _creations.filter(function(c){ return c.id !== item.id; });
+      if (_creations.length === 0) { closePreview(); loadGallery(); return; }
+      if (_previewIdx >= _creations.length) _previewIdx = _creations.length - 1;
+      openPreview(_previewIdx);
+      loadGallery();
+    }
+    _deleteTarget = null;
+  }).catch(function(){ _deleteTarget = null; });
+}
+
+function cancelDelete() {
+  document.getElementById('confirm-modal').classList.remove('active');
+  _deleteTarget = null;
+}
+
+document.addEventListener('keydown', function(e) {
+  var ov = document.getElementById('preview-overlay');
+  if (!ov || !ov.classList.contains('active')) return;
+  if (e.key === 'Escape') closePreview();
+  if (e.key === 'ArrowLeft') navPreview(-1);
+  if (e.key === 'ArrowRight') navPreview(1);
+});
+
+var _touchX = 0;
+document.addEventListener('touchstart', function(e) { _touchX = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', function(e) {
+  var ov = document.getElementById('preview-overlay');
+  if (!ov || !ov.classList.contains('active')) return;
+  var dx = e.changedTouches[0].clientX - _touchX;
+  if (Math.abs(dx) > 50) navPreview(dx < 0 ? 1 : -1);
+});
+
+function toggleSidebar() {
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  if (!sb || !ov) return;
+  sb.style.transform = 'translateX(0)';
+  ov.style.display = 'block';
+}
+function closeSidebar() {
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  if (!sb) return;
+  sb.style.transform = 'translateX(-100%)';
+  if (ov) ov.style.display = 'none';
+}
+
+// Init
+renderAuth();
+loadGallery();
+</script>
+<script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('my-creations');});</script>
+</body>
+</html>

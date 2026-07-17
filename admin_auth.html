@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Login Google Admin - fotowisuda.ai</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Efek Gradient Mengalir untuk Tombol Premium */
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradientFlow 4s ease infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex overflow-hidden">
+
+    <!-- SIDEBAR NAVIGASI (Sisi Kiri) -->
+    <aside class="w-80 bg-slate-900/60 border-r border-slate-800/80 p-5 flex flex-col justify-between shrink-0">
+
+        <!-- Bagian Atas Sidebar -->
+        <div class="flex flex-col gap-6">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5 px-2">
+                <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+                    fotowisuda.ai
+                </span>
+                <span class="px-2 py-0.5 bg-slate-800 border border-slate-700/60 rounded-md text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                    V2.5
+                </span>
+            </div>
+
+            <!-- Menu Navigation -->
+            <nav class="flex flex-col gap-1.5">
+                <!-- Label Kelompok 1 -->
+                <div class="text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1 px-3">✨ Generators</div>
+
+                <!-- Background Change -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-800/30 hover:bg-slate-800/60 border border-transparent hover:border-slate-800 text-slate-300 hover:text-white transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-cyan-400">
+                        <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                        <path d="M9 19.5l4.5-4.5 5 5" />
+                        <circle cx="17.5" cy="13" r="0.5" fill="currentColor" stroke="none" />
+                        <circle cx="7.5" cy="7.5" r="4.5" />
+                        <path d="M6 7.5h3M7.5 6l1.5 1.5-1.5 1.5" />
+                    </svg>
+                    <span class="text-sm font-semibold">Background Change</span>
+                </a>
+
+                <!-- Dress Replicate -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-800/30 hover:bg-slate-800/60 border border-transparent hover:border-slate-800 text-slate-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-shirt text-cyan-400 w-5 text-center text-base"></i>
+                    <span class="text-sm font-semibold">Dress Replicate</span>
+                </a>
+
+                <!-- Filter Gallery -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-800/30 hover:bg-slate-800/60 border border-transparent hover:border-slate-800 text-slate-300 hover:text-white transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-cyan-400">
+                        <path d="M2 19a1 1 0 0 0 1 1h12a1 1 0 0 0 .8-.4l-5.3-7.1a1.5 1.5 0 0 0-2.4 0L2.2 18.2A1 1 0 0 0 2 19z" />
+                        <path d="M11 19.5h9a1 1 0 0 0 .8-.4l-3.3-4.4a1.5 1.5 0 0 0-2.4 0l-1.3 1.7" />
+                        <circle cx="14" cy="6" r="2" fill="currentColor" stroke="none" />
+                    </svg>
+                    <span class="text-sm font-semibold">Filter Gallery</span>
+                </a>
+
+                <!-- PEMBATAS JARAK 1 -->
+                <div class="my-3 border-t border-slate-800/60"></div>
+
+                <!-- My Creations -->
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-800/30 hover:bg-slate-800/60 border border-transparent hover:border-slate-800 text-slate-300 hover:text-white transition-all">
+                    <i class="fa-solid fa-images text-amber-400 w-5 text-center text-base"></i>
+                    <span class="text-sm font-semibold">My Creations</span>
+                </a>
+
+                <!-- POWER TOOLS (Hanya muncul jika masuk sebagai admin.fotowisuda@gmail.com) -->
+                <div id="admin-menu-section" class="flex flex-col gap-1.5 mt-3 pt-3 border-t border-slate-800/60">
+                    <div class="text-[10px] font-bold text-purple-400 tracking-wider uppercase mb-1 px-3">⚡ Power Tools</div>
+
+                    <!-- Filter Gallery Factory -->
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-950/20 border border-purple-500/10 text-purple-300 hover:bg-purple-900/30 hover:border-purple-500/30 hover:text-purple-100 transition-all">
+                        <i class="fa-solid fa-cubes text-purple-400 w-5 text-center text-base"></i>
+                        <span class="text-sm font-semibold">Filter Gallery Factory</span>
+                    </a>
+
+                    <!-- Filter Gallery Admin -->
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-200 hover:bg-purple-600/30 hover:border-purple-500/50 hover:text-white transition-all shadow-lg shadow-purple-500/5">
+                        <i class="fa-solid fa-sliders text-purple-300 w-5 text-center text-base"></i>
+                        <span class="text-sm font-semibold">Filter Gallery Admin</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+    </aside>
+
+    <!-- WORKSPACE UTAMA (Sisi Kanan) -->
+    <main class="flex-grow p-8 flex flex-col gap-6 overflow-y-auto">
+
+        <!-- HEADER WORKSPACE -->
+        <header class="flex justify-between items-center pb-4 border-b border-slate-800/60">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-white">Filter Gallery Workspace</h1>
+                <p class="text-xs text-slate-400 mt-1">Simulasi area pengelolaan sistem dan kontrol akses filter wisuda.</p>
+            </div>
+            <span class="px-3 py-1 bg-slate-900 border border-slate-800 text-[10px] font-semibold text-slate-300 rounded-full flex items-center gap-2">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
+                <span>Active Preview Mode</span>
+            </span>
+        </header>
+
+        <!-- AREA INTERAKTIF GUEST STATE (Tampil jika belum login) -->
+        <div id="guest-workspace" class="flex-grow flex flex-col items-center justify-center text-center p-8 bg-slate-900/20 border border-dashed border-slate-800 rounded-3xl gap-4">
+            <div class="h-16 w-16 bg-slate-850 rounded-2xl flex items-center justify-center border border-slate-800 text-slate-500 text-2xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-200">Portal Manajemen Terkunci</h3>
+                <p class="text-xs text-slate-500 max-w-sm leading-relaxed mt-1.5 mx-auto">
+                    Halaman admin dan perangkat pembuatan filter hanya dapat diakses oleh Administrator utama menggunakan akun email resmi.
+                </p>
+            </div>
+            <!-- Petunjuk visual login -->
+            <div class="flex items-center gap-2 text-[10px] font-semibold text-purple-400 bg-purple-950/30 border border-purple-500/20 px-3.5 py-1.5 rounded-full animate-pulse mt-1">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Silakan Klik Tombol "Masuk Admin" di Pojok Kiri Bawah</span>
+            </div>
+        </div>
+
+        <!-- AREA INTERAKTIF ADMIN DASHBOARD (Tersembunyi secara default) -->
+        <div id="admin-workspace" class="hidden flex flex-col gap-6">
+            <!-- Banner Selamat Datang -->
+            <div class="p-6 bg-gradient-to-r from-purple-950/40 via-slate-900/60 to-slate-900/40 border border-purple-500/20 rounded-3xl flex items-center justify-between gap-4">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                        <span>Selamat Datang Kembali, Admin!</span>
+                        <span class="animate-bounce">👋</span>
+                    </h2>
+                    <p class="text-xs text-purple-300/80">Sesi Bypass Sandbox Pengembang aktif. Seluruh fitur Power Tools terbuka lebar!</p>
+                </div>
+                <div class="h-12 w-12 bg-purple-500/10 rounded-xl flex items-center justify-center border border-purple-500/20 text-purple-400 text-xl">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+            </div>
+
+            <!-- Grid Metrik Dashboard MOCK -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Card 1 -->
+                <div class="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl flex flex-col gap-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Filter Aktif</span>
+                    <span class="text-2xl font-extrabold text-white">12 Filter</span>
+                    <span class="text-[9px] text-green-400 flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> +2 Baru minggu ini</span>
+                </div>
+                <!-- Card 2 -->
+                <div class="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl flex flex-col gap-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Percobaan AI</span>
+                    <span class="text-2xl font-extrabold text-white">4,812 Kali</span>
+                    <span class="text-[9px] text-green-400 flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> Tingkat keberhasilan 99.4%</span>
+                </div>
+                <!-- Card 3 -->
+                <div class="p-5 bg-slate-900/40 border border-slate-800/60 rounded-2xl flex flex-col gap-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bypass Status</span>
+                    <span class="text-2xl font-extrabold text-purple-400">AKTIF</span>
+                    <span class="text-[9px] text-slate-400 flex items-center gap-1"><i class="fa-solid fa-bug"></i> Sandboxed Environment Ok</span>
+                </div>
+            </div>
+
+            <!-- Simulasi Manajemen Saklar Filter Wisuda -->
+            <div class="p-6 bg-slate-900/20 border border-slate-800/80 rounded-2xl flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-200">Pengaturan On/Off Filter Publik</h3>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Filter yang dinonaktifkan di sini otomatis tersembunyi dari halaman publik.</p>
+                    </div>
+                </div>
+
+                <!-- Daftar Item Filter -->
+                <div class="flex flex-col gap-2.5">
+                    <!-- Item 1: Kursi Bioskop -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-900/50 border border-slate-800/60 rounded-xl hover:border-slate-800 transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 bg-slate-850 rounded-lg overflow-hidden border border-slate-800">
+                                <img src="https://placehold.co/40x40/312e81/ffffff?text=KB" alt="Filter thumbnail" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-white block">Kursi Bioskop</span>
+                                <span class="text-[9px] text-slate-500">Indoor, Strobist • ID: filter-bioskop</span>
+                            </div>
+                        </div>
+                        <!-- Saklar Toggle -->
+                        <label class="relative inline-flex items-center cursor-pointer gap-2.5">
+                            <input type="checkbox" class="sr-only peer" checked data-toggle-id="filter-bioskop" onchange="toggleFilterState(this)">
+                            <div class="w-10 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-slate-900 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-400 after:border-slate-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600 peer-checked:after:bg-white"></div>
+                            <span class="text-[9px] font-bold text-slate-500 peer-checked:text-purple-400 uppercase tracking-wider toggle-label w-6">ON</span>
+                        </label>
+                    </div>
+
+                    <!-- Item 2: Pantai Extreme Long Shot -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-900/50 border border-slate-800/60 rounded-xl hover:border-slate-800 transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 bg-slate-850 rounded-lg overflow-hidden border border-slate-800">
+                                <img src="https://placehold.co/40x40/312e81/ffffff?text=PT" alt="Filter thumbnail" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-white block">Pantai Extreme Long Shot</span>
+                                <span class="text-[9px] text-slate-500">Outdoor, Natural Ambient • ID: filter-pantai</span>
+                            </div>
+                        </div>
+                        <!-- Saklar Toggle -->
+                        <label class="relative inline-flex items-center cursor-pointer gap-2.5">
+                            <input type="checkbox" class="sr-only peer" checked data-toggle-id="filter-pantai" onchange="toggleFilterState(this)">
+                            <div class="w-10 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-slate-900 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-400 after:border-slate-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600 peer-checked:after:bg-white"></div>
+                            <span class="text-[9px] font-bold text-slate-500 peer-checked:text-purple-400 uppercase tracking-wider toggle-label w-6">ON</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- TOAST NOTIFICATION FLOATING -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 border border-purple-500/30 text-slate-200 text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-text">Notifikasi berhasil!</span>
+    </div>
+
+
+</body>
+</html>

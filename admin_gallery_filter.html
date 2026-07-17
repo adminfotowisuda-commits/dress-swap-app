@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Filter Gallery Admin — fotowisuda.ai</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary": "#430089", "on-tertiary-fixed": "#171c23", "tertiary-fixed-dim": "#c2c7d0",
+                            "on-surface-variant": "#bbc9cf", "text-secondary": "#8B949E", "tertiary-fixed": "#dee2ec",
+                            "surface-container": "#1e2024", "inverse-surface": "#e2e2e8", "secondary-container": "#6205c3",
+                            "outline": "#859399", "surface-dim": "#111318", "on-error": "#690005",
+                            "on-error-container": "#ffdad6", "on-tertiary": "#2c3138", "inverse-on-surface": "#2f3035",
+                            "on-background": "#e2e2e8", "outline-variant": "#3c494e", "primary-fixed": "#b7eaff",
+                            "on-tertiary-fixed-variant": "#42474f", "tertiary": "#d8dce6", "surface-variant": "#333539",
+                            "surface-container-lowest": "#0c0e12", "vivid-purple": "#9D5BFF",
+                            "on-secondary-fixed": "#280057", "on-primary-container": "#00566a", "background": "#111318",
+                            "error": "#ffb4ab", "secondary-fixed-dim": "#d6baff", "surface-container-high": "#282a2e",
+                            "on-tertiary-container": "#494e57", "surface-background": "#0A0C10", "secondary-fixed": "#ecdcff",
+                            "primary-container": "#00d1ff", "surface-tint": "#4cd6ff", "surface-card": "#161B22",
+                            "primary-fixed-dim": "#4cd6ff", "secondary": "#d6baff", "on-surface": "#e2e2e8",
+                            "on-secondary-container": "#cba9ff", "surface-container-low": "#1a1c20", "surface-bright": "#37393e",
+                            "on-primary-fixed-variant": "#004e60", "electric-cyan": "#00D1FF",
+                            "tertiary-container": "#bcc0ca", "border-subtle": "#30363D", "surface": "#111318",
+                            "inverse-primary": "#00677f", "primary": "#a4e6ff", "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC", "on-primary-fixed": "#001f28", "on-primary": "#003543",
+                            "error-container": "#93000a", "on-secondary-fixed-variant": "#6000bf"
+                        },
+                        "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                        "spacing": { "margin-desktop": "32px", "gutter": "24px", "base-unit": "4px", "container-max-width": "1440px", "margin-mobile": "16px" },
+                        "fontFamily": { "headline-xl": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Geist"], "label-md": ["Geist"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"] },
+                        "fontSize": {
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .upload-preview-img { object-fit: cover; width: 100%; height: 100%; border-radius: 1rem; }
+        .upload-zone-filled { border-style: solid !important; padding: 0 !important; }
+        .progress-glow { box-shadow: 0 0 15px rgba(0, 209, 255, 0.5); }
+
+        .modal-overlay { background: rgba(10, 12, 16, 0.85); backdrop-filter: blur(8px); }
+        .modal-panel {
+            background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate-in { animation: modalIn 0.3s ease-out forwards; }
+
+        .grid-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .grid-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 209, 255, 0.12);
+        }
+        .grid-card.hidden {
+            display: none !important;
+        }
+        #filters-grid {
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+        .delete-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .grid-card:hover .delete-btn {
+            opacity: 1;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+        .card-removing {
+            animation: fadeOut 0.3s ease-out forwards;
+            pointer-events: none;
+        }
+        .confirm-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        @keyframes confirmIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .confirm-animate-in {
+            animation: confirmIn 0.2s ease-out forwards;
+        }
+        /* Collapsible sidebar */
+        #sidebar.sidebar-open { left: 0; }
+        #sidebar-overlay.overlay-visible { opacity: 1; pointer-events: auto; }
+    </style>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="p-1.5 -ml-1 rounded-lg hover:bg-white/5 transition-colors" aria-label="Open menu">
+                <span class="material-symbols-outlined text-xl text-text-secondary">menu</span>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm bg-surface-container border border-border-subtle text-text-secondary text-xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>API Connected
+            </span>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed top-0 left-[-280px] w-[280px] h-full bg-[#131418] border-r border-border-subtle flex flex-col z-[100] overflow-y-auto hide-scrollbar transition-[left] duration-300 ease-out">
+        <div class="px-5 py-6 border-b border-border-subtle/50 flex items-center justify-between">
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-0">Navigation</p>
+            <button id="sidebar-close" class="p-1.5 rounded-lg hover:bg-white/5 transition-colors" aria-label="Close menu">
+                <span class="material-symbols-outlined text-lg text-text-secondary">close</span>
+            </button>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-1">
+            <!-- ═══ Section 1 — User Generators ═══ -->
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">✨ Generators</p>
+
+            <a href="/"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span>Home</span>
+            </a>
+
+            <a href="/swap-bg"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                  <path d="M9 19.5l4.5-4.5 5 5" />
+                  <circle cx="17.5" cy="13" r="0.5" fill="currentColor" stroke="none" />
+                  <circle cx="7.5" cy="7.5" r="4.5" />
+                  <path d="M6 7.5h3M7.5 6l1.5 1.5-1.5 1.5" />
+                </svg>
+                <span>Background Change</span>
+            </a>
+
+            <a href="/dress-swap"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <i class="fa-solid fa-shirt text-xl text-text-secondary group-hover:text-electric-cyan transition-colors"></i>
+                <span>Dress Replicate</span>
+            </a>
+
+            <a href="/filter-gallery"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <path d="M2 19a1 1 0 0 0 1 1h12a1 1 0 0 0 .8-.4l-5.3-7.1a1.5 1.5 0 0 0-2.4 0L2.2 18.2A1 1 0 0 0 2 19z" />
+                  <path d="M11 19.5h9a1 1 0 0 0 .8-.4l-3.3-4.4a1.5 1.5 0 0 0-2.4 0l-1.3 1.7" />
+                  <circle cx="14" cy="6" r="2" fill="currentColor" stroke="none" />
+                </svg>
+                <span>Filter Gallery</span>
+            </a>
+
+            <!-- ═══ Divider ═══ -->
+            <div class="my-3 border-t border-slate-800/60"></div>
+
+            <!-- ═══ Section 2 — User Gallery ═══ -->
+
+            <a href="/my-creations"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <i class="fa-solid fa-images text-xl text-text-secondary group-hover:text-electric-cyan transition-colors"></i>
+                <span>My Creations</span>
+            </a>
+
+            <!-- ═══ Divider ═══ -->
+            <div class="my-3 border-t border-slate-800/60"></div>
+
+            <!-- ═══ Section 3 — Admin & Power Tools ═══ -->
+            <div id="admin-menu-section" class="">
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-purple-400/60">⚡ Power Tools</p>
+
+            <a href="/generate"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-950/20 border border-purple-500/20 text-purple-300 hover:bg-purple-900/30 hover:border-purple-500/40 hover:text-purple-200 group">
+                <i class="fa-solid fa-cubes text-xl text-purple-400 group-hover:text-purple-300 transition-colors"></i>
+                <span>Filter Gallery Factory</span>
+            </a>
+
+            <a href="/admin-gallery-filter"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-600/20 border border-purple-500/50 text-purple-300 shadow-lg shadow-purple-500/5">
+                <i class="fa-solid fa-sliders text-xl text-purple-300"></i>
+                <span>Filter Gallery Admin</span>
+                <span class="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_rgba(168,85,247,0.6)]"></span>
+            </a>
+            </div>
+        </nav>
+        <!-- Auth Container -->
+        <div class="px-4 py-4 border-t border-border-subtle/50 space-y-3">
+            <div class="flex items-center gap-2 text-[9px] text-text-secondary/40 uppercase tracking-wider">
+                <span class="w-1 h-1 rounded-full bg-emerald-500/40"></span>
+                <span>v2.0 — Filter Gallery Admin</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Sidebar overlay backdrop -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] p-8 overflow-y-auto">
+        <div class="mb-8">
+            <h2 class="font-headline-lg text-white mb-2">Filter Gallery Admin</h2>
+            <p class="text-text-secondary text-sm">Background Re-use Engine — click any image to use its scene as a backdrop for a new subject.</p>
+        </div>
+
+        <!-- Filter Pills -->
+        <!-- Category Filters -->
+        <div id="filter-pills" class="flex flex-wrap gap-2 mb-3">
+            <button class="filter-pill px-4 py-2 bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20 rounded-full text-sm font-medium transition-all hover:bg-electric-cyan/20 active" data-filter="all">All</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Studio">Studio</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Indoor">Indoor</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Outdoor">Outdoor</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Poster Film">Poster Film</button>
+            <button class="filter-pill px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-electric-cyan/30 hover:text-white" data-filter="Animation">Animation</button>
+        </div>
+
+        <!-- Lighting Filters -->
+        <div class="text-[9px] font-bold text-slate-500 tracking-widest uppercase mb-1.5 px-1 mt-4 pt-3 border-t border-slate-800/40">Lighting &amp; Ambient Styles</div>
+        <div id="lighting-filter-pills" class="flex flex-wrap gap-2 mb-6">
+            <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Soft Light">Soft Light</button>
+            <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Strobist">Strobist</button>
+            <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Natural Ambient">Natural Ambient</button>
+        </div>
+
+        <!-- Grid Layout Switcher -->
+        <div class="flex items-center justify-end mb-4">
+            <div class="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl shrink-0">
+                <button id="btn-cols-1" class="p-2 text-xs rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all" title="1 Column View">
+                    <i class="fa-regular fa-square"></i>
+                </button>
+                <button id="btn-cols-2" class="p-2 text-xs rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all" title="2 Columns View">
+                    <i class="fa-solid fa-table-columns"></i>
+                </button>
+                <button id="btn-cols-3" class="p-2 text-xs rounded-lg bg-purple-500/10 text-purple-300 border border-purple-500/20 transition-all" title="3 Columns View">
+                    <i class="fa-solid fa-grip"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Grid -->
+        <div id="filters-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
+            <!-- Populated dynamically -->
+        </div>
+
+        <!-- Loading state -->
+        <div id="grid-loading" class="flex items-center justify-center py-20">
+            <div class="flex flex-col items-center gap-4 text-text-secondary">
+                <div class="w-10 h-10 border-2 border-electric-cyan/30 border-t-electric-cyan rounded-full animate-spin"></div>
+                <span class="text-sm">Loading gallery images...</span>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="grid-empty" class="hidden flex items-center justify-center py-20">
+            <div class="text-center space-y-3">
+                <span class="material-symbols-outlined text-5xl text-text-secondary">image_not_supported</span>
+                <p class="text-text-secondary">No Generate Image records found. Create some images first.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================
+         MODAL — Execution Panel
+         ============================================================ -->
+    <div id="execution-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        <div class="modal-panel relative z-10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto hide-scrollbar p-8 modal-animate-in">
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-headline-md text-white" id="modal-dynamic-title">Background Filter</h3>
+                <button onclick="closeModal()" class="p-2 rounded-lg hover:bg-surface-container transition-colors">
+                    <span class="material-symbols-outlined text-text-secondary">close</span>
+                </button>
+            </div>
+
+            <!-- Filter Cover Preview — Before/After -->
+            <div class="mb-6">
+                <p class="text-[10px] uppercase tracking-widest text-text-secondary mb-2">Filter Cover Preview</p>
+                <div class="-mx-8 grid grid-cols-2 gap-2.5">
+                    <!-- BEFORE -->
+                    <div class="aspect-[2/3] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-l-none overflow-hidden relative flex items-center justify-center">
+                        <img id="modal-before-preview" src="" alt="Before"
+                             class="w-full h-full object-cover hidden" />
+                        <span id="modal-before-placeholder" class="material-symbols-outlined text-3xl text-text-secondary">person</span>
+                        <div class="absolute top-2 left-2 bg-slate-950/75 border border-slate-700/50 text-[10px] font-bold text-slate-300 px-2 py-1 rounded-md uppercase tracking-wider backdrop-blur-sm">
+                            BEFORE
+                        </div>
+                    </div>
+                    <!-- AFTER -->
+                    <div class="aspect-[2/3] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-r-none overflow-hidden relative flex items-center justify-center">
+                        <img id="modal-cover-preview" src="" alt="Filter cover preview"
+                             class="w-full h-full object-cover hidden" />
+                        <span id="modal-cover-placeholder" class="material-symbols-outlined text-3xl text-text-secondary">image</span>
+                        <div class="absolute top-2 left-2 bg-purple-950/80 border border-purple-500/40 text-[10px] font-bold text-purple-300 px-2 py-1 rounded-md uppercase tracking-wider shadow-lg shadow-purple-500/10 backdrop-blur-sm">
+                            AFTER
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Upload Dropzone -->
+            <div class="mb-6">
+                <div class="text-center mb-3">
+                    <p class="font-bold text-sm tracking-wide text-white">THE GRADUATE</p>
+                    <p class="text-xs text-slate-400 font-medium mt-1">Image Reference 1</p>
+                </div>
+                <div id="modal-upload-zone"
+                     class="border-2 border-dashed border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-electric-cyan/50 transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden min-h-[140px]"
+                     onclick="document.getElementById('modal-file-input').click()">
+                    <div id="modal-upload-placeholder" class="flex flex-col items-center gap-2">
+                        <span class="material-symbols-outlined text-3xl text-text-secondary group-hover:text-electric-cyan transition-colors">upload_file</span>
+                        <div class="text-center">
+                            <p class="text-text-primary font-bold text-sm">Click to upload subject photo</p>
+                            <p class="text-text-secondary text-xs">PNG, JPG or WEBP (Max. 10MB)</p>
+                        </div>
+                    </div>
+                    <img id="modal-upload-preview" class="upload-preview-img absolute inset-0 hidden" alt="Subject preview" />
+                    <button id="modal-upload-remove"
+                            class="absolute top-3 right-3 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
+                            onclick="event.stopPropagation(); removeModalSubject()" title="Remove">
+                        <span class="material-symbols-outlined text-sm text-error">close</span>
+                    </button>
+                    <input type="file" id="modal-file-input" accept="image/*" class="hidden" onchange="handleModalFileSelect(event)">
+                </div>
+            </div>
+
+            <!-- Aspect Ratio Selection -->
+            <div class="mb-6">
+                <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80 block mb-3">
+                    Aspect Ratio
+                </label>
+                <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden" id="modal-ratio-container">
+                    <div class="absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-electric-cyan rounded-lg z-0 transition-transform duration-300 ease-out" id="modalRatioHighlight"></div>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300" data-ratio="2:3">2:3</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
+                </div>
+                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 1696 × 2528 px</p>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="modal-generate-btn"
+                    class="w-full bg-electric-cyan text-surface-background font-black py-4 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110">
+                <span class="material-symbols-outlined font-bold" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                <span class="uppercase tracking-tighter">Generate</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        const API_BASE = window.location.origin;
+
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        function getAspectClass(record) {
+            const dims = (record.dimensions || '').toString();
+            const match = dims.match(/(\d+)\s*[×x]\s*(\d+)/i);
+            if (match) {
+                const w = parseInt(match[1], 10);
+                const h = parseInt(match[2], 10);
+                for (const [ratio, sizes] of Object.entries(ASPECT_RATIO_DIMENSIONS)) {
+                    if (sizes.width === w && sizes.height === h) {
+                        return 'aspect-[' + ratio.replace(':', '/') + ']';
+                    }
+                }
+                const r = w / h;
+                if (r > 1.2) return 'aspect-[4/3]';
+                if (r > 0.7) return 'aspect-[4/5]';
+                return 'aspect-[2/3]';
+            }
+            return 'aspect-[2/3]';
+        }
+
+        const state = {
+            records: [],
+            selectedRecord: null,
+            modalSubjectFile: null,
+            modalRatio: '2:3',
+            modalDimensions: ASPECT_RATIO_DIMENSIONS['2:3']
+        };
+
+        // =====================================================
+        // IMAGE GRID LOADING
+        // =====================================================
+
+        async function loadImages() {
+            const grid = document.getElementById('filters-grid');
+            const loading = document.getElementById('grid-loading');
+            const empty = document.getElementById('grid-empty');
+
+            console.log('[Admin] loadImages: starting fetch...');
+            console.log('[Admin] Page loaded — open access mode.');
+
+            try {
+                // Timeout after 8 seconds — prevent permanent spinner
+                const controller = new AbortController();
+                const timeoutId = setTimeout(function() { controller.abort(); }, 8000);
+
+                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/images?limit=100`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                console.log('[Admin] API response status:', resp.status);
+                if (!resp.ok) throw new Error('Failed to load images — status ' + resp.status);
+                const data = await resp.json();
+                state.records = data.records || [];
+                console.log('[Admin] Records loaded:', state.records.length);
+
+                // Always hide loading spinner
+                if (loading) loading.classList.add('hidden');
+
+                if (state.records.length === 0) {
+                    console.log('[Admin] No records — showing empty state');
+                    if (empty) empty.classList.remove('hidden');
+                    return;
+                }
+
+                state.records.forEach((record, index) => {
+                    const safeTitle = escapeHtml(record.title || record.prompt || 'Untitled');
+                    const displayTags = Array.isArray(record.tags) && record.tags.length > 0
+                        ? record.tags.join(', ')
+                        : '';
+                    const tagsAttr = displayTags ? displayTags.toLowerCase() : '';
+                    const safeTags = escapeHtml(displayTags);
+                    const tagsHtml = safeTags
+                        ? `<p class="text-[10px] text-text-secondary/70 mt-1 truncate">${safeTags}</p>`
+                        : '';
+                    const filterId = record.generation_id || `filter-${index}`;
+
+                    const card = document.createElement('div');
+                    card.className = 'grid-card bg-surface-card border border-border-subtle rounded-2xl overflow-hidden cursor-pointer group';
+                    card.setAttribute('data-tags', tagsAttr);
+                    card.setAttribute('data-lighting', (record.lighting || '').toLowerCase());
+                    card.setAttribute('data-id', filterId);
+                    card.setAttribute('data-filter-id', filterId);
+                    card.innerHTML = `
+                        <div class="w-full ${getAspectClass(record)} overflow-hidden relative">
+                            <img src="${record.cover_image_path || record.image_url}"
+                                 alt="Generated background"
+                                 class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                                 loading="lazy"
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect fill=%22%23161B22%22 width=%22200%22 height=%22150%22/><text fill=%22%238B949E%22 x=%22100%22 y=%2275%22 text-anchor=%22middle%22 font-size=%2212%22>No Preview</text></svg>'">
+                            <button class="delete-btn absolute top-2 right-2 p-1.5 bg-surface-background/90 hover:bg-error-container rounded-full z-10 transition-colors"
+                                    title="Delete filter">
+                                <span class="material-symbols-outlined text-sm text-error">delete</span>
+                            </button>
+                        </div>
+                        <div class="p-3 space-y-1">
+                            <h3 class="filter-title text-xs text-text-primary font-semibold truncate">${safeTitle}</h3>
+                            ${tagsHtml}
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
+                                <span class="text-[10px] text-electric-cyan opacity-0 group-hover:opacity-100 transition-opacity">Click to use →</span>
+                            </div>
+                            <!-- Visibility Toggle -->
+                            <div class="pt-2 mt-1 border-t border-border-subtle/50 flex items-center justify-between" onclick="event.stopPropagation();">
+                                <span class="text-[9px] uppercase tracking-wider text-text-secondary/60 font-semibold">Public</span>
+                                <label class="relative inline-flex items-center cursor-pointer gap-2">
+                                    <input type="checkbox" class="sr-only peer filter-visibility-toggle" data-toggle-id="${escapeHtml(filterId)}" checked
+                                           onchange="handleFilterToggle(this, '${escapeHtml(filterId)}')">
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-slate-900 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-300 after:border-slate-900 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600 peer-checked:after:bg-white"></div>
+                                    <span class="text-[9px] font-semibold text-slate-400 peer-checked:text-purple-400 uppercase tracking-wider toggle-label-text">OFF</span>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.delete-btn')) return;
+                        if (e.target.closest('label') || e.target.closest('input[type=checkbox]')) return;
+                        openModal(record);
+                    });
+                    if (grid) grid.appendChild(card);
+                });
+
+                initFilterToggles();
+                console.log('[Admin] loadImages: rendering complete.');
+
+            } catch (err) {
+                console.error('[Admin] loadImages failed:', err.message || err);
+                // Always hide spinner — even on error
+                if (loading) loading.classList.add('hidden');
+                // Show graceful error in empty-state area
+                if (empty) {
+                    empty.classList.remove('hidden');
+                    empty.innerHTML = '<div class="text-center space-y-3">' +
+                        '<span class="material-symbols-outlined text-5xl text-text-secondary">cloud_off</span>' +
+                        '<p class="text-text-secondary">Gagal terhubung ke server.</p>' +
+                        '<p class="text-xs text-slate-500">Periksa koneksi dan refresh halaman.</p>' +
+                        '</div>';
+                }
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = (str || '').slice(0, 100);
+            return div.innerHTML;
+        }
+
+        // =====================================================
+        // FILTER PILLS LOGIC — category + lighting
+        // =====================================================
+
+        const filterState = { category: 'all', lighting: '' };
+
+        function applyAllFilters() {
+            const cards = document.querySelectorAll('#filters-grid .grid-card');
+            cards.forEach(card => {
+                let visible = true;
+                // Category filter
+                if (filterState.category !== 'all') {
+                    const cardTags = (card.getAttribute('data-tags') || '').toLowerCase();
+                    if (!cardTags.includes(filterState.category.toLowerCase())) {
+                        visible = false;
+                    }
+                }
+                // Lighting filter
+                if (filterState.lighting) {
+                    const cardLighting = (card.getAttribute('data-lighting') || '').toLowerCase();
+                    if (!cardLighting.includes(filterState.lighting.toLowerCase())) {
+                        visible = false;
+                    }
+                }
+                card.classList.toggle('hidden', !visible);
+            });
+        }
+
+        function initFilterPills() {
+            // Category pills
+            const catPills = document.querySelectorAll('.filter-pill');
+            catPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    filterState.category = pill.getAttribute('data-filter');
+                    catPills.forEach(p => {
+                        p.classList.remove('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                        p.classList.add('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    });
+                    pill.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                    pill.classList.remove('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    applyAllFilters();
+                });
+            });
+
+            // Lighting pills
+            const lightPills = document.querySelectorAll('.lighting-filter-pill');
+            lightPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const clicked = pill.getAttribute('data-filter');
+                    // Toggle: clicking the active pill deselects it
+                    if (filterState.lighting === clicked) {
+                        filterState.lighting = '';
+                        lightPills.forEach(p => {
+                            p.classList.remove('bg-amber-500/20', 'border-amber-400', 'text-amber-200', 'shadow-lg', 'shadow-amber-500/5');
+                            p.classList.add('bg-amber-950/10', 'border-amber-500/20', 'text-amber-300/90');
+                        });
+                    } else {
+                        filterState.lighting = clicked;
+                        lightPills.forEach(p => {
+                            p.classList.remove('bg-amber-500/20', 'border-amber-400', 'text-amber-200', 'shadow-lg', 'shadow-amber-500/5');
+                            p.classList.add('bg-amber-950/10', 'border-amber-500/20', 'text-amber-300/90');
+                        });
+                        pill.classList.add('bg-amber-500/20', 'border-amber-400', 'text-amber-200', 'shadow-lg', 'shadow-amber-500/5');
+                        pill.classList.remove('bg-amber-950/10', 'border-amber-500/20', 'text-amber-300/90');
+                    }
+                    applyAllFilters();
+                });
+            });
+        }
+
+        // =====================================================
+        // FILTER VISIBILITY TOGGLES — localStorage persistence
+        // =====================================================
+
+        const STORAGE_KEY = 'active_filters';
+
+        function getActiveFilters() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function saveActiveFilters(obj) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+            } catch (_) {}
+        }
+
+        window.handleFilterToggle = function(checkbox, filterId) {
+            const active = getActiveFilters();
+            active[filterId] = checkbox.checked;
+            saveActiveFilters(active);
+            // Update label text
+            const label = checkbox.parentElement.querySelector('.toggle-label-text');
+            if (label) {
+                label.textContent = checkbox.checked ? 'ON' : 'OFF';
+            }
+        };
+
+        function initFilterToggles() {
+            const active = getActiveFilters();
+            document.querySelectorAll('.filter-visibility-toggle').forEach(cb => {
+                const id = cb.getAttribute('data-toggle-id');
+                if (!id) return;
+                // Default to true (checked) if no saved state
+                const isOn = active.hasOwnProperty(id) ? active[id] : true;
+                cb.checked = isOn;
+                if (!active.hasOwnProperty(id)) {
+                    active[id] = true;
+                }
+                const label = cb.parentElement.querySelector('.toggle-label-text');
+                if (label) {
+                    label.textContent = isOn ? 'ON' : 'OFF';
+                }
+            });
+            saveActiveFilters(active);
+        }
+
+        // =====================================================
+        // MODAL LOGIC
+        // =====================================================
+
+        function openModal(record) {
+            state.selectedRecord = record;
+            state.modalSubjectFile = null;
+
+            // Dynamically set the modal header to the card's title
+            const modalTitle = document.getElementById('modal-dynamic-title');
+            if (modalTitle) {
+                modalTitle.textContent = record.title || 'Background Filter';
+            }
+
+            // AFTER — filter cover preview
+            const coverPreview = document.getElementById('modal-cover-preview');
+            const coverPlaceholder = document.getElementById('modal-cover-placeholder');
+            const coverUrl = record.cover_image_path || record.image_url;
+            if (coverPreview && coverUrl) {
+                coverPreview.src = coverUrl;
+                coverPreview.classList.remove('hidden');
+                if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
+            } else {
+                if (coverPreview) { coverPreview.classList.add('hidden'); coverPreview.src = ''; }
+                if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
+            }
+
+            // BEFORE — reference image or generic placeholder
+            const beforePreview = document.getElementById('modal-before-preview');
+            const beforePlaceholder = document.getElementById('modal-before-placeholder');
+            const beforeUrl = record.reference_image_1_path || record.reference_image_2_path || null;
+            if (beforePreview && beforeUrl) {
+                beforePreview.src = `${API_BASE}/${beforeUrl}`;
+                beforePreview.classList.remove('hidden');
+                if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
+            } else {
+                if (beforePreview) { beforePreview.classList.add('hidden'); beforePreview.src = ''; }
+                if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
+            }
+
+            document.getElementById('execution-modal').classList.remove('hidden');
+            document.getElementById('execution-modal').style.display = 'flex';
+
+            // Reset upload
+            resetModalUpload();
+            // Reset ratio
+            moveModalHighlight(0);
+        }
+
+        window.closeModal = function() {
+            document.getElementById('execution-modal').classList.add('hidden');
+            document.getElementById('execution-modal').style.display = 'none';
+        };
+
+        function resetModalUpload() {
+            const preview = document.getElementById('modal-upload-preview');
+            const placeholder = document.getElementById('modal-upload-placeholder');
+            const removeBtn = document.getElementById('modal-upload-remove');
+            const zone = document.getElementById('modal-upload-zone');
+            const fileInput = document.getElementById('modal-file-input');
+            if (preview) { preview.classList.add('hidden'); preview.src = ''; }
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (removeBtn) removeBtn.classList.add('hidden');
+            if (zone) { zone.classList.remove('upload-zone-filled', 'border-electric-cyan/50'); zone.classList.add('border-dashed', 'border-border-subtle'); }
+            if (fileInput) fileInput.value = '';
+            state.modalSubjectFile = null;
+        }
+
+        window.handleModalFileSelect = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showCustomAlert('Silakan pilih file gambar yang valid (PNG, JPG, atau WEBP).'); event.target.value = ''; return; }
+            state.modalSubjectFile = file;
+
+            const preview = document.getElementById('modal-upload-preview');
+            const placeholder = document.getElementById('modal-upload-placeholder');
+            const removeBtn = document.getElementById('modal-upload-remove');
+            const zone = document.getElementById('modal-upload-zone');
+            if (preview && placeholder && removeBtn && zone) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result; preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden'); removeBtn.classList.remove('hidden');
+                    zone.classList.add('upload-zone-filled', 'border-electric-cyan/50');
+                    zone.classList.remove('border-dashed', 'border-border-subtle');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.removeModalSubject = function() { resetModalUpload(); };
+
+        // =====================================================
+        // MODAL ASPECT RATIO
+        // =====================================================
+
+        function moveModalHighlight(index) {
+            const highlight = document.getElementById('modalRatioHighlight');
+            const buttons = document.querySelectorAll('.modal-ratio-btn');
+            if (!highlight || !buttons.length) return;
+            highlight.style.transform = `translateX(${index * 100}%)`;
+            buttons.forEach((btn, idx) => {
+                if (idx === index) { btn.classList.add('text-surface-background', 'font-bold'); btn.classList.remove('text-text-secondary', 'font-medium'); }
+                else { btn.classList.remove('text-surface-background', 'font-bold'); btn.classList.add('text-text-secondary', 'font-medium'); }
+            });
+            const ratio = buttons[index].getAttribute('data-ratio');
+            state.modalRatio = ratio;
+            state.modalDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
+            if (state.modalDimensions) {
+                document.getElementById('modal-dimension-readout').textContent =
+                    `Dimensions: ${state.modalDimensions.width} × ${state.modalDimensions.height} px`;
+            }
+        }
+
+        function initModalAspectRatio() {
+            document.querySelectorAll('.modal-ratio-btn').forEach((btn, idx) => {
+                btn.addEventListener('click', () => moveModalHighlight(idx));
+            });
+            moveModalHighlight(0);
+        }
+
+        // =====================================================
+        // MODAL GENERATION FLOW
+        // =====================================================
+
+        async function handleModalGenerate() {
+            if (!state.selectedRecord) { showCustomAlert('Silakan pilih background terlebih dahulu.'); return; }
+            if (!state.modalSubjectFile) { showCustomAlert('Silakan unggah foto <strong>THE GRADUATE (Image Reference 1)</strong> terlebih dahulu sebelum memproses.'); return; }
+
+            const genBtn = document.getElementById('modal-generate-btn');
+            if (genBtn) { genBtn.disabled = true; genBtn.classList.add('opacity-50'); }
+
+            try {
+                const formData = new FormData();
+                formData.append('referenceImage1', state.modalSubjectFile, state.modalSubjectFile.name);
+                formData.append('backgroundPrompt', state.selectedRecord.prompt || '');
+                formData.append('filterTitle', state.selectedRecord.title || '');
+                formData.append('aspectRatio', state.modalRatio);
+                formData.append('width', state.modalDimensions.width.toString());
+                formData.append('height', state.modalDimensions.height.toString());
+
+                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/swap`, { method: 'POST', body: formData });
+
+                if (resp.status === 202) {
+                    const { jobId } = await resp.json();
+                    console.log('Job accepted:', jobId);
+
+                    // Save admin processing record to localStorage
+                    try {
+                        var queue = JSON.parse(localStorage.getItem('all_creations') || '[]');
+                        queue.push({
+                            id: jobId,
+                            generation_id: jobId,
+                            status: 'processing',
+                            type: 'admin-filter',
+                            owner_email: 'admin.fotowisuda@gmail.com',
+                            isAdmin: true,
+                            title: state.selectedRecord.title || 'Admin Filter Creation',
+                            prompt: state.selectedRecord.prompt || '',
+                            createdAt: Date.now(),
+                            dimensions: state.modalDimensions.width + ' × ' + state.modalDimensions.height
+                        });
+                        localStorage.setItem('all_creations', JSON.stringify(queue));
+                        console.log('[AdminSave] Processing record saved to localStorage.');
+                    } catch (_) {}
+
+                    window.location.href = `/admin-creations?pending=${encodeURIComponent(jobId)}`;
+                    return;
+                }
+
+                if (!resp.ok) {
+                    const errData = await resp.json().catch(() => ({}));
+                    throw new Error(errData.error || `Server returned ${resp.status}`);
+                }
+
+                // Fallback: non-202 success — still redirect
+                const data = await resp.json();
+                const pendingId = data.jobId || data.generationId;
+                console.log('Job accepted (fallback):', pendingId);
+
+                // Save admin processing record to localStorage (fallback path)
+                try {
+                    var fbQueue = JSON.parse(localStorage.getItem('all_creations') || '[]');
+                    fbQueue.push({
+                        id: pendingId,
+                        generation_id: pendingId,
+                        status: 'processing',
+                        type: 'admin-filter',
+                        owner_email: 'admin.fotowisuda@gmail.com',
+                        isAdmin: true,
+                        title: state.selectedRecord.title || 'Admin Filter Creation',
+                        prompt: state.selectedRecord.prompt || '',
+                        createdAt: Date.now(),
+                        dimensions: state.modalDimensions.width + ' × ' + state.modalDimensions.height
+                    });
+                    localStorage.setItem('all_creations', JSON.stringify(fbQueue));
+                } catch (_) {}
+
+                window.location.href = `/admin-creations?pending=${encodeURIComponent(pendingId)}`;
+
+            } catch (error) {
+                console.error('AGF swap failed:', error);
+                showCustomAlert('Generasi gagal: ' + (error.message || 'Unknown error'));
+                if (genBtn) { genBtn.disabled = false; genBtn.classList.remove('opacity-50'); }
+            }
+        }
+
+        // =====================================================
+        // INIT
+        // =====================================================
+
+        function initSidebarActiveState() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('aside nav a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (href === '/admin-gallery-filter' && currentPath.startsWith('/admin-gallery-filter'))) {
+                    link.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border', 'border-electric-cyan/20');
+                    link.classList.remove('text-text-secondary', 'hover:text-white', 'hover:bg-white/[0.04]');
+                    if (!link.querySelector('.ml-auto')) {
+                        const dot = document.createElement('span');
+                        dot.className = 'ml-auto w-1.5 h-1.5 rounded-full bg-electric-cyan shadow-[0_0_6px_#00D1FF]';
+                        link.appendChild(dot);
+                    }
+                }
+            });
+        }
+
+        function initSidebarToggle() {
+            var sb = document.getElementById('sidebar');
+            var ov = document.getElementById('sidebar-overlay');
+            var tb = document.getElementById('sidebar-toggle');
+            var cb = document.getElementById('sidebar-close');
+            if (!sb || !ov) return;
+            function open(){ sb.classList.add('sidebar-open'); ov.classList.add('overlay-visible'); document.body.classList.add('overflow-hidden'); }
+            function close(){ sb.classList.remove('sidebar-open'); ov.classList.remove('overlay-visible'); document.body.classList.remove('overflow-hidden'); }
+            if (tb) tb.addEventListener('click', open);
+            if (cb) cb.addEventListener('click', close);
+            ov.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && sb.classList.contains('sidebar-open')) close(); });
+        }
+
+        // =====================================================
+        // GRID LAYOUT SWITCHER
+        // =====================================================
+
+        function initGridLayoutSwitcher() {
+            const grid = document.getElementById('filters-grid');
+            const btn1 = document.getElementById('btn-cols-1');
+            const btn2 = document.getElementById('btn-cols-2');
+            const btn3 = document.getElementById('btn-cols-3');
+
+            if (!grid || !btn1 || !btn2 || !btn3) return;
+
+            const STORAGE_KEY = 'filter_gallery_layout';
+            const ACTIVE = ['bg-purple-500/10', 'text-purple-300', 'border', 'border-purple-500/20'];
+            const INACTIVE = ['text-slate-400', 'hover:bg-slate-800', 'hover:text-white'];
+
+            function saveLayout(cols) {
+                try { localStorage.setItem(STORAGE_KEY, 'cols-' + cols); } catch (_) {}
+            }
+
+            function setActive(activeBtn) {
+                [btn1, btn2, btn3].forEach(function(b) {
+                    b.classList.remove(...ACTIVE);
+                    b.classList.add(...INACTIVE);
+                });
+                activeBtn.classList.remove(...INACTIVE);
+                activeBtn.classList.add(...ACTIVE);
+            }
+
+            function setGridColumns(cols) {
+                grid.classList.remove(
+                    'grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4',
+                    'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3',
+                    'lg:grid-cols-3', 'lg:grid-cols-4',
+                    'xl:grid-cols-5'
+                );
+                if (cols === 1) {
+                    grid.classList.add('grid-cols-1');
+                } else if (cols === 2) {
+                    grid.classList.add('grid-cols-2');
+                } else {
+                    grid.classList.add('grid-cols-3');
+                }
+            }
+
+            function switchLayout(cols, activeBtn) {
+                // Brief fade + scale dip for buttery-smooth transition
+                grid.classList.add('opacity-0', 'scale-[0.98]');
+                setTimeout(function() {
+                    setGridColumns(cols);
+                    setActive(activeBtn);
+                    saveLayout(cols);
+                    grid.classList.remove('opacity-0', 'scale-[0.98]');
+                }, 150);
+            }
+
+            btn1.addEventListener('click', function() { switchLayout(1, btn1); });
+            btn2.addEventListener('click', function() { switchLayout(2, btn2); });
+            btn3.addEventListener('click', function() { switchLayout(3, btn3); });
+
+            // Restore saved layout preference on page load
+            function loadSavedLayout() {
+                try {
+                    var saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved === 'cols-1') {
+                        setGridColumns(1); setActive(btn1);
+                    } else if (saved === 'cols-2') {
+                        setGridColumns(2); setActive(btn2);
+                    } else {
+                        // Default: 3-column view
+                        setGridColumns(3); setActive(btn3);
+                    }
+                } catch (_) {}
+            }
+            loadSavedLayout();
+        }
+
+        // =====================================================
+        // SESSION & PROFILE MANAGEMENT (shared across all pages)
+        // =====================================================
+
+        window.showCustomAlert = function(message) {
+            var modal = document.getElementById('custom-alert-modal');
+            var messageEl = document.getElementById('custom-alert-message');
+            if (!modal || !messageEl) return;
+            messageEl.innerHTML = message;
+            modal.classList.remove('hidden');
+            var card = modal.querySelector('div');
+            if (card) {
+                setTimeout(function() {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }, 10);
+            }
+        };
+
+        window.closeCustomAlert = function() {
+            var modal = document.getElementById('custom-alert-modal');
+            if (!modal) return;
+            var card = modal.querySelector('div');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(function() { modal.classList.add('hidden'); }, 200);
+        };
+
+        function applyAdminVisibility() {
+            var email = safeStorage.getItem('active_user_email');
+            var section = document.getElementById('admin-menu-section');
+            if (!section) return;
+            if (email === 'admin.fotowisuda@gmail.com') {
+                section.style.display = '';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function renderAuthContainer() {
+            var container = document.getElementById('auth-container');
+            if (!container) return;
+            var activeEmail = safeStorage.getItem('active_user_email');
+
+            if (activeEmail) {
+                var namePrefix = activeEmail.split('@')[0];
+                var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
+                var initials = namePrefix.substring(0, 2).toUpperCase();
+
+                container.innerHTML = '<div class="flex flex-col gap-2">' +
+                    '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
+                        '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
+                        '<div class="flex flex-col min-w-0">' +
+                            '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
+                            '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                        '<i class="fa-solid fa-right-from-bracket"></i>' +
+                        '<span>Keluar Sesi</span>' +
+                    '</button>' +
+                '</div>';
+            } else {
+                container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+                    '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
+                        '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
+                        '<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>' +
+                        '<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>' +
+                    '</svg>' +
+                    '<span>Masuk Google</span>' +
+                '</button>';
+            }
+        }
+
+        function initSession() {
+            try { renderAuthContainer(); } catch(e) { console.error('[Admin] renderAuthContainer failed:', e); }
+            try { applyAdminVisibility(); } catch(e) { console.error('[Admin] applyAdminVisibility failed:', e); }
+        }
+
+        // Dead code removed — see safeStorage above for active implementation
+
+        function _dead_code_removed_() {}
+            var CREATIONS_KEY = 'my_creations';
+
+            function safeGet(storage, key) {
+                try { var v = storage.getItem(key); return v ? JSON.parse(v) : null; } catch(_) { return null; }
+            }
+            function safeSet(storage, key, val) {
+                try { storage.setItem(key, JSON.stringify(val)); } catch(_) {}
+            }
+
+            function getActiveEmail() {
+                try { return sessionStorage.getItem(ACTIVE_KEY) || null; } catch(_) { return null; }
+            }
+            function setActiveEmail(email) {
+                try { sessionStorage.setItem(ACTIVE_KEY, email); } catch(_) {}
+            }
+            function clearActiveEmail() {
+                try { sessionStorage.removeItem(ACTIVE_KEY); } catch(_) {}
+            }
+
+            function getUsers() { return safeGet(localStorage, USERS_KEY) || {}; }
+            function saveUsers(u) { safeSet(localStorage, USERS_KEY, u); }
+
+            function getOrCreateUser(email) {
+                var users = getUsers();
+                if (!users[email]) {
+                    var colors = ['from-cyan-500 to-purple-600','from-purple-500 to-pink-600','from-emerald-500 to-cyan-600','from-amber-500 to-rose-600','from-blue-500 to-indigo-600'];
+                    var namePart = email.split('@')[0];
+                    var dn = namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/[._-]/g, ' ');
+                    users[email] = { displayName: dn, gradient: colors[Math.floor(Math.random()*colors.length)], initial: dn.charAt(0).toUpperCase(), createdAt: new Date().toISOString() };
+                    saveUsers(users);
+                    seedDemoCreations(email);
+                }
+                return users[email];
+            }
+
+            function seedDemoCreations(email) {
+                var creations = safeGet(localStorage, CREATIONS_KEY) || [];
+                var hasExisting = creations.some(function(c) { return c.owner_email === email; });
+                if (hasExisting) return;
+                var demos = [
+                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 × 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 × 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 × 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
+                ];
+                safeSet(localStorage, CREATIONS_KEY, creations.concat(demos));
+            }
+
+            return {
+                getActiveEmail: getActiveEmail, setActiveEmail: setActiveEmail, clearActiveEmail: clearActiveEmail,
+                getOrCreateUser: getOrCreateUser, safeGet: safeGet, safeSet: safeSet
+            };
+        })();
+
+        function openProfileModal() {
+            var modal = document.getElementById('profile-management-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden'); modal.style.display = 'flex';
+            var email = Session.getActiveEmail();
+            var gp = document.getElementById('profile-modal-guest');
+            var lp = document.getElementById('profile-modal-logged-in');
+            if (email) {
+                if (gp) gp.classList.add('hidden');
+                if (lp) lp.classList.remove('hidden');
+                var user = Session.getOrCreateUser(email);
+                updateProfileUI(user, email);
+            } else {
+                if (gp) gp.classList.remove('hidden');
+                if (lp) lp.classList.add('hidden');
+                var inp = document.getElementById('signin-email-input');
+                if (inp) inp.value = '';
+            }
+        }
+
+        function closeProfileModal() {
+            var m = document.getElementById('profile-management-modal');
+            if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+        }
+
+        function updateProfileUI(user, email) {
+            var pa = document.getElementById('profile-avatar');
+            var ma = document.getElementById('modal-avatar');
+            if (pa) { pa.className = 'w-8 h-8 rounded-full bg-gradient-to-br ' + user.gradient + ' flex items-center justify-center text-white text-xs font-bold shrink-0'; pa.textContent = user.initial; }
+            if (ma) { ma.className = 'w-14 h-14 rounded-full bg-gradient-to-br ' + user.gradient + ' flex items-center justify-center text-white text-xl font-bold shrink-0'; ma.textContent = user.initial; }
+            var nel = document.querySelectorAll('#profile-name, #modal-name');
+            var eel = document.querySelectorAll('#profile-email, #modal-email');
+            nel.forEach(function(el) { el.textContent = user.displayName; });
+            eel.forEach(function(el) { el.textContent = email; });
+        }
+
+        function renderGuestState() {
+            var g = document.getElementById('profile-guest');
+            var l = document.getElementById('profile-logged-in');
+            if (g) g.classList.remove('hidden');
+            if (l) l.classList.add('hidden');
+        }
+
+        function renderLoggedInState(email) {
+            var g = document.getElementById('profile-guest');
+            var l = document.getElementById('profile-logged-in');
+            if (g) g.classList.add('hidden');
+            if (l) l.classList.remove('hidden');
+            updateProfileUI(Session.getOrCreateUser(email), email);
+        }
+
+        function handleSignIn() {
+            var inp = document.getElementById('signin-email-input');
+            if (!inp) return;
+            var email = inp.value.trim();
+            if (!email || email.indexOf('@') === -1) { alert('Silakan masukkan alamat email yang valid.'); return; }
+            Session.setActiveEmail(email);
+            Session.getOrCreateUser(email);
+            renderLoggedInState(email);
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function handleLogout() {
+            Session.clearActiveEmail();
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function handleDeleteAccount() {
+            if (!confirm('Hapus semua data kreasi untuk akun ini? Tindakan ini tidak dapat dibatalkan.')) return;
+            var email = Session.getActiveEmail();
+            if (email) {
+                var creations = Session.safeGet(localStorage, 'my_creations') || [];
+                creations = creations.filter(function(c) { return c.owner_email !== email; });
+                Session.safeSet(localStorage, 'my_creations', creations);
+                Session.clearActiveEmail();
+            }
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function bindProfileModalEvents() {
+            var cb = document.getElementById('btn-confirm-signin');
+            var lb = document.getElementById('btn-logout');
+            var db = document.getElementById('btn-delete-account');
+            var si = document.getElementById('signin-email-input');
+            if (cb) cb.addEventListener('click', handleSignIn);
+            if (lb) lb.addEventListener('click', handleLogout);
+            if (db) db.addEventListener('click', handleDeleteAccount);
+            if (si) si.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignIn(); });
+        }
+
+        // =====================================================
+        // MOCK LOGIN MODAL
+        // =====================================================
+
+        function __dead_openMockLoginModal() {
+            var modal = document.getElementById('mock-login-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            var inp = document.getElementById('mock-email-input');
+            if (inp) { inp.value = ''; inp.focus(); }
+            var pwd = document.getElementById('mock-password-input');
+            if (pwd) pwd.value = '';
+        }
+
+        function __dead_closeMockLoginModal() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function __dead_handleMockSubmit(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('mock-email-input');
+            var email = emailInput ? emailInput.value.trim() : '';
+            if (!email || email.indexOf('@') === -1) {
+                alert('Silakan masukkan alamat email yang valid.');
+                return;
+            }
+            safeStorage.setItem('active_user_email', email);
+            closeMockLoginModal();
+            window.location.reload();
+        }
+
+        // =====================================================
+        // ADMIN VISIBILITY
+        // =====================================================
+
+        function applyAdminVisibility_old() {
+            // Neutralized — uses safeStorage instead of deprecated Session
+            var email = safeStorage.getItem('active_user_email');
+            var section = document.getElementById('admin-menu-section');
+            if (!section) return;
+            if (email === 'admin.fotowisuda@gmail.com') {
+                section.style.display = '';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function initSession_fixed() {
+            renderAuthContainer();
+            applyAdminVisibility();
+        }
+
+        function init() {
+            initSidebarToggle();
+            initModalAspectRatio();
+            initSidebarActiveState();
+            initFilterPills();
+            initGridLayoutSwitcher();
+
+            // Bind modal generate button
+            const modalGenBtn = document.getElementById('modal-generate-btn');
+            if (modalGenBtn) modalGenBtn.addEventListener('click', handleModalGenerate);
+
+            // Bind modal drag-and-drop
+            const modalZone = document.getElementById('modal-upload-zone');
+            if (modalZone) {
+                modalZone.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); modalZone.classList.add('border-electric-cyan/50'); });
+                modalZone.addEventListener('dragleave', (e) => { e.preventDefault(); e.stopPropagation(); if (!modalZone.classList.contains('upload-zone-filled')) modalZone.classList.remove('border-electric-cyan/50'); });
+                modalZone.addEventListener('drop', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (!modalZone.classList.contains('upload-zone-filled')) modalZone.classList.remove('border-electric-cyan/50');
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const input = document.getElementById('modal-file-input');
+                        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+                        handleModalFileSelect({ target: input });
+                    }
+                });
+            }
+
+            // --- Custom confirmation modal helpers ---
+            let pendingDelete = { card: null, genId: null };
+
+            function showConfirmModal(card, genId) {
+                pendingDelete.card = card;
+                pendingDelete.genId = genId;
+                // Ensure the execution panel stays completely closed
+                const execModal = document.getElementById('execution-modal');
+                if (execModal && !execModal.classList.contains('hidden')) {
+                    execModal.classList.add('hidden');
+                    execModal.style.display = 'none';
+                }
+                const modal = document.getElementById('confirm-modal');
+                if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; }
+            }
+
+            function hideConfirmModal() {
+                pendingDelete.card = null;
+                pendingDelete.genId = null;
+                const modal = document.getElementById('confirm-modal');
+                if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
+            }
+
+            async function executeDelete() {
+                const { card, genId } = pendingDelete;
+                if (!card || !genId) return;
+                hideConfirmModal();
+                try {
+                    const resp = await fetch(`${API_BASE}/api/filter-gallery/${genId}`, { method: 'DELETE' });
+                    if (!resp.ok) {
+                        const errData = await resp.json().catch(() => ({}));
+                        throw new Error(errData.error || `Server returned ${resp.status}`);
+                    }
+                    card.classList.add('card-removing');
+                    setTimeout(() => card.remove(), 300);
+                } catch (err) {
+                    console.error('Delete failed:', err);
+                    alert('Failed to delete: ' + (err.message || 'Unknown error'));
+                }
+            }
+
+            // Bind confirm modal buttons
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const confirmOverlayBg = document.getElementById('confirm-overlay-bg');
+            if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmModal);
+            if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', executeDelete);
+            if (confirmOverlayBg) confirmOverlayBg.addEventListener('click', hideConfirmModal);
+
+            // Delete handler — event delegation on the image grid
+            const grid = document.getElementById('filters-grid');
+            if (grid) {
+                grid.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (!deleteBtn) return;
+
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const card = deleteBtn.closest('.grid-card');
+                    if (!card) return;
+
+                    const genId = card.getAttribute('data-id');
+                    if (!genId) return;
+
+                    // Show custom confirmation modal instead of native confirm()
+                    showConfirmModal(card, genId);
+                });
+            }
+
+            // Close modals on Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const confirmModal = document.getElementById('confirm-modal');
+                    if (confirmModal && !confirmModal.classList.contains('hidden')) {
+                        hideConfirmModal();
+                        return;
+                    }
+                    const execModal = document.getElementById('execution-modal');
+                    if (execModal && !execModal.classList.contains('hidden')) {
+                        closeModal();
+                    }
+                }
+            });
+
+            loadImages();
+            console.log('Admin Gallery Filter initialized.');
+        }
+
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+    </script>
+
+    <!-- ============================================================
+         DELETE CONFIRMATION MODAL
+         ============================================================ -->
+    <div id="confirm-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
+        <div class="confirm-overlay absolute inset-0" id="confirm-overlay-bg"></div>
+        <div class="relative z-10 bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-6 confirm-animate-in shadow-2xl">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-2xl text-error" style="font-variation-settings: 'FILL' 1;">delete_forever</span>
+                <h3 class="font-headline-md text-white text-lg">Delete Filter</h3>
+            </div>
+            <p class="text-text-secondary text-sm mb-6 leading-relaxed">
+                Are you sure you want to delete this backdrop filter? This action cannot be undone.
+            </p>
+            <div class="flex gap-3">
+                <button id="confirm-cancel-btn"
+                        class="flex-1 py-2.5 bg-surface-container border border-border-subtle text-text-primary rounded-xl font-semibold text-sm transition-all hover:bg-surface-container-high">
+                    Cancel
+                </button>
+                <button id="confirm-delete-btn"
+                        class="flex-1 py-2.5 bg-error-container border border-error/30 text-error rounded-xl font-semibold text-sm transition-all hover:bg-error/20 hover:border-error/50">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+<!-- ============================================================
+     MOCK LOGIN MODAL — Email + Password simulation
+     ============================================================ -->
+<div id="mock-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-sm w-full text-center flex flex-col gap-4 transition-all transform scale-95 duration-300">
+        <div class="h-12 w-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20 text-cyan-400 text-xl mx-auto">
+            <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="flex flex-col gap-1">
+            <h3 class="text-base font-bold text-white tracking-wide">Simulasi Masuk Sesi</h3>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+                Ketik email &amp; password acak untuk mensimulasikan login multi-user di localhost.
+            </p>
+        </div>
+        <form id="mock-login-form" class="flex flex-col gap-3 text-left mt-1" onsubmit="handleMockSubmit(event)">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alamat Email</label>
+                <input type="email" id="mock-email-input" required placeholder="budi@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kata Sandi</label>
+                <input type="password" id="mock-password-input" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+            </div>
+            <div class="flex gap-2 mt-2">
+                <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-95 shadow-lg shadow-cyan-500/10">
+                    Masuk Sesi
+                </button>
+                <button type="button" onclick="closeMockLoginModal()" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition-all border border-slate-700/50">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     PROFILE MANAGEMENT MODAL
+     ============================================================ -->
+<div id="profile-management-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeProfileModal()"></div>
+    <div class="relative z-10 bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl" style="animation: modalIn 0.25s ease-out forwards;">
+        <div id="profile-modal-guest">
+            <h3 class="font-headline-md text-white text-lg mb-1">Masuk Google</h3>
+            <p class="text-xs text-slate-400 mb-5">Simulasi login email untuk localhost.</p>
+            <input type="email" id="signin-email-input"
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors mb-3"
+                   placeholder="nama@email.com" />
+            <button id="btn-confirm-signin"
+                    class="w-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-semibold py-2.5 rounded-xl hover:bg-cyan-500/30 transition-all text-sm">
+                Masuk
+            </button>
+        </div>
+        <div id="profile-modal-logged-in" class="hidden">
+            <div class="flex items-center gap-4 mb-5">
+                <div id="modal-avatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">?</div>
+                <div class="min-w-0">
+                    <h3 id="modal-name" class="font-headline-md text-white text-lg truncate">User</h3>
+                    <p id="modal-email" class="text-xs text-slate-400 truncate">user@gmail.com</p>
+                </div>
+            </div>
+            <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-[10px] font-semibold text-cyan-400 mb-5">
+                Sesi Simulasi Lokal (Localhost)
+            </div>
+            <div class="space-y-2.5">
+                <button id="btn-logout"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 rounded-xl text-sm font-medium text-red-300 hover:text-red-200 transition-all">
+                    <span class="material-symbols-outlined text-base">logout</span>
+                    Logout / Keluar Sesi
+                </button>
+                <button id="btn-delete-account"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/40 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-300 transition-all">
+                    <span class="material-symbols-outlined text-base">delete_forever</span>
+                    Hapus Akun
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ============================================================
+     CUSTOM ALERT MODAL (Purple Theme)
+     ============================================================ -->
+<div id="custom-alert-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-purple-500/30 shadow-2xl shadow-purple-500/10 rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-5 transition-all transform scale-95 duration-300">
+        <div class="h-16 w-16 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20 text-purple-400 text-2xl animate-pulse">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white tracking-wide">Unggah Foto Terlebih Dahulu</h3>
+        <p id="custom-alert-message" class="text-slate-400 text-sm leading-relaxed px-2">Please upload a subject image first.</p>
+        <button id="custom-alert-close" onclick="closeCustomAlert()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-purple-600/20 active:scale-95 text-xs tracking-wider uppercase">
+            Mengerti
+        </button>
+    </div>
+</div>
+</body>
+</html>

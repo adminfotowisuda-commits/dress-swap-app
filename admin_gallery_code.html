@@ -1,0 +1,384 @@
+<!DOCTYPE html><html lang="en" class="dark" style=""><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#ecdcff",
+                      "border-subtle": "#30363D",
+                      "text-primary": "#F0F6FC",
+                      "surface-container-lowest": "#0c0e12",
+                      "on-surface": "#e2e2e8",
+                      "primary-fixed-dim": "#4cd6ff",
+                      "on-tertiary-fixed-variant": "#42474f",
+                      "surface-bright": "#37393e",
+                      "surface-dim": "#111318",
+                      "error": "#ffb4ab",
+                      "surface-tint": "#4cd6ff",
+                      "secondary-fixed-dim": "#d6baff",
+                      "on-tertiary": "#2c3138",
+                      "primary-container": "#00d1ff",
+                      "on-tertiary-container": "#494e57",
+                      "on-secondary-fixed-variant": "#6000bf",
+                      "text-secondary": "#8B949E",
+                      "electric-cyan": "#00D1FF",
+                      "surface-card": "#161B22",
+                      "secondary": "#d6baff",
+                      "inverse-primary": "#00677f",
+                      "on-primary-fixed-variant": "#004e60",
+                      "surface": "#111318",
+                      "on-primary-fixed": "#001f28",
+                      "tertiary-fixed-dim": "#c2c7d0",
+                      "tertiary-fixed": "#dee2ec",
+                      "surface-container-high": "#282a2e",
+                      "background": "#111318",
+                      "surface-container-highest": "#333539",
+                      "on-error-container": "#ffdad6",
+                      "inverse-on-surface": "#2f3035",
+                      "error-container": "#93000a",
+                      "tertiary": "#d8dce6",
+                      "surface-container-low": "#1a1c20",
+                      "outline": "#859399",
+                      "surface-container": "#1e2024",
+                      "on-surface-variant": "#bbc9cf",
+                      "on-tertiary-fixed": "#171c23",
+                      "primary": "#a4e6ff",
+                      "on-secondary-fixed": "#280057",
+                      "on-primary": "#003543",
+                      "on-secondary-container": "#cba9ff",
+                      "on-primary-container": "#00566a",
+                      "outline-variant": "#3c494e",
+                      "on-secondary": "#430089",
+                      "surface-background": "#0A0C10",
+                      "tertiary-container": "#bcc0ca",
+                      "secondary-container": "#6205c3",
+                      "primary-fixed": "#b7eaff",
+                      "on-background": "#e2e2e8",
+                      "vivid-purple": "#9D5BFF",
+                      "on-error": "#690005",
+                      "surface-variant": "#333539",
+                      "inverse-surface": "#e2e2e8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "base-unit": "4px",
+                      "gutter": "24px",
+                      "container-max-width": "1440px",
+                      "margin-desktop": "32px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Geist"],
+                      "headline-xl": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["Geist"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                      "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                      "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                      "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+              }
+            },
+          },
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-surface-background text-text-primary font-body-md custom-scrollbar overflow-x-hidden">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="h-screen w-[320px] sticky left-0 top-0 flex flex-col h-full py-margin-desktop bg-surface-card dark:bg-surface-card border-r border-border-subtle z-40">
+<!-- Brand Header -->
+<div class="px-8 mb-10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-electric-cyan to-vivid-purple flex items-center justify-center shadow-[0_0_20px_rgba(0,209,255,0.3)]">
+<span class="material-symbols-outlined text-surface-background font-bold" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-electric-cyan leading-tight">SynthGen AI</h1>
+<p class="font-label-md text-label-md text-text-secondary">Admin Dashboard</p>
+</div>
+</div>
+<button class="w-full py-3 px-4 bg-electric-cyan text-surface-background font-bold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-[0.98]">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="">Create New</span>
+</button>
+</div>
+<!-- Main Nav -->
+<nav class="flex-1 px-4 space-y-1">
+<div class="group flex items-center gap-4 px-4 py-3 rounded-lg text-text-secondary hover:bg-surface-container-high hover:text-text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">Generator</span>
+</div>
+
+<!-- ACTIVE TAB: Admin Gallery -->
+<div class="flex items-center gap-4 px-4 py-3 rounded-lg bg-surface-container-high text-electric-cyan font-bold cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">collections</span>
+<span class="font-label-md text-label-md">Admin Gallery</span>
+</div>
+</nav>
+<!-- Footer Nav -->
+<div class="mt-auto px-4 pt-4 border-t border-border-subtle space-y-1">
+
+
+<!-- Profile Mini -->
+
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col bg-surface-background overflow-hidden relative">
+<!-- Decorative atmospheric blur -->
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-electric-cyan/5 blur-[120px] rounded-full -z-10"></div>
+<div class="absolute bottom-[5%] left-[5%] w-[400px] h-[400px] bg-vivid-purple/5 blur-[120px] rounded-full -z-10"></div>
+<!-- TopNavBar (Embedded Shell Logic) -->
+<header class="w-full top-0 sticky bg-surface-container-lowest/80 backdrop-blur-md border-b border-border-subtle flex justify-between items-center px-margin-desktop py-4 w-full z-50">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-text-secondary group-focus-within:text-electric-cyan transition-colors">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="bg-surface-background border border-border-subtle rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-all text-sm" placeholder="Search generations..." type="text">
+</div>
+</div>
+
+</header>
+<!-- Gallery Canvas -->
+<section class="flex-1 overflow-y-auto custom-scrollbar p-margin-desktop">
+<!-- Header / Filter Bar -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-text-primary mb-1">Admin Gallery</h2>
+<div class="flex items-center gap-2 text-text-secondary font-label-md">
+<span class="text-electric-cyan">1,240</span>
+<span class="">Generations stored</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-surface-card border border-border-subtle rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-electric-cyan transition-colors">
+<span class="text-text-secondary">Sort:</span>
+<span class="text-text-primary font-medium">Newest First</span>
+<span class="material-symbols-outlined text-xs">expand_more</span>
+</div>
+<button class="flex items-center gap-2 bg-surface-card border border-border-subtle rounded-lg px-3 py-2 text-sm hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<span class="">Filters</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid for Generations -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="image-card group bg-surface-card border border-border-subtle rounded-xl overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-all duration-300">
+<!-- Main Image Container -->
+<div class="relative aspect-video bg-surface-container-low overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLuleTQQrUVYlxT5jXnhRK_Ve6LBXGragIGjU47jj4J2Mg3Jj86Ra7vqUM2cVAqSCfKBOgphdr7j0av8yLUwHQzzTvRIpzIEK2uvgIHeVLiualpiAfFUF8eAE-5BMLklpIzY5T4XSU5ZJL4nGFkuLmS1d0EMLzuSvZo1M4BvxnLFu7LdKIvlNW_xxqjUa9pu3g3AvJrgZkVtPpW5927HtfT_wE3k_4oxWKKDMt0_R5s1kgL8DrLOtpzRwLw">
+<!-- Glassmorphic Overlay Actions -->
+<div class="image-card-overlay absolute inset-0 glass-panel flex items-center justify-center gap-4">
+<button class="w-12 h-12 rounded-full bg-electric-cyan text-surface-background flex items-center justify-center hover:scale-110 transition-transform active:scale-95 shadow-lg">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center hover:scale-110 transition-transform active:scale-95 shadow-lg">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<!-- Badges -->
+<div class="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none">
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-electric-cyan uppercase tracking-wider border border-electric-cyan/20">16:9</span>
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-text-primary border border-border-subtle flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock</span> Nano Banana 2
+                                </span>
+</div>
+</div>
+<!-- Card Footer Content -->
+<div class="p-4 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs text-text-secondary uppercase font-bold tracking-widest mb-1">References</p>
+<div class="flex gap-2">
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsYaz6VtogpmXGAcig15nL0toXSVo0KwAqUbogGyUy2jxZtyvz4yUT5MqukrDIH2QcuP2h9jmaNQ4_6Xrta_lA5R4uEnpV9kCF19HrqwbLxOTgGjPmVNbJvwPR3DbfpiF7iLC0hda4wMc1B0KSk4r50oLFcRpKFkVzmD0Hpey8d5veUWQt9op1DuAIbb3ziP4ljXmKN0lIdpYzHFYstfsbN7Rs_amnwAXZX7xnvO9qYBmflO2RvFgDdkRM">
+</div>
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLu6cGl5wtdGTg0I2Rz5tRMCDg9Fzds7X-Ara3qIqZDz9vBsiZCFAqZ1H64dKVUP_aO-v2CdtLXipm7Up2TMB7YafoYgqterexdbUktg9k2xF8YeH0a6gXcgqLfxedza-6enetOSG5dauSSp_oM1KKlbr1GNRzHPHORHntDEfEfg4t83H_yLZ28U_7Fx3X4oiq5ejr9tXfgd9ZmTetMJHUmrE6JRF3Z91EwwDLpS06z84Ub1TUaDd-LBWKEa">
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-text-secondary">Timestamp</p>
+<p class="text-xs font-medium">2m ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="image-card group bg-surface-card border border-border-subtle rounded-xl overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-all duration-300">
+<div class="relative aspect-video bg-surface-container-low overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLu70hZUHKCpNXQtSjAWbBV44rcneh_xi-akDYxnpCGlRz1oCIs9xFaqHW0zI_zBXh6uu2U7GT8vC_V1szgNF0fCfsnYc_afD-fNYgYJCVtui6olPYXzTtg8bQWyw3ZRh0wWHz28XpSXzfEuvqK6vJRog4SRTGlq-BcO3uNPKelMdwSiJjRgiIlhdlMlRtvL7A9NLD3gp-Hza3Cr37SoqWxTspjZI6chV9UdtNAesHqGt1jsxGCvgwAhEjAE">
+<div class="image-card-overlay absolute inset-0 glass-panel flex items-center justify-center gap-4">
+<button class="w-12 h-12 rounded-full bg-electric-cyan text-surface-background flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<div class="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none">
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-electric-cyan uppercase tracking-wider border border-electric-cyan/20">16:9</span>
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-text-primary border border-border-subtle flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock</span> Nano Banana 2
+                                </span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs text-text-secondary uppercase font-bold tracking-widest mb-1">References</p>
+<div class="flex gap-2">
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLu6cGl5wtdGTg0I2Rz5tRMCDg9Fzds7X-Ara3qIqZDz9vBsiZCFAqZ1H64dKVUP_aO-v2CdtLXipm7Up2TMB7YafoYgqterexdbUktg9k2xF8YeH0a6gXcgqLfxedza-6enetOSG5dauSSp_oM1KKlbr1GNRzHPHORHntDEfEfg4t83H_yLZ28U_7Fx3X4oiq5ejr9tXfgd9ZmTetMJHUmrE6JRF3Z91EwwDLpS06z84Ub1TUaDd-LBWKEa">
+</div>
+<div class="w-12 h-12 rounded border border-border-subtle bg-surface-container flex items-center justify-center text-text-secondary">
+<span class="material-symbols-outlined text-xs">add</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-text-secondary">Timestamp</p>
+<p class="text-xs font-medium">15m ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="image-card group bg-surface-card border border-border-subtle rounded-xl overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-all duration-300">
+<div class="relative aspect-video bg-surface-container-low overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLsYaz6VtogpmXGAcig15nL0toXSVo0KwAqUbogGyUy2jxZtyvz4yUT5MqukrDIH2QcuP2h9jmaNQ4_6Xrta_lA5R4uEnpV9kCF19HrqwbLxOTgGjPmVNbJvwPR3DbfpiF7iLC0hda4wMc1B0KSk4r50oLFcRpKFkVzmD0Hpey8d5veUWQt9op1DuAIbb3ziP4ljXmKN0lIdpYzHFYstfsbN7Rs_amnwAXZX7xnvO9qYBmflO2RvFgDdkRM">
+<div class="image-card-overlay absolute inset-0 glass-panel flex items-center justify-center gap-4">
+<button class="w-12 h-12 rounded-full bg-electric-cyan text-surface-background flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<div class="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none">
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-electric-cyan uppercase tracking-wider border border-electric-cyan/20">16:9</span>
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-text-primary border border-border-subtle flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock</span> Nano Banana 2
+                                </span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs text-text-secondary uppercase font-bold tracking-widest mb-1">References</p>
+<div class="flex gap-2">
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuleTQQrUVYlxT5jXnhRK_Ve6LBXGragIGjU47jj4J2Mg3Jj86Ra7vqUM2cVAqSCfKBOgphdr7j0av8yLUwHQzzTvRIpzIEK2uvgIHeVLiualpiAfFUF8eAE-5BMLklpIzY5T4XSU5ZJL4nGFkuLmS1d0EMLzuSvZo1M4BvxnLFu7LdKIvlNW_xxqjUa9pu3g3AvJrgZkVtPpW5927HtfT_wE3k_4oxWKKDMt0_R5s1kgL8DrLOtpzRwLw">
+</div>
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLu70hZUHKCpNXQtSjAWbBV44rcneh_xi-akDYxnpCGlRz1oCIs9xFaqHW0zI_zBXh6uu2U7GT8vC_V1szgNF0fCfsnYc_afD-fNYgYJCVtui6olPYXzTtg8bQWyw3ZRh0wWHz28XpSXzfEuvqK6vJRog4SRTGlq-BcO3uNPKelMdwSiJjRgiIlhdlMlRtvL7A9NLD3gp-Hza3Cr37SoqWxTspjZI6chV9UdtNAesHqGt1jsxGCvgwAhEjAE">
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-text-secondary">Timestamp</p>
+<p class="text-xs font-medium">42m ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Placeholder/Loading State for variety -->
+<div class="image-card group bg-surface-card border border-border-subtle rounded-xl overflow-hidden flex flex-col border-dashed border-2 opacity-50 hover:opacity-100 transition-all duration-300 cursor-pointer">
+<div class="flex-1 flex flex-col items-center justify-center min-h-[300px]">
+<span class="material-symbols-outlined text-4xl text-text-secondary mb-2">cloud_upload</span>
+<p class="font-label-md text-text-secondary">Drag images here to upload</p>
+</div>
+</div>
+<!-- Repeated cards to fill grid -->
+<!-- Card 4 (Re-using imagery to populate grid per instructions) -->
+<div class="image-card group bg-surface-card border border-border-subtle rounded-xl overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-all duration-300">
+<div class="relative aspect-video bg-surface-container-low overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLuleTQQrUVYlxT5jXnhRK_Ve6LBXGragIGjU47jj4J2Mg3Jj86Ra7vqUM2cVAqSCfKBOgphdr7j0av8yLUwHQzzTvRIpzIEK2uvgIHeVLiualpiAfFUF8eAE-5BMLklpIzY5T4XSU5ZJL4nGFkuLmS1d0EMLzuSvZo1M4BvxnLFu7LdKIvlNW_xxqjUa9pu3g3AvJrgZkVtPpW5927HtfT_wE3k_4oxWKKDMt0_R5s1kgL8DrLOtpzRwLw">
+<div class="absolute top-3 left-3 flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-background/80 backdrop-blur-md rounded text-[10px] font-bold text-electric-cyan border border-electric-cyan/20">16:9</span>
+</div>
+</div>
+<div class="p-4 flex justify-between items-start">
+<div>
+<p class="text-xs text-text-secondary uppercase font-bold tracking-widest mb-1">References</p>
+<div class="flex gap-2">
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsYaz6VtogpmXGAcig15nL0toXSVo0KwAqUbogGyUy2jxZtyvz4yUT5MqukrDIH2QcuP2h9jmaNQ4_6Xrta_lA5R4uEnpV9kCF19HrqwbLxOTgGjPmVNbJvwPR3DbfpiF7iLC0hda4wMc1B0KSk4r50oLFcRpKFkVzmD0Hpey8d5veUWQt9op1DuAIbb3ziP4ljXmKN0lIdpYzHFYstfsbN7Rs_amnwAXZX7xnvO9qYBmflO2RvFgDdkRM">
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xs font-medium">1h ago</p>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="image-card group bg-surface-card border border-border-subtle rounded-xl overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-all duration-300">
+<div class="relative aspect-video bg-surface-container-low overflow-hidden">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLu70hZUHKCpNXQtSjAWbBV44rcneh_xi-akDYxnpCGlRz1oCIs9xFaqHW0zI_zBXh6uu2U7GT8vC_V1szgNF0fCfsnYc_afD-fNYgYJCVtui6olPYXzTtg8bQWyw3ZRh0wWHz28XpSXzfEuvqK6vJRog4SRTGlq-BcO3uNPKelMdwSiJjRgiIlhdlMlRtvL7A9NLD3gp-Hza3Cr37SoqWxTspjZI6chV9UdtNAesHqGt1jsxGCvgwAhEjAE">
+</div>
+<div class="p-4 flex justify-between items-start">
+<div>
+<p class="text-xs text-text-secondary uppercase font-bold tracking-widest mb-1">References</p>
+<div class="flex gap-2">
+<div class="w-12 h-12 rounded border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLu6cGl5wtdGTg0I2Rz5tRMCDg9Fzds7X-Ara3qIqZDz9vBsiZCFAqZ1H64dKVUP_aO-v2CdtLXipm7Up2TMB7YafoYgqterexdbUktg9k2xF8YeH0a6gXcgqLfxedza-6enetOSG5dauSSp_oM1KKlbr1GNRzHPHORHntDEfEfg4t83H_yLZ28U_7Fx3X4oiq5ejr9tXfgd9ZmTetMJHUmrE6JRF3Z91EwwDLpS06z84Ub1TUaDd-LBWKEa">
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xs font-medium">3h ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More / Pagination -->
+<div class="mt-12 mb-8 flex justify-center">
+<button class="px-8 py-3 bg-surface-container-high border border-border-subtle rounded-full text-text-primary hover:bg-surface-container-highest transition-all flex items-center gap-2 group">
+<span class="font-label-md">Load more generations</span>
+<span class="material-symbols-outlined group-hover:translate-y-1 transition-transform">expand_more</span>
+</button>
+</div>
+</section>
+</main>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Simple search feedback
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            console.log('Searching for:', e.target.value);
+        });
+
+        // Hover animation logic for cards
+        const cards = document.querySelectorAll('.image-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Potential for adding dynamic shadows or data loading
+            });
+        });
+
+        // Mock Quick Actions
+        function handleAction(action, id) {
+            alert(`${action} triggered for generation #${id}`);
+        }
+    </script>
+
+</body></html>

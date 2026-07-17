@@ -1,0 +1,916 @@
+{
+  "users": {
+    "budi@gmail.com": {
+      "email": "budi@gmail.com",
+      "credits_balance": 17017,
+      "created_at": "2026-07-17T02:26:05.556Z",
+      "updated_at": "2026-07-17T08:12:27.321Z",
+      "password": "test123"
+    },
+    "newuser@gmail.com": {
+      "email": "newuser@gmail.com",
+      "credits_balance": 0,
+      "created_at": "2026-07-17T02:26:15.744Z",
+      "updated_at": "2026-07-17T02:26:15.744Z"
+    },
+    "test@example.com": {
+      "email": "test@example.com",
+      "credits_balance": 2000,
+      "created_at": "2026-07-17T02:38:13.338Z",
+      "updated_at": "2026-07-17T02:38:13.433Z"
+    },
+    "demo@test.com": {
+      "email": "demo@test.com",
+      "credits_balance": 5000,
+      "created_at": "2026-07-17T02:38:42.092Z",
+      "updated_at": "2026-07-17T03:19:51.396Z"
+    },
+    "siti@gmail.com": {
+      "email": "siti@gmail.com",
+      "credits_balance": 5030,
+      "created_at": "2026-07-17T02:42:46.232Z",
+      "updated_at": "2026-07-17T09:59:08.873Z",
+      "password": "1234"
+    },
+    "check@test.com": {
+      "email": "check@test.com",
+      "credits_balance": 10,
+      "created_at": "2026-07-17T02:48:12.768Z",
+      "updated_at": "2026-07-17T07:53:30.273Z"
+    },
+    "ana@gmail.com": {
+      "email": "ana@gmail.com",
+      "credits_balance": 115,
+      "created_at": "2026-07-17T08:05:33.827Z",
+      "updated_at": "2026-07-17T10:45:52.533Z",
+      "password": "123"
+    },
+    "widya@gmail.com": {
+      "email": "widya@gmail.com",
+      "password": "123",
+      "credits_balance": 10,
+      "created_at": "2026-07-17T09:52:31.544Z",
+      "updated_at": "2026-07-17T09:53:31.284Z"
+    },
+    "moci@gmail.com": {
+      "email": "moci@gmail.com",
+      "password": "123",
+      "credits_balance": 20,
+      "created_at": "2026-07-17T13:37:01.810Z",
+      "updated_at": "2026-07-17T13:37:27.511Z"
+    },
+    "bambang@gmail.com": {
+      "email": "bambang@gmail.com",
+      "password": "123",
+      "credits_balance": 16,
+      "created_at": "2026-07-17T14:17:09.020Z",
+      "updated_at": "2026-07-17T14:38:37.364Z"
+    }
+  },
+  "transactions": [
+    {
+      "invoice_number": "INV-1784255165643-JGJU",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:26:05.643Z"
+    },
+    {
+      "invoice_number": "INV-1784255165643-JGJU",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:26:05.649Z"
+    },
+    {
+      "invoice_number": "INV-1784255311345-29QY",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T02:28:31.345Z"
+    },
+    {
+      "invoice_number": "INV-1784255472263-SH7C",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T02:31:12.263Z"
+    },
+    {
+      "invoice_number": "INV-1784255530184-M6XL",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T02:32:10.184Z"
+    },
+    {
+      "invoice_number": "INV-1784255611077-ILKD",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T02:33:31.077Z"
+    },
+    {
+      "invoice_number": "INV-1784255796698-LSJM",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T02:36:36.698Z"
+    },
+    {
+      "invoice_number": "INV-1784255893140-6M8V",
+      "email": "test@example.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:38:13.140Z"
+    },
+    {
+      "invoice_number": "INV-1784255893140-6M8V",
+      "email": "test@example.com",
+      "amount": 2000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:38:13.433Z"
+    },
+    {
+      "invoice_number": "INV-1784255921901-NGSM",
+      "email": "demo@test.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:38:41.901Z"
+    },
+    {
+      "invoice_number": "INV-1784255921901-NGSM",
+      "email": "demo@test.com",
+      "amount": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:38:42.097Z"
+    },
+    {
+      "invoice_number": "INV-1784256128115-HOFN",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:42:08.115Z"
+    },
+    {
+      "invoice_number": "INV-1784256128115-HOFN",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:42:08.325Z"
+    },
+    {
+      "invoice_number": "INV-1784256136174-7537",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:42:16.175Z"
+    },
+    {
+      "invoice_number": "INV-1784256136174-7537",
+      "email": "budi@gmail.com",
+      "amount": 2000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:42:16.290Z"
+    },
+    {
+      "invoice_number": "INV-1784256375826-AI8L",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:46:15.826Z"
+    },
+    {
+      "invoice_number": "INV-1784256375826-AI8L",
+      "email": "siti@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:46:16.420Z"
+    },
+    {
+      "invoice_number": "INV-1784256492806-PX8A",
+      "email": "check@test.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:48:12.806Z"
+    },
+    {
+      "invoice_number": "INV-1784256600281-KJ9W",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:50:00.281Z"
+    },
+    {
+      "invoice_number": "INV-1784256608154-TRB1",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:50:08.154Z"
+    },
+    {
+      "invoice_number": "INV-1784256741520-6QX9",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:52:21.520Z"
+    },
+    {
+      "invoice_number": "INV-1784256745359-T0X4",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:52:25.359Z"
+    },
+    {
+      "invoice_number": "INV-1784256910163-ED6Y",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:55:10.163Z"
+    },
+    {
+      "invoice_number": "INV-1784256910772-IPNZ",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:55:10.772Z"
+    },
+    {
+      "invoice_number": "INV-1784256911340-HN4S",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:55:11.341Z"
+    },
+    {
+      "invoice_number": "INV-1784256911753-LJYQ",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T02:55:11.753Z"
+    },
+    {
+      "invoice_number": "INV-1784256973650-TIV0",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:56:13.650Z"
+    },
+    {
+      "invoice_number": "INV-1784256973650-TIV0",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:56:13.833Z"
+    },
+    {
+      "invoice_number": "INV-1784257022262-R0FL",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:57:02.262Z"
+    },
+    {
+      "invoice_number": "INV-1784257022262-R0FL",
+      "email": "siti@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:57:02.424Z"
+    },
+    {
+      "invoice_number": "INV-1784257032499-BVS4",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:57:12.499Z"
+    },
+    {
+      "invoice_number": "INV-1784257032499-BVS4",
+      "email": "siti@gmail.com",
+      "amount": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:57:12.621Z"
+    },
+    {
+      "invoice_number": "INV-1784257144435-DHXS",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:59:04.435Z"
+    },
+    {
+      "invoice_number": "INV-1784257144435-DHXS",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T02:59:04.595Z"
+    },
+    {
+      "invoice_number": "INV-1784257261832-CFCI",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T03:01:01.833Z"
+    },
+    {
+      "invoice_number": "INV-1784257627190-U4IO",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T03:07:07.190Z"
+    },
+    {
+      "invoice_number": "INV-1784257630393-ELNN",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T03:07:10.393Z"
+    },
+    {
+      "invoice_number": "INV-1784257631223-9C6F",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T03:07:11.223Z"
+    },
+    {
+      "invoice_number": "INV-1784257631636-KCIQ",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T03:07:11.636Z"
+    },
+    {
+      "invoice_number": "INV-1784257735556-OQ5Y",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "failed",
+      "created_at": "2026-07-17T03:08:55.556Z"
+    },
+    {
+      "invoice_number": "INV-1784257807308-B81I",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:10:07.308Z"
+    },
+    {
+      "invoice_number": "INV-1784257807308-B81I",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:10:07.534Z"
+    },
+    {
+      "invoice_number": "INV-1784257840227-XULH",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:10:40.228Z"
+    },
+    {
+      "invoice_number": "INV-1784257840227-XULH",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:10:40.502Z"
+    },
+    {
+      "invoice_number": "INV-1784257843601-EFK1",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:10:43.602Z"
+    },
+    {
+      "invoice_number": "INV-1784257843601-EFK1",
+      "email": "budi@gmail.com",
+      "amount": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:10:43.690Z"
+    },
+    {
+      "invoice_number": "INV-1784258012036-RNVN",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:13:32.037Z"
+    },
+    {
+      "invoice_number": "INV-1784258012036-RNVN",
+      "email": "budi@gmail.com",
+      "amount": 3000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:13:32.161Z"
+    },
+    {
+      "invoice_number": "INV-1784258391069-PUWG",
+      "email": "demo@test.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:19:51.069Z"
+    },
+    {
+      "invoice_number": "INV-1784258391069-PUWG",
+      "email": "demo@test.com",
+      "amount": 2000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T03:19:51.396Z"
+    },
+    {
+      "invoice_number": "INV-1784270395667-9MN9",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T06:39:55.668Z"
+    },
+    {
+      "invoice_number": "INV-1784270395667-9MN9",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T06:40:04.677Z"
+    },
+    {
+      "invoice_number": "INV-1784270409160-RU80",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 2000,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T06:40:09.161Z"
+    },
+    {
+      "invoice_number": "INV-1784270443857-3PBN",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T06:40:43.857Z"
+    },
+    {
+      "invoice_number": "INV-1784270443857-3PBN",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T06:40:46.715Z"
+    },
+    {
+      "invoice_number": "INV-1784270643475-0JZK",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T06:44:03.476Z"
+    },
+    {
+      "invoice_number": "INV-1784270643475-0JZK",
+      "email": "budi@gmail.com",
+      "amount": 1000,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T06:44:10.144Z"
+    },
+    {
+      "invoice_number": "INV-1784274809930-9AH6",
+      "email": "check@test.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T07:53:29.930Z"
+    },
+    {
+      "invoice_number": "INV-1784274809930-9AH6",
+      "email": "check@test.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T07:53:30.273Z"
+    },
+    {
+      "invoice_number": "INV-1784275048904-UI1O",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T07:57:28.904Z"
+    },
+    {
+      "invoice_number": "INV-1784275059351-H3UD",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 30,
+      "type": "top-up",
+      "status": "pending",
+      "created_at": "2026-07-17T07:57:39.351Z"
+    },
+    {
+      "invoice_number": "INV-1784275603419-XCB2",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:06:43.419Z"
+    },
+    {
+      "invoice_number": "INV-1784275603419-XCB2",
+      "email": "ana@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:06:45.557Z"
+    },
+    {
+      "invoice_number": "INV-1784275619232-FQ55",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:06:59.232Z"
+    },
+    {
+      "invoice_number": "INV-1784275619232-FQ55",
+      "email": "ana@gmail.com",
+      "amount": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:07:01.475Z"
+    },
+    {
+      "invoice_number": "INV-1784275946891-V0R9",
+      "email": "budi@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:12:26.891Z"
+    },
+    {
+      "invoice_number": "INV-1784275946891-V0R9",
+      "email": "budi@gmail.com",
+      "amount": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:12:27.321Z"
+    },
+    {
+      "invoice_number": "INV-1784276322498-6WE3",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:18:42.498Z"
+    },
+    {
+      "invoice_number": "INV-1784276322498-6WE3",
+      "email": "ana@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:18:46.450Z"
+    },
+    {
+      "invoice_number": "INV-1784276332922-A2WO",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:18:52.922Z"
+    },
+    {
+      "invoice_number": "INV-1784276332922-A2WO",
+      "email": "ana@gmail.com",
+      "amount": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:18:54.219Z"
+    },
+    {
+      "invoice_number": "INV-1784276339731-D3QG",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 30,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:18:59.731Z"
+    },
+    {
+      "invoice_number": "INV-1784276339731-D3QG",
+      "email": "ana@gmail.com",
+      "amount": 30,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T08:19:00.827Z"
+    },
+    {
+      "invoice_number": "INV-1784280495525-B516",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:28:15.525Z"
+    },
+    {
+      "invoice_number": "INV-1784280495525-B516",
+      "email": "ana@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:28:18.263Z"
+    },
+    {
+      "invoice_number": "INV-1784281659663-ML9B",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:47:39.664Z"
+    },
+    {
+      "invoice_number": "INV-1784281659663-ML9B",
+      "email": "ana@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:47:41.427Z"
+    },
+    {
+      "invoice_number": "INV-1784282000732-CWKR",
+      "email": "widya@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:53:20.732Z"
+    },
+    {
+      "invoice_number": "INV-1784282000732-CWKR",
+      "email": "widya@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:53:31.284Z"
+    },
+    {
+      "invoice_number": "INV-1784282340627-EG7J",
+      "email": "siti@gmail.com",
+      "package_id": "pkg_trial_7k",
+      "amount": 7000,
+      "credits": 30,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:59:00.628Z"
+    },
+    {
+      "invoice_number": "INV-1784282340627-EG7J",
+      "email": "siti@gmail.com",
+      "amount": 30,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T09:59:08.873Z"
+    },
+    {
+      "invoice_number": "INV-1784285150421-YQ13",
+      "email": "ana@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T10:45:50.421Z"
+    },
+    {
+      "invoice_number": "INV-1784285150421-YQ13",
+      "email": "ana@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T10:45:52.533Z"
+    },
+    {
+      "invoice_number": "INV-1784295444669-65GU",
+      "email": "moci@gmail.com",
+      "package_id": "pkg_trial_6k",
+      "amount": 6000,
+      "credits": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T13:37:24.669Z"
+    },
+    {
+      "invoice_number": "INV-1784295444669-65GU",
+      "email": "moci@gmail.com",
+      "amount": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T13:37:27.512Z"
+    },
+    {
+      "invoice_number": "INV-1784298009245-2KGD",
+      "email": "bambang@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T14:20:09.245Z"
+    },
+    {
+      "invoice_number": "INV-1784298009245-2KGD",
+      "email": "bambang@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T14:20:12.095Z"
+    },
+    {
+      "invoice_number": "INV-1784299116190-1UI1",
+      "email": "bambang@gmail.com",
+      "package_id": "pkg_trial_5k",
+      "amount": 5000,
+      "credits": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T14:38:36.190Z"
+    },
+    {
+      "invoice_number": "INV-1784299116190-1UI1",
+      "email": "bambang@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-17T14:38:37.364Z"
+    }
+  ],
+  "packages": [
+    {
+      "package_id": "pkg_trial_5k",
+      "name": "Paket Trial Pemula",
+      "price": 5000,
+      "credits_given": 10
+    },
+    {
+      "package_id": "pkg_trial_6k",
+      "name": "Paket Trial Menengah",
+      "price": 6000,
+      "credits_given": 20
+    },
+    {
+      "package_id": "pkg_trial_7k",
+      "name": "Paket Trial Pro",
+      "price": 7000,
+      "credits_given": 30
+    }
+  ]
+}

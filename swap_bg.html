@@ -1,0 +1,1322 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <script>
+        if (!localStorage.getItem('active_user_email')) {
+            window.location.href = '/';
+        }
+    </script>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Background Change â€” fotowisuda.ai</title>
+
+    <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN with Forms + Container Queries plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration: DESIGN.md colors, typography, animations -->
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary": "#430089",
+                            "on-tertiary-fixed": "#171c23",
+                            "tertiary-fixed-dim": "#c2c7d0",
+                            "on-surface-variant": "#bbc9cf",
+                            "text-secondary": "#8B949E",
+                            "tertiary-fixed": "#dee2ec",
+                            "surface-container": "#1e2024",
+                            "inverse-surface": "#e2e2e8",
+                            "secondary-container": "#6205c3",
+                            "outline": "#859399",
+                            "surface-dim": "#111318",
+                            "on-error": "#690005",
+                            "on-error-container": "#ffdad6",
+                            "on-tertiary": "#2c3138",
+                            "inverse-on-surface": "#2f3035",
+                            "on-background": "#e2e2e8",
+                            "outline-variant": "#3c494e",
+                            "primary-fixed": "#b7eaff",
+                            "on-tertiary-fixed-variant": "#42474f",
+                            "tertiary": "#d8dce6",
+                            "surface-variant": "#333539",
+                            "surface-container-lowest": "#0c0e12",
+                            "vivid-purple": "#9D5BFF",
+                            "on-secondary-fixed": "#280057",
+                            "on-primary-container": "#00566a",
+                            "background": "#111318",
+                            "error": "#ffb4ab",
+                            "secondary-fixed-dim": "#d6baff",
+                            "surface-container-high": "#282a2e",
+                            "on-tertiary-container": "#494e57",
+                            "surface-background": "#0A0C10",
+                            "secondary-fixed": "#ecdcff",
+                            "primary-container": "#00d1ff",
+                            "surface-tint": "#4cd6ff",
+                            "surface-card": "#161B22",
+                            "primary-fixed-dim": "#4cd6ff",
+                            "secondary": "#d6baff",
+                            "on-surface": "#e2e2e8",
+                            "on-secondary-container": "#cba9ff",
+                            "surface-container-low": "#1a1c20",
+                            "surface-bright": "#37393e",
+                            "on-primary-fixed-variant": "#004e60",
+                            "electric-cyan": "#00D1FF",
+                            "tertiary-container": "#bcc0ca",
+                            "border-subtle": "#30363D",
+                            "surface": "#111318",
+                            "inverse-primary": "#00677f",
+                            "primary": "#a4e6ff",
+                            "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC",
+                            "on-primary-fixed": "#001f28",
+                            "on-primary": "#003543",
+                            "error-container": "#93000a",
+                            "on-secondary-fixed-variant": "#6000bf"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                        },
+                        "spacing": {
+                            "margin-desktop": "32px",
+                            "gutter": "24px",
+                            "base-unit": "4px",
+                            "container-max-width": "1440px",
+                            "margin-mobile": "16px"
+                        },
+                        "fontFamily": {
+                            "headline-xl": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "label-sm": ["Geist"],
+                            "label-md": ["Geist"],
+                            "headline-lg-mobile": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "body-md": ["Inter"],
+                            "body-lg": ["Inter"]
+                        },
+                        "fontSize": {
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                        },
+                        "animation": {
+                            "breathing": "breathing 4s ease-in-out infinite",
+                            "pulse-cyan": "pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                            "lightning-flash": "lightning-flash 2s infinite ease-out",
+                            "energy-pulse": "energy-pulse 2.5s infinite"
+                        },
+                        "keyframes": {
+                            "breathing": {
+                                "0%, 100%": { transform: "scale(1)", opacity: "1" },
+                                "50%": { transform: "scale(1.05)", opacity: "0.8" }
+                            },
+                            "pulse-cyan": {
+                                "0%, 100%": { opacity: "1", boxShadow: "0 0 0 0 rgba(0, 209, 255, 0.4)" },
+                                "50%": { opacity: "0.5", boxShadow: "0 0 20px 4px rgba(0, 209, 255, 0.2)" }
+                            },
+                            "lightning-flash": {
+                                "0%, 10%, 100%": { opacity: "0", transform: "scale(0.8)" },
+                                "5%": { opacity: "1", transform: "scale(1.2)" },
+                                "7%": { opacity: "0.4", transform: "scale(1)" },
+                                "8%": { opacity: "1", transform: "scale(1.1)" }
+                            },
+                            "energy-pulse": {
+                                "0%, 100%": { boxShadow: "0 0 15px 0px rgba(0, 209, 255, 0.3)" },
+                                "50%": { boxShadow: "0 0 35px 5px rgba(0, 209, 255, 0.6)" }
+                            }
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        /* ============================================================
+           Custom Styles â€” Background Swap Tool
+           ============================================================ */
+
+        .ratio-slider {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .progress-glow {
+            box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+        }
+
+        /* Lightning Effect Custom Classes */
+        .lightning-bolt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+
+        .lightning-svg {
+            position: absolute;
+            fill: #0A0C10;
+            filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+            opacity: 0;
+        }
+
+        .generate-btn:hover .lightning-svg {
+            animation-duration: 0.8s !important;
+        }
+
+        .generate-btn:hover {
+            box-shadow: 0 0 50px 10px rgba(0, 209, 255, 0.7) !important;
+        }
+
+        /* Upload preview image styling */
+        .upload-preview-img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+        }
+
+        /* Upload zone filled state */
+        .upload-zone-filled {
+            border-style: solid !important;
+            padding: 0 !important;
+        }
+
+        /* Fade transitions */
+        .fade-transition {
+            transition: opacity 0.5s ease;
+        }
+
+        /* Result image container */
+        .result-image-fit {
+            object-fit: contain;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Error flash animation */
+        @keyframes errorFlash {
+            0%, 100% { border-color: #30363D; }
+            50% { border-color: #ffb4ab; }
+        }
+        .error-flash {
+            animation: errorFlash 0.6s ease-in-out 3;
+        }
+
+        /* 503 Error Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(10, 12, 16, 0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: #161B22; border: 1px solid #30363D; border-radius: 1.5rem;
+            padding: 2.5rem 2rem 2rem; max-width: 420px; width: 90%;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transform: translateY(12px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+
+        /* Premium fade-in-up animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-title {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glowing-gradient-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #a855f7, #ec4899, #38bdf8);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease infinite;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+        }
+
+        /* Before-After Slideshow Animation â€” Cinema Zoom-Out Crossfade (4s cycle) */
+        @keyframes zoomOutBefore {
+            /* 0sâ€“1.5s: Stable BEFORE hold */
+            0%, 37.5% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            /* 1.5sâ€“2.0s: Zoom-out + fade out â†’ AFTER reveals */
+            /* 2.0sâ€“3.5s: Fully hidden behind AFTER */
+            50%, 87.5% {
+                opacity: 0;
+                transform: scale(1.25);
+            }
+            /* 3.5sâ€“4.0s: Zoom-in + fade in â†’ BEFORE returns */
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        @keyframes zoomOutAfter {
+            /* 0sâ€“1.5s: Fully hidden behind BEFORE */
+            0%, 37.5% {
+                opacity: 0;
+                transform: scale(1.25);
+            }
+            /* 1.5sâ€“2.0s: Zoom-in + fade in â†’ AFTER reveals */
+            /* 2.0sâ€“3.5s: Stable AFTER hold */
+            50%, 87.5% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            /* 3.5sâ€“4.0s: Fade out â†’ BEFORE returns */
+            100% {
+                opacity: 0;
+                transform: scale(1.25);
+            }
+        }
+        .slideshow-before {
+            animation: zoomOutBefore 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+        .slideshow-after {
+            animation: zoomOutAfter 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+    </style>
+<script src="/sidebar.js"></script>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
+
+    <!-- ============================================================
+         TOP NAVIGATION BAR â€” Full-width, glassmorphic
+         ============================================================ -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle-btn" class="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+    </header>
+
+    <!-- ============================================================
+
+    <!-- ============================================================
+         MAIN WORKSPACE â€” Offset for sidebar + header
+         ============================================================ -->
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex items-start justify-center">
+        <!-- ========================================================
+             MAIN CONFIG PANEL â€” Centered, focused dashboard layout
+             ======================================================== -->
+        <section class="w-full max-w-[480px] bg-surface-dim overflow-y-auto hide-scrollbar p-6 flex flex-col">
+            <div class="flex-1 space-y-6">
+
+                <!-- Header -->
+                <header>
+                    <h3 class="font-headline-lg text-headline-lg mb-2 animate-title glowing-gradient-title">Background Change</h3>
+                    <p class="text-text-secondary font-body-md text-xs">Ubah latar foto wisudamu menjadi <strong class="text-white">studio</strong> atau <strong class="text-white">kampus</strong> secara instan dan rapi.</p>
+                </header>
+
+                <!-- Before-After Comparison Slider -->
+                <!-- Animated Before-After Slideshow â€” Cinema Zoom-Out Crossfade -->
+                <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-cyan-500/5 mx-auto max-w-[280px]">
+                    <!-- BEFORE image -->
+                    <img src="/Image_display_background_change/before_bg_change.jpg"
+                         alt="Before"
+                         class="slideshow-before absolute inset-0 w-full h-full object-cover" />
+                    <!-- AFTER image -->
+                    <img src="/Image_display_background_change/after_bg_change.webp"
+                         alt="After"
+                         class="slideshow-after absolute inset-0 w-full h-full object-cover" />
+                    <!-- BEFORE badge -->
+                    <div class="slideshow-before absolute top-3 left-3 bg-slate-900/85 border border-slate-600/40 text-[10px] font-bold text-slate-200 px-2.5 py-1 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none">BEFORE</div>
+                    <!-- AFTER badge -->
+                    <div class="slideshow-after absolute top-3 right-3 bg-cyan-500/20 border border-cyan-500/40 text-[10px] font-bold text-cyan-300 px-2.5 py-1 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-cyan-500/10">AFTER</div>
+                </div>
+
+                <!-- STEP 1: THE GRADUATE -->
+                <div>
+                    <div class="text-center mb-3">
+                        <p class="font-bold text-sm tracking-wide text-white">THE GRADUATE</p>
+                        <p class="text-xs text-slate-400 font-medium mt-1">IMAGE REFERENCE 1</p>
+                    </div>
+                    <div id="upload-zone-1"
+                         class="border-2 border-dashed border-border-subtle rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group hover:border-electric-cyan/50 dropzone-hover-pulse transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden aspect-[2/3] min-h-[260px]"
+                         onclick="document.getElementById('fileInput1').click()">
+                        <div id="upload-placeholder-1" class="flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-0 text-text-secondary group-hover:text-electric-cyan transition-colors"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M6 12.5v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"/><path d="M21.5 12v6"/></svg>
+                            <div class="text-center">
+                                <p class="text-text-primary font-bold text-sm">Drop graduate photo here</p>
+                                <p class="text-text-secondary text-xs">PNG, JPG or WEBP (Max. 10MB)</p>
+                            </div>
+                        </div>
+                        <img id="upload-preview-1" class="upload-preview-img absolute inset-0 hidden" alt="Graduate preview" />
+                        <button id="upload-remove-1"
+                                class="absolute top-3 right-3 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
+                                onclick="event.stopPropagation(); removeReferenceImage(1)"
+                                title="Remove image">
+                            <span class="material-symbols-outlined text-sm text-error">close</span>
+                        </button>
+                        <input type="file" id="fileInput1" accept="image/*" class="hidden" onchange="handleFileSelect(event, 1)">
+                    </div>
+                </div>
+
+                <!-- STEP 2: THE BACKGROUND -->
+                <div>
+                    <div class="text-center mb-3">
+                        <p class="font-bold text-sm tracking-wide text-white">THE BACKGROUND</p>
+                        <p class="text-xs text-slate-400 font-medium mt-1">IMAGE REFERENCE 2</p>
+                    </div>
+                    <div id="upload-zone-2"
+                         class="border-2 border-dashed border-border-subtle rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group hover:border-vivid-purple/50 dropzone-hover-pulse transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden aspect-[2/3] min-h-[260px]"
+                         onclick="document.getElementById('fileInput2').click()">
+                        <div id="upload-placeholder-2" class="flex flex-col items-center gap-2">
+                            <span class="material-symbols-outlined text-3xl text-text-secondary group-hover:text-vivid-purple transition-colors">add_photo_alternate</span>
+                            <div class="text-center">
+                                <p class="text-text-primary font-bold text-sm">Drop background here</p>
+                                <p class="text-text-secondary text-xs">Reference the target aesthetic</p>
+                            </div>
+                        </div>
+                        <img id="upload-preview-2" class="upload-preview-img absolute inset-0 hidden" alt="Background preview" />
+                        <button id="upload-remove-2"
+                                class="absolute top-3 right-3 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
+                                onclick="event.stopPropagation(); removeReferenceImage(2)"
+                                title="Remove image">
+                            <span class="material-symbols-outlined text-sm text-error">close</span>
+                        </button>
+                        <input type="file" id="fileInput2" accept="image/*" class="hidden" onchange="handleFileSelect(event, 2)">
+                    </div>
+                </div>
+
+                <!-- Aspect Ratio Selection (Sliding Toggle) -->
+                <div class="space-y-4">
+                    <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80">
+                        Aspect Ratio
+                    </label>
+                    <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden"
+                         id="ratio-container">
+                        <div class="ratio-slider absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-electric-cyan rounded-lg z-0"
+                             id="ratioHighlight"></div>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300"
+                                data-ratio="2:3">2:3</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300"
+                                data-ratio="4:5">4:5</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300"
+                                data-ratio="4:3">4:3</button>
+                    </div>
+                    <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">
+                        Dimensions: 1696 Ã— 2528 px
+                    </p>
+                </div>
+
+                <!-- GENERATE NOW CTA Button -->
+                <button id="generate-btn"
+                        class="generate-btn relative w-full bg-electric-cyan text-surface-background font-black py-5 rounded-xl flex items-center justify-center gap-3 overflow-hidden animate-energy-pulse transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <!-- Lightning Bolt Effects Layer -->
+                    <div class="lightning-bolt" id="lightningContainer">
+                        <svg class="lightning-svg animate-lightning-flash" style="width: 20px; height: 40px; top: -5px; left: 15%; animation-delay: 0.2s;" viewBox="0 0 24 24">
+                            <path d="M7 2v11h3v9l7-12h-4l4-8z"></path>
+                        </svg>
+                        <svg class="lightning-svg animate-lightning-flash" style="width: 15px; height: 30px; bottom: -5px; right: 20%; animation-delay: 1.1s; transform: rotate(180deg);" viewBox="0 0 24 24">
+                            <path d="M7 2v11h3v9l7-12h-4l4-8z"></path>
+                        </svg>
+                        <svg class="lightning-svg animate-lightning-flash" style="width: 12px; height: 25px; top: 20%; left: 80%; animation-delay: 0.7s;" viewBox="0 0 24 24">
+                            <path d="M7 2v11h3v9l7-12h-4l4-8z"></path>
+                        </svg>
+                        <svg class="lightning-svg animate-lightning-flash" style="width: 18px; height: 35px; bottom: 10%; left: 5%; animation-delay: 1.5s;" viewBox="0 0 24 24">
+                            <path d="M7 2v11h3v9l7-12h-4l4-8z"></path>
+                        </svg>
+                    </div>
+                    <!-- Content Layer -->
+                    <span class="relative z-10 material-symbols-outlined font-bold">bolt</span>
+                    <span class="relative z-10 uppercase tracking-tighter text-lg">Generate Now</span>
+                </button>
+
+
+            </div>
+        </section>
+    </main>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // =====================================================
+        // CONFIGURATION
+        // =====================================================
+
+        /** API base URL â€” always the same server that served this page. */
+        const API_BASE = window.location.origin;
+
+        /**
+         * Aspect ratio â†’ pixel dimensions (PRD spec):
+         *   2:3 â†’ 1696 Ã— 2528
+         *   4:5 â†’ 1856 Ã— 2304
+         *   4:3 â†’ 2400 Ã— 1792
+         */
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        // =====================================================
+        // APPLICATION STATE
+        // =====================================================
+
+        const state = {
+            selectedRatio: '2:3',
+            selectedDimensions: ASPECT_RATIO_DIMENSIONS['2:3'],
+            referenceImages: [null, null],          // File objects [slot1, slot2]
+            isGenerating: false,
+            generationId: null,
+            generatedImageUrl: null,
+            pollTimer: null
+        };
+
+        // =====================================================
+        // DOM REFERENCES
+        // =====================================================
+
+        const DOM = {
+            // Upload zones
+            uploadZone1: null,
+            uploadZone2: null,
+            // Ratio
+            ratioHighlight: null,
+            ratioButtons: null,
+            dimensionReadout: null,
+            // Generate button
+            generateBtn: null,
+            // Panel states
+            placeholderContent: null,
+            processingState: null,
+            resultImage: null,
+            // Progress
+            progressBar: null,
+            progressPercentage: null,
+            progressDetail: null,
+            processingText: null,
+            // Status
+            statusLabel: null,
+            footerStatus: null,
+            statusCircle: null,
+            // Download
+            downloadBtn: null
+        };
+
+        function cacheDomReferences() {
+            DOM.uploadZone1       = document.getElementById('upload-zone-1');
+            DOM.uploadZone2       = document.getElementById('upload-zone-2');
+            DOM.ratioHighlight    = document.getElementById('ratioHighlight');
+            DOM.ratioButtons      = document.querySelectorAll('.ratio-btn');
+            DOM.dimensionReadout  = document.getElementById('dimension-readout');
+            DOM.generateBtn       = document.getElementById('generate-btn');
+            DOM.placeholderContent = document.getElementById('placeholderContent');
+            DOM.processingState   = document.getElementById('processingState');
+            DOM.resultImage       = document.getElementById('resultImage');
+            DOM.progressBar       = document.getElementById('progressBar');
+            DOM.progressPercentage = document.getElementById('progressPercentage');
+            DOM.progressDetail    = document.getElementById('progressDetail');
+            DOM.processingText    = document.getElementById('processingText');
+            DOM.statusLabel       = document.getElementById('statusLabel');
+            DOM.footerStatus      = document.getElementById('footerStatus');
+            DOM.statusCircle      = document.getElementById('statusCircle');
+            DOM.downloadBtn       = document.getElementById('downloadBtn');
+        }
+
+        // =====================================================
+        // ASPECT RATIO LOGIC
+        // =====================================================
+
+        function moveHighlight(index) {
+            if (!DOM.ratioHighlight) return;
+
+            const highlight = DOM.ratioHighlight;
+            const buttons = DOM.ratioButtons;
+
+            highlight.style.transform = `translateX(${index * 100}%)`;
+
+            buttons.forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.add('text-surface-background', 'font-bold');
+                    btn.classList.remove('text-text-secondary', 'font-medium');
+                } else {
+                    btn.classList.remove('text-surface-background', 'font-bold');
+                    btn.classList.add('text-text-secondary', 'font-medium');
+                }
+            });
+
+            // Update state
+            const ratio = buttons[index].getAttribute('data-ratio');
+            state.selectedRatio = ratio;
+            state.selectedDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
+
+            if (DOM.dimensionReadout && state.selectedDimensions) {
+                DOM.dimensionReadout.textContent =
+                    `Dimensions: ${state.selectedDimensions.width} Ã— ${state.selectedDimensions.height} px`;
+            }
+        }
+
+        function initAspectRatio() {
+            DOM.ratioButtons.forEach((btn, idx) => {
+                btn.addEventListener('click', () => moveHighlight(idx));
+            });
+            // Initialize with default (2:3 at index 0)
+            moveHighlight(0);
+        }
+
+        // =====================================================
+        // IMAGE REFERENCE HANDLING
+        // =====================================================
+
+        window.handleFileSelect = function(event, slotNumber) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file (PNG, JPEG, WebP).');
+                event.target.value = '';
+                return;
+            }
+
+            // Store reference
+            state.referenceImages[slotNumber - 1] = file;
+
+            // Update UI
+            const preview     = document.getElementById(`upload-preview-${slotNumber}`);
+            const placeholder = document.getElementById(`upload-placeholder-${slotNumber}`);
+            const removeBtn   = document.getElementById(`upload-remove-${slotNumber}`);
+            const zone        = document.getElementById(`upload-zone-${slotNumber}`);
+
+            if (preview && placeholder && removeBtn && zone) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    removeBtn.classList.remove('hidden');
+                    zone.classList.add('upload-zone-filled');
+                    if (slotNumber === 1) {
+                        zone.classList.add('border-electric-cyan/50');
+                    } else {
+                        zone.classList.add('border-vivid-purple/50');
+                    }
+                    zone.classList.remove('border-dashed', 'border-border-subtle');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.removeReferenceImage = function(slotNumber) {
+            state.referenceImages[slotNumber - 1] = null;
+
+            const preview     = document.getElementById(`upload-preview-${slotNumber}`);
+            const placeholder = document.getElementById(`upload-placeholder-${slotNumber}`);
+            const removeBtn   = document.getElementById(`upload-remove-${slotNumber}`);
+            const zone        = document.getElementById(`upload-zone-${slotNumber}`);
+            const fileInput   = document.getElementById(`fileInput${slotNumber}`);
+
+            if (preview)     { preview.classList.add('hidden'); preview.src = ''; }
+            if (placeholder)  placeholder.classList.remove('hidden');
+            if (removeBtn)    removeBtn.classList.add('hidden');
+            if (zone) {
+                zone.classList.remove('upload-zone-filled', 'border-electric-cyan/50', 'border-vivid-purple/50');
+                zone.classList.add('border-dashed', 'border-border-subtle');
+            }
+            if (fileInput)    fileInput.value = '';
+        };
+
+        // =====================================================
+        // PANEL STATE MANAGEMENT
+        // =====================================================
+
+        function showPlaceholder() {
+            if (DOM.placeholderContent) {
+                DOM.placeholderContent.style.opacity = '1';
+                DOM.placeholderContent.classList.remove('pointer-events-none');
+            }
+            if (DOM.processingState) {
+                DOM.processingState.style.opacity = '0';
+                DOM.processingState.classList.add('pointer-events-none');
+            }
+            if (DOM.resultImage) {
+                DOM.resultImage.classList.add('hidden');
+            }
+        }
+
+        function showProcessing() {
+            if (DOM.placeholderContent) {
+                DOM.placeholderContent.style.opacity = '0';
+                DOM.placeholderContent.classList.add('pointer-events-none');
+            }
+            if (DOM.processingState) {
+                DOM.processingState.style.opacity = '1';
+                DOM.processingState.classList.remove('pointer-events-none');
+            }
+            if (DOM.resultImage) {
+                DOM.resultImage.classList.add('hidden');
+            }
+        }
+
+        function showResult(imageUrl) {
+            if (DOM.placeholderContent) {
+                DOM.placeholderContent.style.opacity = '0';
+                DOM.placeholderContent.classList.add('pointer-events-none');
+            }
+            if (DOM.processingState) {
+                DOM.processingState.style.opacity = '0';
+                DOM.processingState.classList.add('pointer-events-none');
+            }
+            if (DOM.resultImage) {
+                DOM.resultImage.src = imageUrl;
+                DOM.resultImage.classList.remove('hidden');
+            }
+        }
+
+        // =====================================================
+        // PROGRESS UI
+        // =====================================================
+
+        function updateProgress(percent, detail, processingLabel) {
+            const pct = Math.min(100, Math.max(0, percent));
+            if (DOM.progressBar)       DOM.progressBar.style.width       = `${pct}%`;
+            if (DOM.progressPercentage) DOM.progressPercentage.textContent = `${Math.floor(pct)}%`;
+            if (detail && DOM.progressDetail)  DOM.progressDetail.textContent  = detail;
+            if (processingLabel && DOM.processingText) DOM.processingText.textContent = processingLabel;
+        }
+
+        function updateStatus(status) {
+            if (DOM.statusLabel) {
+                switch (status) {
+                    case 'PENDING':   DOM.statusLabel.textContent = 'Queued...'; break;
+                    case 'PROCESSING': DOM.statusLabel.textContent = 'Processing...'; break;
+                    case 'COMPLETE':   DOM.statusLabel.textContent = 'Completed'; break;
+                    case 'FAILED':     DOM.statusLabel.textContent = 'Failed'; break;
+                    default:           DOM.statusLabel.textContent = status;
+                }
+            }
+            if (DOM.footerStatus) {
+                switch (status) {
+                    case 'PENDING':
+                    case 'PROCESSING':
+                        DOM.footerStatus.textContent = 'RUNNING';
+                        if (DOM.statusCircle) DOM.statusCircle.classList.add('animate-pulse-cyan');
+                        break;
+                    case 'COMPLETE':
+                        DOM.footerStatus.textContent = 'IDLE';
+                        if (DOM.statusCircle) DOM.statusCircle.classList.remove('animate-pulse-cyan');
+                        break;
+                    case 'FAILED':
+                        DOM.footerStatus.textContent = 'ERROR';
+                        if (DOM.statusCircle) DOM.statusCircle.classList.remove('animate-pulse-cyan');
+                        break;
+                    default:
+                        DOM.footerStatus.textContent = 'IDLE';
+                }
+            }
+        }
+
+        // =====================================================
+        // GENERATION FLOW
+        // =====================================================
+
+        async function handleGenerate() {
+            // --- Login Gate -----------------------------------------
+            var activeEmail = localStorage.getItem('active_user_email') || '';
+            if (!activeEmail) {
+                showCustomAlert('Silakan masuk sesi (login) terlebih dahulu menggunakan email Anda sebelum memulai proses generate.');
+                openLoginModal();
+                return;
+            }
+
+            // --- Validation -----------------------------------------
+            if (!state.referenceImages[0]) {
+                showCustomAlert('Silakan unggah foto The Graduate (Image Reference 1) terlebih dahulu sebelum memproses.');
+                return;
+            }
+            if (!state.referenceImages[1]) {
+                showCustomAlert('Silakan unggah foto The Background (Image Reference 2) terlebih dahulu.');
+                return;
+            }
+            if (state.isGenerating) return;
+
+            state.isGenerating = true;
+            disableGenerateButton(true);
+
+            // Transition UI to processing
+            showProcessing();
+            updateStatus('PENDING');
+            updateProgress(2, 'Building request payload...', 'Initializing pipeline...');
+
+            try {
+                // --- Build FormData ---------------------------------
+                const formData = new FormData();
+                formData.append('referenceImage1', state.referenceImages[0], state.referenceImages[0].name);
+                formData.append('referenceImage2', state.referenceImages[1], state.referenceImages[1].name);
+                formData.append('aspectRatio', state.selectedRatio);
+                formData.append('width',  state.selectedDimensions.width.toString());
+                formData.append('height', state.selectedDimensions.height.toString());
+
+                // --- Fire the orchestral POST -----------------------
+                updateProgress(5, 'Uploading to orchestration engine...', 'Sending to server...');
+
+                const genResp = await fetch(`${API_BASE}/api/background-swap`, {
+                    method: 'POST',
+                    headers: { 'X-User-Email': activeEmail },
+                    body: formData
+                    // NOTE: Do NOT set Content-Type â€” browser auto-sets
+                    //       the multipart boundary for FormData.
+                });
+
+                if (!genResp.ok) {
+                    // 402 Payment Required â€” insufficient credits
+                    if (genResp.status === 402) {
+                        const errData = await genResp.json().catch(() => ({}));
+                        showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
+                        showPlaceholder();
+                        updateStatus('IDLE');
+                        updateProgress(0, '', '');
+                        disableDownload();
+                        return;
+                    }
+                    // 503 Service Unavailable â€” show friendly Indonesian modal, block redirect
+                    if (genResp.status === 503) {
+                        showErrorModal503();
+                        showPlaceholder();
+                        updateStatus('IDLE');
+                        updateProgress(0, '', '');
+                        disableDownload();
+                        return; // stop â€” no redirect, user can retry
+                    }
+                    const errData = await genResp.json().catch(() => ({}));
+                    throw new Error(errData.error || `Server returned ${genResp.status}`);
+                }
+
+                const { generationId } = await genResp.json();
+                state.generationId = generationId;
+                console.log('Background swap generation started:', generationId);
+
+                // Save processing record to localStorage for live card rendering
+                try {
+                    var queue = JSON.parse(localStorage.getItem('all_creations') || '[]');
+                    queue.push({
+                        id: generationId,
+                        generation_id: generationId,
+                        status: 'processing',
+                        type: 'background-swap',
+                        title: 'Background Change',
+                        createdAt: Date.now(),
+                        dimensions: (state.aspectRatio || '2:3')
+                    });
+                    localStorage.setItem('all_creations', JSON.stringify(queue));
+                } catch (_) {}
+
+                // Redirect to Creations for live tracking
+                window.location.href = '/my-creations?pending=' + generationId;
+                return;
+
+            } catch (error) {
+                console.error('Background swap failed:', error);
+                handleError(error.message || 'An unexpected error occurred.');
+            } finally {
+                state.isGenerating = false;
+                disableGenerateButton(false);
+                if (state.pollTimer) {
+                    clearInterval(state.pollTimer);
+                    state.pollTimer = null;
+                }
+            }
+        }
+        window.handleGenerate = handleGenerate;
+
+        async function pollGenerationStatus(generationId) {
+            const POLL_INTERVAL_MS = 2000;
+            const MAX_POLL_TIME_MS = 360_000;  // 6 minutes
+            const startTime = Date.now();
+
+            let progressTarget = 10;
+            let currentDisplayed = 10;
+
+            // Smooth progress animation
+            const smoothInterval = setInterval(() => {
+                if (currentDisplayed < progressTarget) {
+                    currentDisplayed += 0.4;
+                    if (DOM.progressBar) DOM.progressBar.style.width = `${currentDisplayed}%`;
+                    if (DOM.progressPercentage) DOM.progressPercentage.textContent = `${Math.floor(currentDisplayed)}%`;
+                }
+            }, 100);
+
+            return new Promise((resolve, reject) => {
+                state.pollTimer = setInterval(async () => {
+                    try {
+                        if (Date.now() - startTime > MAX_POLL_TIME_MS) {
+                            clearInterval(smoothInterval);
+                            clearInterval(state.pollTimer);
+                            state.pollTimer = null;
+                            return reject(new Error('Generation timed out after 6 minutes.'));
+                        }
+
+                        const resp = await fetch(`${API_BASE}/api/background-swap/status/${generationId}`);
+                        if (!resp.ok) {
+                            const errData = await resp.json().catch(() => ({}));
+                            clearInterval(smoothInterval);
+                            clearInterval(state.pollTimer);
+                            state.pollTimer = null;
+                            return reject(new Error(errData.error || 'Status check failed.'));
+                        }
+
+                        const data = await resp.json();
+                        const { status, imageUrl, error } = data;
+
+                        updateStatus(status);
+
+                        switch (status) {
+                            case 'COMPLETE':
+                                clearInterval(smoothInterval);
+                                clearInterval(state.pollTimer);
+                                state.pollTimer = null;
+                                updateProgress(100, 'Generation complete!', 'Complete!');
+                                if (imageUrl) {
+                                    state.generatedImageUrl = imageUrl;
+                                    showResult(imageUrl);
+                                    enableDownload();
+                                } else {
+                                    reject(new Error('Generation completed but no image was returned.'));
+                                }
+                                return resolve();
+
+                            case 'FAILED':
+                                clearInterval(smoothInterval);
+                                clearInterval(state.pollTimer);
+                                state.pollTimer = null;
+                                updateProgress(0, 'Generation failed.', 'Failed');
+                                return reject(new Error(error || 'Generation failed on the server.'));
+
+                            case 'PROCESSING':
+                                progressTarget = Math.min(85, progressTarget + (70 / (MAX_POLL_TIME_MS / POLL_INTERVAL_MS)));
+                                updateProgress(progressTarget, 'AI model is synthesizing the new background...', 'Synthesizing pixels...');
+                                break;
+
+                            case 'PENDING':
+                            default:
+                                progressTarget = Math.min(30, progressTarget + 3);
+                                updateProgress(progressTarget, 'Job queued on Leonardo.ai...', 'Waiting in queue...');
+                                break;
+                        }
+                    } catch (err) {
+                        if (Date.now() - startTime > MAX_POLL_TIME_MS) {
+                            clearInterval(smoothInterval);
+                            clearInterval(state.pollTimer);
+                            state.pollTimer = null;
+                            return reject(err);
+                        }
+                        console.warn('Poll attempt failed, retrying...', err.message);
+                    }
+                }, POLL_INTERVAL_MS);
+            });
+        }
+
+        // =====================================================
+        // RESULT & DOWNLOAD
+        // =====================================================
+
+        function enableDownload() {
+            if (!DOM.downloadBtn) return;
+            DOM.downloadBtn.disabled = false;
+            DOM.downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            DOM.downloadBtn.classList.add('hover:border-electric-cyan', 'hover:text-electric-cyan', 'cursor-pointer');
+        }
+
+        function disableDownload() {
+            if (!DOM.downloadBtn) return;
+            DOM.downloadBtn.disabled = true;
+            DOM.downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            DOM.downloadBtn.classList.remove('hover:border-electric-cyan', 'hover:text-electric-cyan', 'cursor-pointer');
+        }
+
+        window.downloadResultImage = async function() {
+            if (!state.generatedImageUrl) return;
+
+            try {
+                const resp = await fetch(state.generatedImageUrl);
+                const blob = await resp.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `background-swap-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+            } catch (_err) {
+                // Fallback: direct open
+                const a = document.createElement('a');
+                a.href = state.generatedImageUrl;
+                a.download = `background-swap-${Date.now()}.png`;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        };
+
+        // =====================================================
+        // ERROR HANDLING
+        // =====================================================
+
+        function handleError(message) {
+            updateStatus('FAILED');
+            updateProgress(0, message, 'Error');
+            alert('Generation failed: ' + message);
+            // Reset to placeholder after a moment
+            setTimeout(() => {
+                showPlaceholder();
+                updateStatus('IDLE');
+                updateProgress(0, '', '');
+                disableDownload();
+            }, 3000);
+        }
+
+        // =====================================================
+        // UTILITY
+        // =====================================================
+
+        // Attached to window so inline onclick="closeCustomAlert()" can reach them
+        window.showCustomAlert = function(message) {
+            const modal = document.getElementById('custom-alert-modal');
+            const messageEl = document.getElementById('custom-alert-message');
+            if (!modal || !messageEl) return;
+
+            messageEl.innerHTML = message;
+            modal.classList.remove('hidden');
+
+            const card = modal.querySelector('div');
+            if (card) {
+                setTimeout(() => {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }, 10);
+            }
+        };
+
+        window.closeCustomAlert = function() {
+            const modal = document.getElementById('custom-alert-modal');
+            if (!modal) return;
+
+            const card = modal.querySelector('div');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        };
+
+        function disableGenerateButton(disabled) {
+            if (!DOM.generateBtn) return;
+            DOM.generateBtn.disabled = disabled;
+        }
+
+        // =====================================================
+        // LIGHTNING EFFECTS
+        // =====================================================
+
+        function injectDynamicLightning() {
+            const container = document.getElementById('lightningContainer');
+            if (!container) return;
+
+            setInterval(() => {
+                const svgNS = "http://www.w3.org/2000/svg";
+                const bolt = document.createElementNS(svgNS, "svg");
+                bolt.setAttribute("viewBox", "0 0 24 24");
+                bolt.classList.add("lightning-svg", "animate-lightning-flash");
+                bolt.style.width  = (Math.random() * 10 + 10) + "px";
+                bolt.style.height = (Math.random() * 20 + 20) + "px";
+                bolt.style.left = (Math.random() * 90) + "%";
+                bolt.style.top  = (Math.random() * 60 - 10) + "%";
+                bolt.style.animationDuration = (0.5 + Math.random() * 1.5) + "s";
+
+                const path = document.createElementNS(svgNS, "path");
+                path.setAttribute("d", "M7 2v11h3v9l7-12h-4l4-8z");
+                bolt.appendChild(path);
+
+                container.appendChild(bolt);
+                setTimeout(() => bolt.remove(), 2000);
+            }, 1200);
+        }
+
+        // =====================================================
+        // DRAG & DROP SUPPORT
+        // =====================================================
+
+        function initDragDrop() {
+            [1, 2].forEach(slot => {
+                const zone = document.getElementById(`upload-zone-${slot}`);
+                if (!zone) return;
+
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    zone.classList.add(slot === 1 ? 'border-electric-cyan/50' : 'border-vivid-purple/50');
+                });
+
+                zone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!zone.classList.contains('upload-zone-filled')) {
+                        zone.classList.remove('border-electric-cyan/50', 'border-vivid-purple/50');
+                    }
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!zone.classList.contains('upload-zone-filled')) {
+                        zone.classList.remove('border-electric-cyan/50', 'border-vivid-purple/50');
+                    }
+
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const input = document.getElementById(`fileInput${slot}`);
+                        // Create a new DataTransfer to set the file
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        input.files = dt.files;
+                        // Trigger the change handler
+                        handleFileSelect({ target: input }, slot);
+                    }
+                });
+            });
+        }
+
+        // =====================================================
+        // BUTTON MICRO-INTERACTIONS
+        // =====================================================
+
+        function initButtonEffects() {
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('mousedown', () => {
+                    if (!btn.disabled) btn.style.transform = 'scale(0.96)';
+                });
+                btn.addEventListener('mouseup', () => {
+                    btn.style.transform = 'scale(1)';
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        // =====================================================
+        // BOOTSTRAP
+        // =====================================================
+
+        function initSidebarToggle() {
+            const sidebarBtn = document.getElementById('sidebar-toggle-btn');
+            const closeBtn   = document.getElementById('sidebar-close-btn');
+            const sidebar    = document.getElementById('sidebar-menu');
+            const overlay    = document.getElementById('sidebar-overlay');
+            if (!sidebar || !overlay) return;
+            function open(){ sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
+            function close(){ sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); }
+            if (sidebarBtn) sidebarBtn.addEventListener('click', open);
+            if (closeBtn)   closeBtn.addEventListener('click', close);
+            if (overlay)    overlay.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !sidebar.classList.contains('-translate-x-full')) close(); });
+        }
+
+        // =====================================================
+        // SIMULATED LOGIN SYSTEM â€” localStorage sandbox-safe
+        // =====================================================
+
+        var safeStorage = {
+            setItem: function(key, val) { try { localStorage.setItem(key, val); } catch(e) { window['__' + key] = val; } },
+            getItem: function(key) {
+                try {
+                    return sessionStorage.getItem(key) || localStorage.getItem(key) || window['__' + key] || null;
+                } catch(e) {
+                    try { return localStorage.getItem(key) || window['__' + key] || null; } catch(e2) { return window['__' + key] || null; }
+                }
+            },
+            removeItem: function(key) { try { localStorage.removeItem(key); sessionStorage.removeItem(key); } catch(e) {} delete window['__' + key]; }
+        };
+
+        // mock login removed
+
+        // mock login removed
+
+        // mock login removed
+
+        // mock login removed
+
+        function renderAuthContainer() {
+            var container = document.getElementById('auth-container');
+            if (!container) return;
+            var activeEmail = safeStorage.getItem('active_user_email');
+
+            if (activeEmail) {
+                var namePrefix = activeEmail.split('@')[0];
+                var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
+                var initials = namePrefix.substring(0, 2).toUpperCase();
+
+                container.innerHTML = '<div class="flex flex-col gap-2">' +
+                    '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
+                        '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
+                        '<div class="flex flex-col min-w-0">' +
+                            '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
+                            '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                        '<i class="fa-solid fa-right-from-bracket"></i>' +
+                        '<span>Keluar Sesi</span>' +
+                    '</button>' +
+                '</div>';
+            } else {
+                container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+                    '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
+                        '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
+                        '<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>' +
+                        '<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>' +
+                    '</svg>' +
+                    '<span>Masuk Google</span>' +
+                '</button>';
+            }
+        }
+
+        function initSession() {
+            renderAuthContainer();
+        }
+
+        function init() {
+            initSession();
+            cacheDomReferences();
+            initSidebarToggle();
+            initAspectRatio();
+            initDragDrop();
+            initButtonEffects();
+            injectDynamicLightning();
+
+            // Bind generate button via event listener (NOT inline onclick)
+            if (DOM.generateBtn) {
+                DOM.generateBtn.addEventListener('click', handleGenerate);
+            }
+
+            // Ensure we start in the idle/placeholder state
+            showPlaceholder();
+            updateStatus('IDLE');
+            disableDownload();
+
+            console.log('Background Swap Tool initialized.');
+            console.log(`API base: ${API_BASE}`);
+            console.log(`Default aspect ratio: ${state.selectedRatio} â†’ ${state.selectedDimensions.width}Ã—${state.selectedDimensions.height}`);
+        }
+
+        // =====================================================
+        // SIDEBAR ACTIVE STATE
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+    })();
+    </script>
+
+    <!-- 503 Error Modal -->
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-purple-500/30 shadow-2xl shadow-purple-500/10 rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-5 transition-all transform scale-95 duration-350">
+            <div class="h-16 w-16 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20 text-purple-400 text-2xl animate-pulse">
+                <span class="material-symbols-outlined text-3xl">warning</span>
+            </div>
+            <h3 class="text-xl font-bold text-white tracking-wide">Unggah Foto Terlebih Dahulu</h3>
+            <p id="custom-alert-message" class="text-slate-400 text-sm leading-relaxed px-2"></p>
+            <button id="custom-alert-close" onclick="closeCustomAlert()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-purple-600/20 active:scale-95">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="error503Modal">
+        <div class="modal-card">
+            <div class="w-16 h-16 rounded-full bg-error/10 border border-error/20 flex items-center justify-center mx-auto mb-5">
+                <span class="material-symbols-outlined text-3xl text-error">cloud_off</span>
+            </div>
+            <h3 class="text-white font-headline-md text-headline-md mb-3">Server Sibuk</h3>
+            <p class="text-text-secondary text-sm leading-relaxed mb-6" id="error503Message">
+                Proses generate gagal. Server sedang dalam gangguan atau antrean sedang sangat padat. Silakan coba beberapa saat lagi.
+            </p>
+            <button class="px-8 py-3 bg-electric-cyan text-surface-background font-bold rounded-xl hover:brightness-110 transition-all active:scale-95"
+                    onclick="document.getElementById('error503Modal').classList.remove('active')">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function showErrorModal503() {
+            document.getElementById('error503Modal').classList.add('active');
+        }
+    </script>
+
+
+<!-- mock-login-modal removed -->
+
+<!-- ============================================================
+     PROFILE MANAGEMENT MODAL
+     ============================================================ -->
+
+</div>
+
+<script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('swap-bg');});</script>
+</body>
+</html>

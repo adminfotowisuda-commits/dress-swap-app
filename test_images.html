@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html><html><head><meta charset="utf-8"><title>Image Test</title></head>
+<body style="background:#0A0C10;color:#fff;padding:20px;">
+<h2>Direct Image Test for budi@gmail.com</h2>
+<p>If images below are broken, the problem is static file serving.</p>
+<img src="/user_data_image_generate/budi_at_gmail_com_1784231379914.png" style="max-width:300px;margin:10px;border:2px solid cyan;">
+<img src="/user_data_image_generate/budi_at_gmail_com_1784232162536.png" style="max-width:300px;margin:10px;border:2px solid cyan;">
+<img src="/user_data_image_generate/budi_at_gmail_com_1784233116721.png" style="max-width:300px;margin:10px;border:2px solid cyan;">
+<img src="/user_data_image_generate/budi_at_gmail_com_1784239120086.png" style="max-width:300px;margin:10px;border:2px solid cyan;">
+<p id="api-result" style="margin-top:20px;font-family:monospace;"></p>
+<script>
+fetch('/api/user-creations?email=budi@gmail.com').then(r=>r.json()).then(d=>{
+  document.getElementById('api-result').textContent = 'API returned '+d.length+' files: '+d.map(f=>f.id).join(', ');
+});
+</script>
+</body></html>

@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Creations — fotowisuda.ai</title>
+
+    <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN with Forms + Container Queries plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration: DESIGN.md tokens (shared with code.html) -->
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "tertiary-container": "#bcc0ca",
+                            "on-primary-container": "#00566a",
+                            "surface-container-lowest": "#0c0e12",
+                            "tertiary": "#d8dce6",
+                            "surface-container-low": "#1a1c20",
+                            "surface-container": "#1e2024",
+                            "border-subtle": "#30363D",
+                            "on-tertiary-fixed-variant": "#42474f",
+                            "vivid-purple": "#9D5BFF",
+                            "outline-variant": "#3c494e",
+                            "on-tertiary": "#2c3138",
+                            "on-error-container": "#ffdad6",
+                            "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC",
+                            "on-secondary-fixed-variant": "#6000bf",
+                            "surface-bright": "#37393e",
+                            "primary": "#a4e6ff",
+                            "error-container": "#93000a",
+                            "on-primary": "#003543",
+                            "on-secondary": "#430089",
+                            "on-secondary-fixed": "#280057",
+                            "on-error": "#690005",
+                            "secondary-fixed": "#ecdcff",
+                            "electric-cyan": "#00D1FF",
+                            "on-surface-variant": "#bbc9cf",
+                            "surface-variant": "#333539",
+                            "on-tertiary-fixed": "#171c23",
+                            "background": "#111318",
+                            "tertiary-fixed-dim": "#c2c7d0",
+                            "secondary-fixed-dim": "#d6baff",
+                            "tertiary-fixed": "#dee2ec",
+                            "on-background": "#e2e2e8",
+                            "outline": "#859399",
+                            "surface": "#111318",
+                            "surface-container-high": "#282a2e",
+                            "text-secondary": "#8B949E",
+                            "error": "#ffb4ab",
+                            "primary-fixed-dim": "#4cd6ff",
+                            "inverse-surface": "#e2e2e8",
+                            "inverse-on-surface": "#2f3035",
+                            "on-tertiary-container": "#494e57",
+                            "surface-background": "#0A0C10",
+                            "surface-dim": "#111318",
+                            "on-surface": "#e2e2e8",
+                            "primary-fixed": "#b7eaff",
+                            "on-primary-fixed": "#001f28",
+                            "secondary-container": "#6205c3",
+                            "primary-container": "#00d1ff",
+                            "on-primary-fixed-variant": "#004e60",
+                            "on-secondary-container": "#cba9ff",
+                            "inverse-primary": "#00677f",
+                            "surface-tint": "#4cd6ff",
+                            "secondary": "#d6baff",
+                            "surface-card": "#161B22"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                        },
+                        "spacing": {
+                            "base-unit": "4px",
+                            "gutter": "24px",
+                            "container-max-width": "1440px",
+                            "margin-desktop": "32px",
+                            "margin-mobile": "16px"
+                        },
+                        "fontFamily": {
+                            "body-lg": ["Inter"],
+                            "label-md": ["Geist"],
+                            "headline-lg": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "headline-xl": ["Inter"],
+                            "headline-lg-mobile": ["Inter"],
+                            "body-md": ["Inter"],
+                            "label-sm": ["Geist"]
+                        },
+                        "fontSize": {
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        /* ============================================================
+           Gallery-specific styles — glassmorphic overlays, animations
+           ============================================================ */
+
+        /* Hide scrollbar for sidebar */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom scrollbar for dark theme */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #30363D;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #484F58;
+        }
+
+        /* Glassmorphic panel used on card hover overlays */
+        .glass-panel {
+            background: rgba(10, 12, 16, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Card overlay: hidden by default, shown on hover */
+        .image-card-overlay {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .image-card:hover .image-card-overlay {
+            opacity: 1;
+        }
+
+        /* Smooth card hover lift */
+        .image-card {
+            transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fade-in for panels */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Pulse for loading skeleton */
+        @keyframes skeletonPulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 0.7; }
+        }
+        .skeleton-pulse {
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+
+        /* Toast notification slide-in */
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .toast-enter {
+            animation: toastIn 0.3s ease-out forwards;
+        }
+
+        /* Tab active indicator */
+        .nav-item-active {
+            background: rgba(0, 209, 255, 0.08);
+            border-right: 2px solid #00D1FF;
+        }
+        .confirm-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        @keyframes confirmIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .confirm-animate-in {
+            animation: confirmIn 0.2s ease-out forwards;
+        }
+
+        /* Progress bar glow for pending generation cards */
+        .progress-glow {
+            box-shadow: 0 0 12px rgba(0, 209, 255, 0.6);
+        }
+
+        /* Pending card fade-out on completion */
+        @keyframes pendingResolve {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95) translateY(-8px); }
+        }
+        .pending-resolve {
+            animation: pendingResolve 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        /* 503 Error Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(10, 12, 16, 0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: #161B22; border: 1px solid #30363D; border-radius: 1.5rem;
+            padding: 2.5rem 2rem 2rem; max-width: 420px; width: 90%;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transform: translateY(12px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+
+        /* Pinterest-style masonry layout via CSS columns */
+        /* CSS Grid layout — horizontal row flow, no column-count collapse */
+        .masonry-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .masonry-container.masonry-1 { grid-template-columns: repeat(1, 1fr); gap: 8px; }
+        .masonry-container.masonry-2 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .masonry-container.masonry-3 { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        /* Responsive: scale columns with viewport width */
+        @media (min-width: 640px) {
+            .masonry-container.masonry-2 { grid-template-columns: repeat(2, 1fr); }
+            .masonry-container.masonry-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 768px) {
+            .masonry-container.masonry-3 { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .masonry-container.masonry-2 { grid-template-columns: repeat(2, 1fr); }
+            .masonry-container.masonry-3 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Cards inside CSS Grid — no masonry-specific properties needed */
+        .pinterest-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Compact grid views (2+ columns): hide text, keep only spinner */
+        .masonry-2 .pending-hideable,
+        .masonry-3 .pending-hideable {
+            display: none !important;
+        }
+
+        .pinterest-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 209, 255, 0.18);
+        }
+        .pinterest-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* Detail modal */
+        @keyframes detailModalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(16px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .detail-modal-overlay {
+            background: rgba(10, 12, 16, 0.88); backdrop-filter: blur(10px);
+        }
+        .detail-modal-panel {
+            background: #161B22; border: 1px solid #30363D; border-radius: 1.5rem;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+            animation: detailModalIn 0.28s ease-out forwards;
+        }
+
+        /* Heartbeat animation for favorite toggle */
+        @keyframes heartPop {
+            0%   { transform: scale(1); }
+            30%  { transform: scale(1.35); }
+            60%  { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .heart-pop { animation: heartPop 0.4s ease-out; }
+        .favorite-btn { transition: color 0.2s ease, transform 0.2s ease; }
+        .favorite-btn:hover { transform: scale(1.15); }
+        /* Collapsible sidebar */
+        #sidebar.sidebar-open { left: 0; }
+        #sidebar-overlay.overlay-visible { opacity: 1; pointer-events: auto; }
+
+    </style>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md custom-scrollbar overflow-x-hidden">
+
+    <!-- ============================================================
+         TOP NAVIGATION BAR — Full-width, glassmorphic
+         ============================================================ -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="p-1.5 -ml-1 rounded-lg hover:bg-white/5 transition-colors" aria-label="Open menu">
+                <span class="material-symbols-outlined text-xl text-text-secondary">menu</span>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm bg-surface-container border border-border-subtle text-text-secondary text-xs">
+                <span id="sidebar-status-dot" class="w-1.5 h-1.5 rounded-full bg-text-secondary"></span>
+                <span id="sidebar-status-label">Checking server…</span>
+            </span>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         PERSISTENT SIDEBAR — Fixed left, 260px, dark theme
+         ============================================================ -->
+    <aside id="sidebar" class="fixed top-0 left-[-280px] w-[280px] h-full bg-[#131418] border-r border-border-subtle flex flex-col z-[100] overflow-y-auto hide-scrollbar transition-[left] duration-300 ease-out">
+        <!-- Sidebar Header with close button -->
+        <div class="px-5 py-6 border-b border-border-subtle/50 flex items-center justify-between">
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-0">Navigation</p>
+            <button id="sidebar-close" class="p-1.5 rounded-lg hover:bg-white/5 transition-colors" aria-label="Close menu">
+                <span class="material-symbols-outlined text-lg text-text-secondary">close</span>
+            </button>
+        </div>
+
+        <!-- Nav Items -->
+        <nav class="flex-1 px-3 py-4 space-y-1">
+            <!-- ═══ Section 1 — User Generators ═══ -->
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">✨ Generators</p>
+
+            <a href="/"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span>Home</span>
+            </a>
+
+            <a href="/swap-bg"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                  <path d="M9 19.5l4.5-4.5 5 5" />
+                  <circle cx="17.5" cy="13" r="0.5" fill="currentColor" stroke="none" />
+                  <circle cx="7.5" cy="7.5" r="4.5" />
+                  <path d="M6 7.5h3M7.5 6l1.5 1.5-1.5 1.5" />
+                </svg>
+                <span>Background Change</span>
+            </a>
+
+            <a href="/dress-swap"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <i class="fa-solid fa-shirt text-xl text-text-secondary group-hover:text-electric-cyan transition-colors"></i>
+                <span>Dress Replicate</span>
+            </a>
+
+            <a href="/filter-gallery"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <path d="M2 19a1 1 0 0 0 1 1h12a1 1 0 0 0 .8-.4l-5.3-7.1a1.5 1.5 0 0 0-2.4 0L2.2 18.2A1 1 0 0 0 2 19z" />
+                  <path d="M11 19.5h9a1 1 0 0 0 .8-.4l-3.3-4.4a1.5 1.5 0 0 0-2.4 0l-1.3 1.7" />
+                  <circle cx="14" cy="6" r="2" fill="currentColor" stroke="none" />
+                </svg>
+                <span>Filter Gallery</span>
+            </a>
+
+            <!-- ═══ Divider ═══ -->
+            <div class="my-3 border-t border-slate-800/60"></div>
+
+            <!-- ═══ Section 2 — User Gallery ═══ -->
+
+            <a href="/my-creations"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <i class="fa-solid fa-images text-xl text-text-secondary group-hover:text-electric-cyan transition-colors"></i>
+                <span>My Creations</span>
+            </a>
+
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <!-- Auth Container -->
+        <div class="px-4 py-4 border-t border-border-subtle/50 space-y-3">
+            <div class="flex items-center gap-2 text-[9px] text-text-secondary/40 uppercase tracking-wider">
+                <span class="w-1 h-1 rounded-full bg-emerald-500/40"></span>
+                <span>v2.0 — Creations</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Sidebar overlay backdrop -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+    <!-- ============================================================
+         MAIN CONTENT AREA — Offset for sidebar + header
+         ============================================================ -->
+    <main class="mt-16 ml-0 flex flex-col bg-surface-background overflow-hidden relative min-h-[calc(100vh-64px)]">
+
+            <!-- Decorative atmospheric blur orbs -->
+            <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-electric-cyan/5 blur-[120px] rounded-full pointer-events-none"></div>
+            <div class="absolute bottom-[5%] left-[5%] w-[400px] h-[400px] bg-vivid-purple/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+            <!-- ====================================================
+                 GALLERY CANVAS
+                 ==================================================== -->
+            <section class="flex-1 overflow-y-auto custom-scrollbar p-margin-desktop">
+
+                <!-- Header / Filter Bar -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                    <div>
+                        <h2 class="font-headline-lg text-headline-lg text-text-primary mb-1">Creations</h2>
+                        <div class="flex items-center gap-2 text-text-secondary font-label-md">
+                            <span id="gallery-count" class="text-electric-cyan font-bold">—</span>
+                            <span>Generations stored</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <!-- Sort/Filter icon buttons -->
+                        <div class="flex items-center gap-0.5 bg-surface-card border border-border-subtle rounded-lg p-1" id="sort-btns">
+                            <button class="sort-btn px-2.5 py-1.5 rounded text-xs font-medium transition-colors bg-electric-cyan/15 text-electric-cyan"
+                                    data-sort="newest" title="Newest first">
+                                <span class="material-symbols-outlined text-sm">arrow_downward</span>
+                            </button>
+                            <button class="sort-btn px-2.5 py-1.5 rounded text-xs font-medium transition-colors"
+                                    data-sort="oldest" title="Oldest first">
+                                <span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            </button>
+                            <button class="sort-btn px-2.5 py-1.5 rounded text-xs font-medium transition-colors"
+                                    data-sort="favorite" title="Favorites only">
+                                <span class="material-symbols-outlined text-sm">favorite</span>
+                            </button>
+                        </div>
+
+                        <!-- Grid Layout Switcher -->
+                        <div class="flex items-center gap-0.5 bg-surface-card border border-border-subtle rounded-lg p-1">
+                            <button class="grid-layout-btn px-2.5 py-1.5 rounded text-xs font-medium transition-colors"
+                                    data-cols="1" title="1 Column">
+                                <span class="material-symbols-outlined text-sm">square</span>
+                            </button>
+                            <button class="grid-layout-btn px-2.5 py-1.5 rounded text-xs font-medium transition-colors"
+                                    data-cols="2" title="2 Columns">
+                                <span class="material-symbols-outlined text-sm">view_column_2</span>
+                            </button>
+                            <button class="grid-layout-btn px-2.5 py-1.5 rounded text-xs font-medium transition-colors bg-electric-cyan/15 text-electric-cyan"
+                                    data-cols="3" title="3 Columns">
+                                <span class="material-symbols-outlined text-sm">grid_view</span>
+                            </button>
+                        </div>
+
+                        <!-- Refresh button — icon only -->
+                        <button id="refresh-btn"
+                                class="flex items-center justify-center w-9 h-9 bg-surface-card border border-border-subtle rounded-lg text-text-secondary hover:text-electric-cyan hover:border-electric-cyan/50 transition-all flex-shrink-0"
+                                title="Refresh gallery">
+                            <span class="material-symbols-outlined text-[18px]">refresh</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================================================
+                     MASONRY LAYOUT — Pinterest-style columns
+                     ================================================ -->
+                <div id="gallery-grid" class="masonry-container masonry-3">
+                    <!-- Cards rendered dynamically via JavaScript -->
+                </div>
+
+                <!-- ================================================
+                     EMPTY STATE — shown when no records exist
+                     ================================================ -->
+                <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center animate-fade-in">
+                    <i class="fa-solid fa-wand-magic-sparkles text-slate-600 text-3xl mb-3 animate-pulse"></i>
+                    <h3 class="font-headline-md text-text-primary mb-2">Belum ada kreasi foto wisuda.</h3>
+                    <p class="font-body-md text-text-secondary max-w-md mb-6">
+                        Mulai ubah latar belakang atau coba kebaya wisuda impianmu sekarang!
+                    </p>
+                    <a href="/swap-bg"
+                       class="px-8 py-3 bg-electric-cyan text-surface-background font-bold rounded-xl hover:brightness-110 transition-all inline-flex items-center gap-2 no-underline">
+                        <span class="material-symbols-outlined">bolt</span>
+                        Mulai Berkreasi
+                    </a>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- ============================================================
+         TOAST NOTIFICATION CONTAINER
+         ============================================================ -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 pointer-events-none">
+        <!-- Toasts injected here -->
+    </div>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // =====================================================
+        // CONFIGURATION
+        // =====================================================
+        const API_BASE = window.location.origin;
+        const PAGE_SIZE = 24;  // records per page
+
+        // =====================================================
+        // APPLICATION STATE
+        // =====================================================
+        const state = {
+            records: [],           // All loaded records
+            total: 0,             // Total count from server
+            offset: 0,            // Current pagination offset
+            searchQuery: '',      // Client-side search filter
+            sortOrder: 'newest',  // 'newest' | 'oldest' | 'favorite'
+            gridLayout: 3,        // 1 | 2 | 3 columns
+            isLoading: false,
+            favoriteIds: new Set(), // Set of generation_ids marked as favorite
+            pendingGenerations: new Map()  // genId → { status, timer, cardEl, progressEl, barEl, statusEl, detailEl }
+        };
+
+        // =====================================================
+        // PENDING GENERATION — URL param parser
+        // =====================================================
+        function parsePendingFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('pending');
+        }
+
+        // =====================================================
+        // DOM REFERENCES
+        // =====================================================
+        const DOM = {
+            galleryGrid:      null,
+            emptyState:       null,
+            galleryCount:     null,
+            searchInput:      null,
+            refreshBtn:       null,
+            gridLayoutBtns:   null,
+            sidebarStatusDot: null,
+            sidebarStatusLabel: null,
+            toastContainer:   null
+        };
+
+        // =====================================================
+        // INITIALIZATION
+        // =====================================================
+        function cacheDomReferences() {
+            DOM.galleryGrid        = document.getElementById('gallery-grid');
+            DOM.emptyState         = document.getElementById('empty-state');
+            DOM.galleryCount       = document.getElementById('gallery-count');
+            DOM.searchInput        = document.getElementById('search-input');
+            DOM.refreshBtn         = document.getElementById('refresh-btn');
+            DOM.gridLayoutBtns     = document.querySelectorAll('.grid-layout-btn');
+            DOM.sidebarStatusDot   = document.getElementById('sidebar-status-dot');
+            DOM.sidebarStatusLabel = document.getElementById('sidebar-status-label');
+            DOM.toastContainer     = document.getElementById('toast-container');
+        }
+
+        // =====================================================
+        // BACKEND HEALTH CHECK
+        // =====================================================
+        async function checkBackendHealth() {
+            try {
+                // A fetch to the gallery endpoint confirms the server is alive
+                const resp = await fetch(`${API_BASE}/api/gallery?limit=1`);
+                if (resp.ok) {
+                    if (DOM.sidebarStatusDot)   DOM.sidebarStatusDot.className   = 'w-2 h-2 rounded-full bg-electric-cyan';
+                    if (DOM.sidebarStatusLabel) DOM.sidebarStatusLabel.textContent = 'Server connected';
+                    return true;
+                }
+            } catch (_err) { /* fall through to offline state */ }
+
+            if (DOM.sidebarStatusDot)   DOM.sidebarStatusDot.className   = 'w-2 h-2 rounded-full bg-error';
+            if (DOM.sidebarStatusLabel) DOM.sidebarStatusLabel.textContent = 'Server offline';
+            return false;
+        }
+
+        // =====================================================
+        // LOADING UI
+        // =====================================================
+        function showLoading() {
+            state.isLoading = true;
+        }
+
+        function hideLoading() {
+            state.isLoading = false;
+        }
+
+        // =====================================================
+        // TOAST NOTIFICATIONS
+        // =====================================================
+        function showToast(message, type = 'info') {
+            if (!DOM.toastContainer) return;
+
+            const colorMap = {
+                info:    { bg: 'bg-surface-card', border: 'border-electric-cyan', text: 'text-text-primary', icon: 'info' },
+                success: { bg: 'bg-surface-card', border: 'border-electric-cyan', text: 'text-electric-cyan', icon: 'check_circle' },
+                error:   { bg: 'bg-surface-card', border: 'border-error',         text: 'text-error',         icon: 'error' }
+            };
+            const c = colorMap[type] || colorMap.info;
+
+            const toast = document.createElement('div');
+            toast.className = `toast-enter pointer-events-auto ${c.bg} border ${c.border} rounded-xl px-4 py-3 shadow-lg flex items-center gap-3 min-w-[280px]`;
+            toast.innerHTML = `
+                <span class="material-symbols-outlined text-sm ${c.text}">${c.icon}</span>
+                <span class="font-label-md text-label-md ${c.text}">${escapeHtml(message)}</span>
+            `;
+
+            DOM.toastContainer.appendChild(toast);
+
+            // Auto-dismiss after 3.5 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // =====================================================
+        // API CALLS
+        // =====================================================
+
+        /**
+         * Fetch gallery records from the server.
+         */
+        async function fetchGallery(limit = PAGE_SIZE, offset = 0) {
+            const params = new URLSearchParams({ limit, offset });
+            const resp = await fetch(`${API_BASE}/api/gallery?${params}`);
+
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.error || `Server returned ${resp.status}`);
+            }
+
+            return resp.json();
+        }
+
+        /**
+         * Delete a generation record by its generation_id.
+         */
+        async function deleteGeneration(generationId) {
+            const resp = await fetch(`${API_BASE}/api/gallery/${generationId}`, {
+                method: 'DELETE'
+            });
+
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.error || `Delete failed (${resp.status})`);
+            }
+
+            return resp.json();
+        }
+
+        // =====================================================
+        // PENDING GENERATION POLLING
+        // =====================================================
+
+        /**
+         * Inject a pending card into the gallery grid and poll the server
+         * until the generation completes or fails.
+         */
+        function startPendingPoll(generationId, serverCreatedAt) {
+            // Guard: don't double-poll the same ID
+            if (state.pendingGenerations.has(generationId)) return;
+
+            // Build and inject the pending card at the top of the grid
+            const cardHtml = buildPendingCardHtml(generationId);
+
+            // Create a temporary container to parse the HTML
+            const temp = document.createElement('div');
+            temp.innerHTML = cardHtml;
+            const cardEl = temp.firstElementChild;
+
+            // Prepend to the gallery grid
+            if (DOM.galleryGrid) {
+                DOM.galleryGrid.prepend(cardEl);
+                DOM.galleryGrid.classList.remove('hidden');
+            }
+            if (DOM.emptyState) DOM.emptyState.classList.add('hidden');
+
+            // Collect element references for live updates
+            const pendingData = {
+                status: 'PENDING',
+                startTime: Date.now(),
+                serverCreatedAt: serverCreatedAt || null,  // used for stale-job detection
+                timer: null,
+                stopwatchTimer: null,
+                cardEl: cardEl,
+                barEl: cardEl.querySelector(`[id^="pending-bar-"]`),
+                statusEl: cardEl.querySelector(`[id^="pending-status-"]`),
+                detailEl: cardEl.querySelector(`[id^="pending-detail-"]`),
+                spinnerEl: cardEl.querySelector(`[id^="pending-spinner-"]`),
+                timerEl: cardEl.querySelector(`[id^="pending-timer-"]`)
+            };
+            state.pendingGenerations.set(generationId, pendingData);
+
+            // --- High-resolution stopwatch tick (every 50 ms) ---
+            // If resuming from a server timestamp, compute the base offset so the
+            // stopwatch continues from where it left off instead of resetting to zero.
+            const baseOffsetMs = serverCreatedAt ? (Date.now() - serverCreatedAt) : 0;
+            const startHr = performance.now();
+            pendingData.stopwatchTimer = setInterval(() => {
+                const elapsedMs = baseOffsetMs + (performance.now() - startHr);
+                if (pendingData.timerEl) {
+                    pendingData.timerEl.textContent = formatStopwatch(elapsedMs);
+                }
+            }, 50);
+
+            // If resuming, pre-set the initial stopwatch display immediately
+            if (baseOffsetMs > 0 && pendingData.timerEl) {
+                pendingData.timerEl.textContent = formatStopwatch(baseOffsetMs);
+            }
+
+            // Cleanup helper — clears both poll + stopwatch timers
+            function clearPendingTimers() {
+                if (pendingData.timer)          { clearInterval(pendingData.timer);          pendingData.timer = null; }
+                if (pendingData.stopwatchTimer) { clearInterval(pendingData.stopwatchTimer); pendingData.stopwatchTimer = null; }
+            }
+
+            const POLL_INTERVAL = 2000;
+            const MAX_TIME = 360_000; // 6 minutes
+
+            pendingData.timer = setInterval(async () => {
+                const elapsed = Date.now() - pendingData.startTime;
+
+                // --- Stale-job timeout (5 min based on server created_at) ---
+                // Zombie processing records that survive a server restart or
+                // pipeline crash are detected here.  The backend cleanup flips
+                // them on boot, but if the server stays up and the in-memory
+                // state is lost, this frontend guard catches the rest.
+                const STALE_TIMEOUT_MS = 300_000; // 5 minutes
+                if (pendingData.serverCreatedAt) {
+                    const serverElapsed = Date.now() - pendingData.serverCreatedAt;
+                    if (serverElapsed > STALE_TIMEOUT_MS) {
+                        clearPendingTimers();
+                        state.pendingGenerations.delete(generationId);
+                        // Morph card into a dismissable "Gagal Memproses" state
+                        if (pendingData.barEl) {
+                            pendingData.barEl.style.transition = 'width 0.3s ease-out';
+                            pendingData.barEl.style.width = '100%';
+                            pendingData.barEl.classList.remove('from-electric-cyan', 'to-vivid-purple');
+                            pendingData.barEl.classList.add('bg-amber-500');
+                        }
+                        if (pendingData.statusEl) {
+                            pendingData.statusEl.textContent = 'Gagal Memproses ⚠️';
+                            pendingData.statusEl.classList.remove('text-electric-cyan');
+                            pendingData.statusEl.classList.add('text-amber-400');
+                        }
+                        if (pendingData.detailEl) {
+                            pendingData.detailEl.textContent = 'Klik untuk hapus';
+                        }
+                        if (pendingData.spinnerEl) pendingData.spinnerEl.classList.add('hidden');
+                        if (pendingData.timerEl) pendingData.timerEl.textContent = '--:--.--';
+                        // Make the entire card click-to-dismiss
+                        cardEl.style.cursor = 'pointer';
+                        cardEl.classList.add('border-amber-500/40');
+                        cardEl.classList.remove('border-electric-cyan/20');
+                        cardEl.addEventListener('click', function onDismiss() {
+                            cardEl.style.opacity = '0';
+                            cardEl.style.transition = 'opacity 0.4s ease';
+                            setTimeout(() => { if (cardEl.parentNode) cardEl.remove(); }, 400);
+                        });
+                        return;
+                    }
+                }
+
+                // --- Timeout check (6 min local — absolute last resort) ---
+                if (elapsed > MAX_TIME) {
+                    clearPendingTimers();
+                    state.pendingGenerations.delete(generationId);
+                    if (pendingData.statusEl) pendingData.statusEl.textContent = 'Waktu Habis ⏰';
+                    if (pendingData.detailEl) pendingData.detailEl.textContent = 'Proses melebihi batas 6 menit. Silakan coba lagi.';
+                    if (pendingData.spinnerEl) pendingData.spinnerEl.classList.add('hidden');
+                    if (pendingData.barEl) pendingData.barEl.style.width = '100%';
+                    if (pendingData.barEl) pendingData.barEl.classList.remove('from-electric-cyan', 'to-vivid-purple');
+                    if (pendingData.barEl) pendingData.barEl.classList.add('bg-error');
+                    setTimeout(() => { if (cardEl.parentNode) cardEl.remove(); }, 5000);
+                    return;
+                }
+
+                // --- Time-based progress + Indonesian status stages ---
+                let cosmeticPct = 0;
+                if (elapsed < 30000) {
+                    cosmeticPct = (elapsed / 30000) * 30;          // 0–30s → 0–30%
+                } else if (elapsed < 120000) {
+                    cosmeticPct = 30 + ((elapsed - 30000) / 90000) * 45; // 30–120s → 30–75%
+                } else {
+                    cosmeticPct = 75 + ((elapsed - 120000) / (MAX_TIME - 120000)) * 15; // 120s+ → 75–90%
+                }
+                cosmeticPct = Math.min(90, cosmeticPct);
+                if (pendingData.barEl) {
+                    pendingData.barEl.style.width = `${cosmeticPct}%`;
+                }
+
+                // Update Indonesian progressive status on each tick
+                const stage = getProgressStage(elapsed);
+                if (pendingData.statusEl)  pendingData.statusEl.textContent  = stage.status;
+                if (pendingData.detailEl)  pendingData.detailEl.textContent  = stage.detail;
+
+                // --- Fetch real status ---
+                try {
+                    const resp = await fetch(`${API_BASE}/api/status/${generationId}`);
+                    if (!resp.ok) return; // silently retry
+
+                    const data = await resp.json();
+                    const { status, imageUrl, error } = data;
+
+                    // Skip RETRYING status — our local progress animation handles the UX
+                    if (status && status.startsWith('RETRYING')) return;
+
+                    pendingData.status = status;
+
+                    switch (status) {
+                        case 'COMPLETE':
+                            clearPendingTimers();
+                            state.pendingGenerations.delete(generationId);
+
+                            // Snap progress to 100%
+                            if (pendingData.barEl) {
+                                pendingData.barEl.style.transition = 'width 0.4s ease-out';
+                                pendingData.barEl.style.width = '100%';
+                            }
+                            if (pendingData.statusEl) pendingData.statusEl.textContent = 'Selesai! ✨';
+                            if (pendingData.detailEl) pendingData.detailEl.textContent = 'Memuat hasil akhir…';
+                            if (pendingData.spinnerEl) pendingData.spinnerEl.classList.add('hidden');
+
+                            // After a brief pause, refresh the gallery to pick up the real record
+                            setTimeout(async () => {
+                                // Animate the card out
+                                if (cardEl.parentNode) {
+                                    cardEl.classList.add('pending-resolve');
+                                }
+                                // Reload gallery data — the new record is now in database.json
+                                await loadGallery(true);
+                                // Remove the pending card (it'll be replaced by the real one)
+                                setTimeout(() => {
+                                    if (cardEl.parentNode) cardEl.remove();
+                                }, 500);
+                            }, 800);
+                            break;
+
+                        case 'FAILED':
+                            clearPendingTimers();
+                            state.pendingGenerations.delete(generationId);
+
+                            // Add failed border to the card
+                            cardEl.classList.add('border-error/40');
+                            cardEl.classList.remove('border-electric-cyan/20');
+
+                            // Detect 503 / server-congestion failures from the background pipeline
+                            const is503Failure = error && (
+                                error.includes('503') || error.includes('UNAVAILABLE') ||
+                                error.includes('overloaded') || error.includes('rate_limit')
+                            );
+
+                            if (is503Failure) {
+                                // Show Indonesian modal
+                                showErrorModal503();
+
+                                // Update card to "Gagal / Retry" state (keep it visible)
+                                if (pendingData.barEl) {
+                                    pendingData.barEl.style.transition = 'width 0.3s ease-out';
+                                    pendingData.barEl.style.width = '100%';
+                                    pendingData.barEl.classList.remove('from-electric-cyan', 'to-vivid-purple');
+                                    pendingData.barEl.classList.add('bg-error');
+                                }
+                                if (pendingData.statusEl) {
+                                    pendingData.statusEl.textContent = 'Gagal — Server Sibuk 😞';
+                                    pendingData.statusEl.classList.remove('text-electric-cyan');
+                                    pendingData.statusEl.classList.add('text-error');
+                                }
+                                if (pendingData.detailEl) {
+                                    pendingData.detailEl.textContent = 'Server sedang sibuk. Silakan coba generate ulang sebentar lagi.';
+                                }
+                                if (pendingData.spinnerEl) {
+                                    // Replace spinner with red error cross icon
+                                    const spinner = pendingData.spinnerEl;
+                                    spinner.classList.remove('animate-pulse');
+                                    spinner.style.boxShadow = '0 0 24px rgba(239,68,68,0.3)';
+                                    spinner.style.background = 'linear-gradient(to bottom right, #ef4444, #dc2626)';
+                                    const inner = spinner.querySelector('div');
+                                    if (inner) {
+                                        inner.innerHTML = '<i class="fa-solid fa-circle-xmark text-2xl text-rose-500" style="animation: heartPop 0.4s ease-out forwards;"></i>';
+                                    }
+                                }
+                                // Keep card visible indefinitely — user must dismiss manually
+                                break;
+                            }
+
+                            if (pendingData.barEl) {
+                                pendingData.barEl.style.transition = 'width 0.3s ease-out';
+                                pendingData.barEl.style.width = '100%';
+                                pendingData.barEl.classList.remove('from-electric-cyan', 'to-vivid-purple');
+                                pendingData.barEl.classList.add('bg-error');
+                            }
+                            if (pendingData.statusEl) {
+                                pendingData.statusEl.textContent = 'Gagal — Error Server 😞';
+                                pendingData.statusEl.classList.remove('text-electric-cyan');
+                                pendingData.statusEl.classList.add('text-error');
+                            }
+                            if (pendingData.detailEl) {
+                                pendingData.detailEl.textContent = error || 'Terjadi kesalahan tidak dikenal di server';
+                            }
+                            if (pendingData.spinnerEl) pendingData.spinnerEl.classList.add('hidden');
+
+                            // Auto-remove the error card after 8 seconds
+                            setTimeout(() => {
+                                if (cardEl.parentNode) {
+                                    cardEl.style.opacity = '0';
+                                    cardEl.style.transition = 'opacity 0.5s ease';
+                                    setTimeout(() => { if (cardEl.parentNode) cardEl.remove(); }, 500);
+                                }
+                            }, 8000);
+                            break;
+
+                        case 'PROCESSING':
+                        case 'PENDING':
+                        default:
+                            // Progressive Indonesian status already updated above on each tick
+                            break;
+                    }
+                } catch (_pollErr) {
+                    // Network glitch — silently retry next interval
+                    console.warn('Pending poll attempt failed, retrying…');
+                }
+            }, POLL_INTERVAL);
+        }
+
+        // =====================================================
+        // DATA LOADING & RENDERING
+        // =====================================================
+
+        /**
+         * Initial load — fetch first page and render.
+         */
+        async function loadGallery(reset = true) {
+            if (state.isLoading) return;
+            state.isLoading = true;
+
+            if (reset) {
+                state.offset = 0;
+                state.records = [];
+                if (DOM.galleryGrid) DOM.galleryGrid.innerHTML = '';
+            }
+
+            showLoading();
+
+            try {
+                const data = await fetchGallery(PAGE_SIZE, state.offset);
+                state.total = data.total;
+
+                // Separate in-progress records from completed ones;
+                // silently drop failed records (they stay in DB for status lookups)
+                const completeRecords = [];
+                const processingRecords = [];
+                for (const r of data.records) {
+                    if (r.status === 'failed') continue;
+                    if (r.status === 'processing') {
+                        processingRecords.push(r);
+                    } else {
+                        completeRecords.push(r);
+                    }
+                }
+
+                if (reset) {
+                    state.records = completeRecords;
+                    state.favoriteIds.clear();
+                    completeRecords.forEach(r => {
+                        if (r.isFavorite) state.favoriteIds.add(r.generation_id);
+                    });
+                } else {
+                    state.records = state.records.concat(completeRecords);
+                    completeRecords.forEach(r => {
+                        if (r.isFavorite) state.favoriteIds.add(r.generation_id);
+                    });
+                }
+                state.offset = state.records.length;
+
+                // Resume polling for any processing records (with stopwatch offset)
+                for (const pr of processingRecords) {
+                    const createdAt = pr.created_at ? new Date(pr.created_at).getTime() : undefined;
+                    startPendingPoll(pr.generation_id, createdAt);
+                }
+
+                renderGallery();
+            } catch (err) {
+                console.error('Failed to load gallery:', err);
+                showToast('Failed to load gallery. Is the server running?', 'error');
+                hideLoading();
+                if (state.records.length === 0) {
+                    // Show empty state, ensure grid stays hidden
+                    if (DOM.galleryGrid) DOM.galleryGrid.classList.add('hidden');
+                    if (DOM.emptyState)  DOM.emptyState.classList.remove('hidden');
+                }
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        /**
+         * Re-render the gallery grid from state.records,
+         * applying client-side search and sort filters.
+         */
+        function renderGallery() {
+            hideLoading();
+
+            let filtered = [...state.records];
+
+            // --- Client-side search filter ---
+            if (state.searchQuery.trim()) {
+                const q = state.searchQuery.trim().toLowerCase();
+                filtered = filtered.filter(r =>
+                    (r.prompt || '').toLowerCase().includes(q) ||
+                    (r.dimensions || '').toLowerCase().includes(q)
+                );
+            }
+
+            // --- Favorite filter ---
+            if (state.sortOrder === 'favorite') {
+                filtered = filtered.filter(r => state.favoriteIds.has(r.generation_id));
+            }
+
+            // --- Client-side sort ---
+            if (state.sortOrder === 'oldest') {
+                filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            } else {
+                // 'newest' (or 'favorite' within newest) — already sorted by server, re-sort after filter
+                filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+
+            // --- Render cards ---
+            const hasPendingCards = state.pendingGenerations.size > 0;
+
+            if (filtered.length === 0 && !hasPendingCards) {
+                // No complete records AND no active polling cards → show empty state
+                if (DOM.galleryGrid) {
+                    DOM.galleryGrid.innerHTML = '';
+                    DOM.galleryGrid.classList.add('hidden');
+                }
+                if (DOM.emptyState)  DOM.emptyState.classList.remove('hidden');
+            } else {
+                if (DOM.emptyState) DOM.emptyState.classList.add('hidden');
+                if (DOM.galleryGrid) {
+                    // Only overwrite complete cards, preserve any pending cards already injected
+                    if (!hasPendingCards) {
+                        DOM.galleryGrid.innerHTML = filtered.map(buildCardHtml).join('');
+                    } else {
+                        // Remove existing complete cards, keep pending cards
+                        DOM.galleryGrid.querySelectorAll('.pinterest-card').forEach(c => c.remove());
+                        // Append complete cards after pending cards
+                        const completeHtml = filtered.map(buildCardHtml).join('');
+                        if (completeHtml) {
+                            DOM.galleryGrid.insertAdjacentHTML('beforeend', completeHtml);
+                        }
+                    }
+                    DOM.galleryGrid.classList.remove('hidden');
+                }
+            }
+
+            // --- Update count ---
+            // Failed pending generations are deleted from the Map on FAILED,
+            // so .size naturally excludes them — only active jobs are counted.
+            if (DOM.galleryCount) {
+                const renderedCount = filtered.length + state.pendingGenerations.size;
+                DOM.galleryCount.textContent = renderedCount.toLocaleString();
+            }
+
+            // Re-bind card event listeners
+            bindCardEvents();
+        }
+
+        /**
+         * Build the HTML string for a single gallery card.
+         */
+        /**
+         * Map a dimensions string ("2:3", "4:5", "4:3") to a Tailwind
+         * arbitrary aspect-ratio class so portrait images aren't cropped.
+         * Falls back to a portrait-friendly 3:4 for unknown formats.
+         */
+        function aspectClassFromDimensions(dimensions) {
+            const map = {
+                '2:3': 'aspect-[2/3]',
+                '3:2': 'aspect-[3/2]',
+                '4:5': 'aspect-[4/5]',
+                '5:4': 'aspect-[5/4]',
+                '4:3': 'aspect-[4/3]',
+                '3:4': 'aspect-[3/4]',
+                '16:9': 'aspect-[16/9]',
+                '9:16': 'aspect-[9/16]',
+                '1:1': 'aspect-[1/1]'
+            };
+            return map[dimensions] || 'aspect-[3/4]';  // default: portrait
+        }
+
+        function buildCardHtml(record) {
+            const genId    = escapeHtml(record.generation_id || '');
+            const coverUrl = record.cover_image_path
+                ? `${API_BASE}/${escapeHtml(record.cover_image_path)}`
+                : '';
+
+            // Store the full record index for the modal lookup
+            const recordIndex = state.records.indexOf(record);
+
+            const lightingBadge = record.lighting
+                ? `<span class="absolute bottom-2 right-2 z-10 px-2 py-0.5 bg-black/50 backdrop-blur-sm rounded-full text-[9px] text-vivid-purple font-semibold border border-vivid-purple/20 opacity-0 group-hover:opacity-100 transition-opacity">⚡ ${escapeHtml(record.lighting)}</span>`
+                : '';
+
+            return `
+            <div class="pinterest-card rounded-xl overflow-hidden cursor-pointer relative group"
+                 data-record-index="${recordIndex}"
+                 data-gen-id="${genId}"
+                 data-image-url="${escapeHtml(record.image_url || '')}">
+                ${coverUrl ? `
+                <img src="${coverUrl}"
+                     alt="Generated artwork"
+                     loading="lazy"
+                     onerror="this.parentElement.innerHTML='<div class=\\'w-full aspect-[3/4] flex items-center justify-center bg-surface-container-low rounded-xl\\'><span class=\\'material-symbols-outlined text-4xl text-text-secondary\\'>broken_image</span></div>'">
+                ` : `
+                <div class="w-full aspect-[3/4] flex items-center justify-center bg-surface-container-low rounded-xl">
+                    <span class="material-symbols-outlined text-4xl text-text-secondary">image</span>
+                </div>
+                `}
+                ${lightingBadge}
+            </div>`;
+        }
+
+        /**
+         * Resolve a human-readable job-type label from the generation ID prefix.
+         */
+        function resolveJobTypeLabel(genId) {
+            if (genId.startsWith('bgswapc_'))  return 'Background Change by Claude';
+            if (genId.startsWith('bgswap_'))   return 'Background Change';
+            if (genId.startsWith('dresswap_')) return 'Dress Replicate';
+            if (genId.startsWith('agfilter_')) return 'Image Generation';
+            if (genId.startsWith('gen_'))      return 'Image Generation';
+            return 'Processing';
+        }
+
+        /**
+         * Build the HTML for a pending-generation placeholder card.
+         * Shown at the top of the grid while the server processes the generation.
+         */
+        /**
+         * Progressive Indonesian status messages keyed by estimated phase.
+         */
+        const PROGRESS_STAGES = [
+            { atSec: 0,   status: 'Menganalisa struktur wajah kamu… 🔍',  detail: 'AI sedang mendeteksi fitur wajah dari foto referensi' },
+            { atSec: 20,  status: 'Menyelaraskan kebaya/toga wisuda pilihan… 👔', detail: 'Menyesuaikan pose & busana dengan latar tujuan' },
+            { atSec: 60,  status: 'Menata pencahayaan latar studio foto… 📸', detail: 'Mengomposisikan tata cahaya & bayangan natural' },
+            { atSec: 120, status: 'Sentuhan akhir… Foto wisudamu siap meluncur! ✨', detail: 'Merender hasil akhir dalam kualitas HD penuh' }
+        ];
+
+        /**
+         * Format milliseconds as MM:SS.ms (e.g. "01:23.45").
+         */
+        function formatStopwatch(ms) {
+            const totalSec = Math.floor(ms / 1000);
+            const minutes   = Math.floor(totalSec / 60);
+            const seconds   = totalSec % 60;
+            const centis    = Math.floor((ms % 1000) / 10);
+            const mm = String(minutes).padStart(2, '0');
+            const ss = String(seconds).padStart(2, '0');
+            const cs = String(centis).padStart(2, '0');
+            return `${mm}:${ss}.${cs}`;
+        }
+
+        function getProgressStage(elapsedMs) {
+            const sec = elapsedMs / 1000;
+            let stage = PROGRESS_STAGES[0];
+            for (let i = PROGRESS_STAGES.length - 1; i >= 0; i--) {
+                if (sec >= PROGRESS_STAGES[i].atSec) {
+                    stage = PROGRESS_STAGES[i];
+                    break;
+                }
+            }
+            return stage;
+        }
+
+        function buildPendingCardHtml(genId) {
+            const escapedId = escapeHtml(genId);
+            const jobLabel = resolveJobTypeLabel(genId);
+            return `
+            <div class="pending-card bg-surface-card border border-electric-cyan/20 rounded-xl overflow-hidden flex flex-col animate-fade-in shadow-[0_0_20px_rgba(0,209,255,0.08)]"
+                 data-pending-id="${escapedId}">
+                <!-- Card Body — pulsing gradient ring + status -->
+                <div class="relative aspect-[3/4] bg-surface-container-low overflow-hidden flex items-center justify-center">
+                    <div class="flex flex-col items-center gap-4 z-10 px-4">
+                        <!-- Premium pulsing gradient spinner ring (always visible) -->
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-electric-cyan via-vivid-purple to-electric-cyan p-[2px] animate-pulse shadow-[0_0_24px_rgba(0,209,255,0.3)]"
+                             id="pending-spinner-${escapedId}">
+                            <div class="w-full h-full rounded-full bg-surface-container-low flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl text-electric-cyan animate-spin" style="animation-duration: 3s;">progress_activity</span>
+                            </div>
+                        </div>
+                        <p class="pending-hideable text-electric-cyan text-sm font-semibold tracking-wide text-center"
+                           id="pending-status-${escapedId}">Menganalisa struktur wajah kamu… 🔍</p>
+                    </div>
+                    <!-- Subtle shimmer overlay -->
+                    <div class="pending-hideable absolute inset-0 bg-gradient-to-b from-transparent via-electric-cyan/5 to-transparent animate-pulse pointer-events-none"></div>
+                    <!-- Progress bar at bottom -->
+                    <div class="pending-hideable absolute bottom-0 left-0 right-0 h-1.5 bg-surface-container-low">
+                        <div class="h-full bg-gradient-to-r from-electric-cyan to-vivid-purple progress-glow transition-all duration-700 ease-out"
+                             id="pending-bar-${escapedId}" style="width: 0%"></div>
+                    </div>
+                </div>
+                <!-- Card Footer — job type + dynamic detail + stopwatch -->
+                <div class="pending-hideable p-4 flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-electric-cyan animate-pulse shadow-[0_0_6px_#00D1FF]"></span>
+                        <p class="text-xs text-text-secondary font-medium">${escapeHtml(jobLabel)}</p>
+                    </div>
+                    <p class="text-[10px] text-electric-cyan/50 tracking-wide"
+                       id="pending-detail-${escapedId}">AI sedang mendeteksi fitur wajah dari foto referensi</p>
+                    <p class="font-mono text-xs tracking-widest text-electric-cyan/70 tabular-nums mt-1"
+                       id="pending-timer-${escapedId}">00:00.00</p>
+                </div>
+            </div>`;
+        }
+
+        // =====================================================
+        // CARD EVENT HANDLERS — click to open detail modal
+        // =====================================================
+        function bindCardEvents() {
+            // Heart/favorite button — stop propagation so it doesn't open the modal
+            document.querySelectorAll('.card-favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const genId = btn.getAttribute('data-gen-id');
+                    if (genId) toggleFavorite(genId);
+                });
+            });
+
+            // Card click → open detail modal
+            document.querySelectorAll('.pinterest-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const idx = parseInt(card.getAttribute('data-record-index'), 10);
+                    if (!isNaN(idx) && state.records[idx]) {
+                        openDetailModal(state.records[idx]);
+                    }
+                });
+            });
+        }
+
+        // =====================================================
+        // DETAIL MODAL
+        // =====================================================
+        let detailModalRecord = null;
+        let detailModalIndex = -1;  // index in state.records of the currently displayed record
+
+        /**
+         * Navigate the detail modal to the next or previous record.
+         * @param {number} direction — -1 for previous, +1 for next
+         */
+        function navigateDetailModal(direction) {
+            if (!state.records || state.records.length === 0) return;
+            if (detailModalIndex < 0) return;
+
+            const total = state.records.length;
+            // Wrap around cleanly
+            let newIndex = (detailModalIndex + direction) % total;
+            if (newIndex < 0) newIndex = total - 1;
+
+            if (newIndex === detailModalIndex) return;
+            detailModalIndex = newIndex;
+            openDetailModal(state.records[newIndex]);
+        }
+
+        function openDetailModal(record) {
+            detailModalRecord = record;
+            // Find and store the record's index in state.records for prev/next navigation
+            if (record && state.records) {
+                detailModalIndex = state.records.findIndex(r => r.generation_id === record.generation_id);
+            }
+            const modal = document.getElementById('detail-modal');
+            if (!modal) return;
+
+            // Image
+            const img = document.getElementById('detail-modal-image');
+            const coverUrl = record.cover_image_path
+                ? `${API_BASE}/${record.cover_image_path}`
+                : (record.image_url || '');
+            if (img && coverUrl) {
+                img.src = coverUrl;
+            }
+
+            // Favorite heart icon — sync with current state
+            const favBtn = document.getElementById('detail-modal-favorite');
+            if (favBtn) {
+                favBtn.setAttribute('data-gen-id', record.generation_id);
+                applyFavoriteState(record.generation_id, state.favoriteIds.has(record.generation_id));
+            }
+
+            // Dimensions
+            const dimsEl = document.getElementById('detail-modal-dims');
+            if (dimsEl) dimsEl.textContent = record.dimensions || 'N/A';
+
+            // Lighting — hide row when value is empty or N/A
+            const lightingRow = document.getElementById('detail-modal-lighting-row');
+            const lightingEl  = document.getElementById('detail-modal-lighting');
+            const hasLighting  = record.lighting && record.lighting !== 'N/A';
+            if (lightingRow) lightingRow.style.display = hasLighting ? '' : 'none';
+            if (lightingEl)  lightingEl.textContent  = record.lighting || 'N/A';
+
+            // Date
+            const dateEl = document.getElementById('detail-modal-date');
+            if (dateEl) {
+                dateEl.textContent = record.created_at
+                    ? formatRelativeTime(record.created_at)
+                    : 'Unknown';
+            }
+
+            // Reference images
+            const refsEl = document.getElementById('detail-modal-refs');
+            if (refsEl) {
+                let refsHtml = '';
+                [record.reference_image_1_path, record.reference_image_2_path].forEach(refPath => {
+                    if (refPath) {
+                        const refUrl = `${API_BASE}/${refPath}`;
+                        refsHtml += `
+                        <div class="w-20 h-20 rounded-lg border border-border-subtle overflow-hidden bg-surface-container-low flex-shrink-0">
+                            <img src="${refUrl}" alt="Reference" class="w-full h-full object-cover" loading="lazy"
+                                 onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center\\'><span class=\\'material-symbols-outlined text-xs text-text-secondary\\'>image</span></div>'">
+                        </div>`;
+                    }
+                });
+                if (!refsHtml) {
+                    refsHtml = `
+                    <div class="w-20 h-20 rounded-lg border border-border-subtle bg-surface-container-low flex items-center justify-center">
+                        <span class="material-symbols-outlined text-sm text-text-secondary">image</span>
+                    </div>`;
+                }
+                refsEl.innerHTML = refsHtml;
+            }
+
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            detailModalRecord = null;
+        }
+
+        function modalDownloadImage() {
+            if (!detailModalRecord) return;
+            const imageUrl = detailModalRecord.image_url || detailModalRecord.cover_image_path;
+            if (imageUrl) {
+                const fullUrl = imageUrl.startsWith('http') ? imageUrl : `${API_BASE}/${imageUrl}`;
+                downloadImage(fullUrl);
+            }
+        }
+
+        function modalDeleteImage() {
+            if (!detailModalRecord) return;
+            const genId = detailModalRecord.generation_id;
+            const card = document.querySelector(`.pinterest-card[data-gen-id="${genId}"]`);
+            closeDetailModal();
+            if (genId) handleDelete(genId, card);
+        }
+
+        /**
+         * Download an image via the Leonardo CDN URL.
+         */
+        async function downloadImage(imageUrl) {
+            try {
+                showToast('Downloading…', 'info');
+                const resp = await fetch(imageUrl);
+                const blob = await resp.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `fotowisuda-${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+                showToast('Image downloaded successfully.', 'success');
+            } catch (_err) {
+                // Fallback: open in new tab
+                window.open(imageUrl, '_blank', 'noopener');
+                showToast('Opened image in new tab.', 'info');
+            }
+        }
+
+        /**
+         * Delete a generation record with confirmation + animation.
+         */
+        /**
+         * Custom confirmation modal helpers.
+         */
+        let pendingDelete = { generationId: null, cardElement: null };
+
+        function showConfirmModal(generationId, cardElement) {
+            pendingDelete.generationId = generationId;
+            pendingDelete.cardElement = cardElement;
+            const modal = document.getElementById('confirm-modal');
+            if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; }
+        }
+
+        function hideConfirmModal() {
+            pendingDelete.generationId = null;
+            pendingDelete.cardElement = null;
+            const modal = document.getElementById('confirm-modal');
+            if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
+        }
+
+        async function executeDelete() {
+            const { generationId, cardElement } = pendingDelete;
+            if (!generationId) return;
+            hideConfirmModal();
+
+            try {
+                // Animate card out if we have one, otherwise just reload
+                if (cardElement) {
+                    cardElement.style.opacity = '0';
+                    cardElement.style.transform = 'scale(0.95)';
+                    cardElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                }
+
+                await deleteGeneration(generationId);
+
+                state.records = state.records.filter(r => r.generation_id !== generationId);
+                state.total = Math.max(0, state.total - 1);
+
+                // Animate the deleted card out, then re-render so the counter,
+                // empty state, and grid all stay perfectly in sync.
+                setTimeout(() => {
+                    if (cardElement) cardElement.remove();
+                    renderGallery();
+                }, 300);
+
+                showToast('Generation deleted successfully.', 'success');
+            } catch (err) {
+                if (cardElement) {
+                    cardElement.style.opacity = '1';
+                    cardElement.style.transform = 'scale(1)';
+                }
+                console.error('Delete failed:', err);
+                showToast('Failed to delete: ' + (err.message || 'Unknown error'), 'error');
+            }
+        }
+
+        async function handleDelete(generationId, cardElement) {
+            showConfirmModal(generationId, cardElement);
+        }
+
+        function updateCountDisplay() {
+            // Failed pending generations are deleted from the Map, so .size excludes them
+            if (DOM.galleryCount) {
+                const renderedCount = state.records.length + state.pendingGenerations.size;
+                DOM.galleryCount.textContent = renderedCount.toLocaleString();
+            }
+        }
+
+        // =====================================================
+        // RELATIVE TIME FORMATTING
+        // =====================================================
+        function formatRelativeTime(isoString) {
+            const now = Date.now();
+            const then = new Date(isoString).getTime();
+            const diffMs = now - then;
+
+            if (diffMs < 0) return 'just now';
+
+            const seconds = Math.floor(diffMs / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours   = Math.floor(minutes / 60);
+            const days    = Math.floor(hours / 24);
+
+            if (seconds < 60)  return 'just now';
+            if (minutes < 60)  return `${minutes}m ago`;
+            if (hours < 24)    return `${hours}h ago`;
+            if (days < 7)      return `${days}d ago`;
+
+            // Fallback to formatted date
+            const d = new Date(isoString);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
+        }
+
+        // =====================================================
+        // SEARCH + SORT HANDLERS
+        // =====================================================
+        function onSearchInput() {
+            state.searchQuery = DOM.searchInput?.value || '';
+            renderGallery();
+        }
+
+        /**
+         * Grid layout switcher — 1, 2, or 3 columns via CSS grid.
+         * Mobile: 1-col; tablet (≤1023px): 2-col max; desktop: as selected.
+         */
+        function setGridLayout(cols) {
+            state.gridLayout = cols;
+            // Update active button styles
+            if (DOM.gridLayoutBtns) {
+                DOM.gridLayoutBtns.forEach(btn => {
+                    const btnCols = parseInt(btn.getAttribute('data-cols'), 10);
+                    if (btnCols === cols) {
+                        btn.classList.add('bg-electric-cyan/15', 'text-electric-cyan');
+                    } else {
+                        btn.classList.remove('bg-electric-cyan/15', 'text-electric-cyan');
+                    }
+                });
+            }
+            // Apply Pinterest masonry column class — fluid on all screen sizes
+            if (DOM.galleryGrid) {
+                DOM.galleryGrid.className = `masonry-container masonry-${cols}`;
+            }
+        }
+
+        function setSortOrder(order) {
+            state.sortOrder = order;
+            // Update active button styles
+            const sortBtns = document.querySelectorAll('.sort-btn');
+            sortBtns.forEach(btn => {
+                if (btn.getAttribute('data-sort') === order) {
+                    btn.classList.add('bg-electric-cyan/15', 'text-electric-cyan');
+                } else {
+                    btn.classList.remove('bg-electric-cyan/15', 'text-electric-cyan');
+                }
+            });
+            renderGallery();
+        }
+
+        /**
+         * Toggle the favorite flag for a generation — calls the server,
+         * then updates local state and all visible heart icons from the response.
+         */
+        async function toggleFavorite(generationId) {
+            try {
+                const resp = await fetch(`${API_BASE}/api/creations/${generationId}/toggle-favorite`, {
+                    method: 'PATCH'
+                });
+                if (!resp.ok) {
+                    console.error('Favorite toggle failed:', resp.status);
+                    return;
+                }
+
+                const data = await resp.json();
+                const isFav = data.isFavorite === true;
+
+                // Update local state to match server
+                if (isFav) {
+                    state.favoriteIds.add(generationId);
+                } else {
+                    state.favoriteIds.delete(generationId);
+                }
+
+                // Update all heart icons to reflect the confirmed server state
+                applyFavoriteState(generationId, isFav);
+
+                // Refresh if currently viewing favorites-only
+                if (state.sortOrder === 'favorite') renderGallery();
+
+            } catch (err) {
+                console.error('Favorite toggle network error:', err);
+            }
+        }
+
+        /**
+         * Apply a known favorite state to all heart icons for a generation.
+         * Explicitly adds/removes classes — no fragile regex replacements.
+         */
+        function applyFavoriteState(generationId, isFav) {
+            const fillState = isFav ? 1 : 0;
+
+            // Colors for each state (mutually exclusive sets)
+            const ADD_LOVED    = ['text-red-400'];
+            const REMOVE_LOVED = ['text-red-400'];
+            const ADD_UNLOVED  = ['text-white/60', 'hover:text-red-300'];
+            const REMOVE_UNLOVED = ['text-white/60', 'hover:text-red-300', 'text-text-secondary'];
+
+            const addClasses    = isFav ? ADD_LOVED    : ADD_UNLOVED;
+            const removeClasses = isFav ? REMOVE_UNLOVED : REMOVE_LOVED;
+
+            // Grid card hearts
+            document.querySelectorAll(`.card-favorite-btn[data-gen-id="${generationId}"]`).forEach(btn => {
+                const icon = btn.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.style.fontVariationSettings = `'FILL' ${fillState}`;
+                }
+                btn.classList.remove(...removeClasses);
+                btn.classList.add(...addClasses);
+                if (isFav) {
+                    btn.classList.add('heart-pop');
+                    setTimeout(() => btn.classList.remove('heart-pop'), 400);
+                }
+            });
+
+            // Detail modal heart
+            const modalBtn = document.getElementById('detail-modal-favorite');
+            if (modalBtn && detailModalRecord && detailModalRecord.generation_id === generationId) {
+                const icon = modalBtn.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.style.fontVariationSettings = `'FILL' ${fillState}`;
+                }
+                modalBtn.classList.remove(...removeClasses);
+                modalBtn.classList.add(...addClasses);
+                if (isFav) {
+                    modalBtn.classList.add('heart-pop');
+                    setTimeout(() => modalBtn.classList.remove('heart-pop'), 400);
+                }
+            }
+        }
+
+        // =====================================================
+        // EVENT BINDINGS
+        // =====================================================
+        function bindEvents() {
+            // Search input (debounced)
+            let searchTimer;
+            if (DOM.searchInput) {
+                DOM.searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimer);
+                    searchTimer = setTimeout(onSearchInput, 300);
+                });
+            }
+
+            // Refresh button
+            if (DOM.refreshBtn) {
+                DOM.refreshBtn.addEventListener('click', () => {
+                    loadGallery(true);
+                });
+            }
+
+            // Sort icon buttons
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const order = btn.getAttribute('data-sort');
+                    if (order) setSortOrder(order);
+                });
+            });
+        }
+
+        // =====================================================
+        // BOOTSTRAP
+        // =====================================================
+        function initSidebarActiveState() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('aside nav a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (href === '/gallery' && currentPath === '/gallery')) {
+                    link.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border', 'border-electric-cyan/20');
+                    link.classList.remove('text-text-secondary', 'hover:text-white', 'hover:bg-white/[0.04]');
+                    const existingDot = link.querySelector('.ml-auto');
+                    if (!existingDot) {
+                        const dot = document.createElement('span');
+                        dot.className = 'ml-auto w-1.5 h-1.5 rounded-full bg-electric-cyan';
+                        dot.style.boxShadow = '0 0 6px #00D1FF';
+                        link.appendChild(dot);
+                    }
+                }
+            });
+        }
+
+        function initSidebarToggle() {
+            var sb = document.getElementById('sidebar');
+            var ov = document.getElementById('sidebar-overlay');
+            var tb = document.getElementById('sidebar-toggle');
+            var cb = document.getElementById('sidebar-close');
+            if (!sb || !ov) return;
+            function open(){ sb.classList.add('sidebar-open'); ov.classList.add('overlay-visible'); document.body.classList.add('overflow-hidden'); }
+            function close(){ sb.classList.remove('sidebar-open'); ov.classList.remove('overlay-visible'); document.body.classList.remove('overflow-hidden'); }
+            if (tb) tb.addEventListener('click', open);
+            if (cb) cb.addEventListener('click', close);
+            ov.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && sb.classList.contains('sidebar-open')) close(); });
+        }
+
+        // =====================================================
+        // SESSION & PROFILE MANAGEMENT (shared across all pages)
+        // =====================================================
+
+        var Session = (function() {
+            var ACTIVE_KEY = 'active_user_email';
+            var USERS_KEY = 'simulated_users';
+            var CREATIONS_KEY = 'my_creations';
+
+            function safeGet(storage, key) {
+                try { var v = storage.getItem(key); return v ? JSON.parse(v) : null; } catch(_) { return null; }
+            }
+            function safeSet(storage, key, val) {
+                try { storage.setItem(key, JSON.stringify(val)); } catch(_) {}
+            }
+
+            function getActiveEmail() {
+                try { return sessionStorage.getItem(ACTIVE_KEY) || null; } catch(_) { return null; }
+            }
+            function setActiveEmail(email) {
+                try { sessionStorage.setItem(ACTIVE_KEY, email); } catch(_) {}
+            }
+            function clearActiveEmail() {
+                try { sessionStorage.removeItem(ACTIVE_KEY); } catch(_) {}
+            }
+
+            function getUsers() { return safeGet(localStorage, USERS_KEY) || {}; }
+            function saveUsers(u) { safeSet(localStorage, USERS_KEY, u); }
+
+            function getOrCreateUser(email) {
+                var users = getUsers();
+                if (!users[email]) {
+                    var colors = ['from-cyan-500 to-purple-600','from-purple-500 to-pink-600','from-emerald-500 to-cyan-600','from-amber-500 to-rose-600','from-blue-500 to-indigo-600'];
+                    var namePart = email.split('@')[0];
+                    var dn = namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/[._-]/g, ' ');
+                    users[email] = { displayName: dn, gradient: colors[Math.floor(Math.random()*colors.length)], initial: dn.charAt(0).toUpperCase(), createdAt: new Date().toISOString() };
+                    saveUsers(users);
+                    seedDemoCreations(email);
+                }
+                return users[email];
+            }
+
+            function seedDemoCreations(email) {
+                var creations = safeGet(localStorage, CREATIONS_KEY) || [];
+                var hasExisting = creations.some(function(c) { return c.owner_email === email; });
+                if (hasExisting) return;
+                var demos = [
+                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 × 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 × 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 × 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
+                ];
+                safeSet(localStorage, CREATIONS_KEY, creations.concat(demos));
+            }
+
+            return {
+                getActiveEmail: getActiveEmail, setActiveEmail: setActiveEmail, clearActiveEmail: clearActiveEmail,
+                getOrCreateUser: getOrCreateUser, safeGet: safeGet, safeSet: safeSet
+            };
+        })();
+
+        function openProfileModal() {
+            var modal = document.getElementById('profile-management-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden'); modal.style.display = 'flex';
+            var email = Session.getActiveEmail();
+            var gp = document.getElementById('profile-modal-guest');
+            var lp = document.getElementById('profile-modal-logged-in');
+            if (email) {
+                if (gp) gp.classList.add('hidden');
+                if (lp) lp.classList.remove('hidden');
+                var user = Session.getOrCreateUser(email);
+                updateProfileUI(user, email);
+            } else {
+                if (gp) gp.classList.remove('hidden');
+                if (lp) lp.classList.add('hidden');
+                var inp = document.getElementById('signin-email-input');
+                if (inp) inp.value = '';
+            }
+        }
+
+        function closeProfileModal() {
+            var m = document.getElementById('profile-management-modal');
+            if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+        }
+
+        function updateProfileUI(user, email) {
+            var pa = document.getElementById('profile-avatar');
+            var ma = document.getElementById('modal-avatar');
+            if (pa) { pa.className = 'w-8 h-8 rounded-full bg-gradient-to-br ' + user.gradient + ' flex items-center justify-center text-white text-xs font-bold shrink-0'; pa.textContent = user.initial; }
+            if (ma) { ma.className = 'w-14 h-14 rounded-full bg-gradient-to-br ' + user.gradient + ' flex items-center justify-center text-white text-xl font-bold shrink-0'; ma.textContent = user.initial; }
+            var nel = document.querySelectorAll('#profile-name, #modal-name');
+            var eel = document.querySelectorAll('#profile-email, #modal-email');
+            nel.forEach(function(el) { el.textContent = user.displayName; });
+            eel.forEach(function(el) { el.textContent = email; });
+        }
+
+        function renderGuestState() {
+            var g = document.getElementById('profile-guest');
+            var l = document.getElementById('profile-logged-in');
+            if (g) g.classList.remove('hidden');
+            if (l) l.classList.add('hidden');
+        }
+
+        function renderLoggedInState(email) {
+            var g = document.getElementById('profile-guest');
+            var l = document.getElementById('profile-logged-in');
+            if (g) g.classList.add('hidden');
+            if (l) l.classList.remove('hidden');
+            updateProfileUI(Session.getOrCreateUser(email), email);
+        }
+
+        function handleSignIn() {
+            var inp = document.getElementById('signin-email-input');
+            if (!inp) return;
+            var email = inp.value.trim();
+            if (!email || email.indexOf('@') === -1) { alert('Silakan masukkan alamat email yang valid.'); return; }
+            Session.setActiveEmail(email);
+            Session.getOrCreateUser(email);
+            renderLoggedInState(email);
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function handleLogout() {
+            Session.clearActiveEmail();
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function handleDeleteAccount() {
+            if (!confirm('Hapus semua data kreasi untuk akun ini? Tindakan ini tidak dapat dibatalkan.')) return;
+            var email = Session.getActiveEmail();
+            if (email) {
+                var creations = Session.safeGet(localStorage, 'my_creations') || [];
+                creations = creations.filter(function(c) { return c.owner_email !== email; });
+                Session.safeSet(localStorage, 'my_creations', creations);
+                Session.clearActiveEmail();
+            }
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function bindProfileModalEvents() {
+            var cb = document.getElementById('btn-confirm-signin');
+            var lb = document.getElementById('btn-logout');
+            var db = document.getElementById('btn-delete-account');
+            var si = document.getElementById('signin-email-input');
+            if (cb) cb.addEventListener('click', handleSignIn);
+            if (lb) lb.addEventListener('click', handleLogout);
+            if (db) db.addEventListener('click', handleDeleteAccount);
+            if (si) si.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignIn(); });
+        }
+
+        // =====================================================
+        // MOCK LOGIN MODAL
+        // =====================================================
+
+        function openMockLoginModal() {
+            var modal = document.getElementById('mock-login-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            var inp = document.getElementById('mock-email-input');
+            if (inp) { inp.value = ''; inp.focus(); }
+            var pwd = document.getElementById('mock-password-input');
+            if (pwd) pwd.value = '';
+        }
+
+        function closeMockLoginModal() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleMockSubmit(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('mock-email-input');
+            var email = emailInput ? emailInput.value.trim() : '';
+            if (!email || email.indexOf('@') === -1) {
+                alert('Silakan masukkan alamat email yang valid.');
+                return;
+            }
+            Session.setActiveEmail(email);
+            Session.getOrCreateUser(email);
+            closeMockLoginModal();
+            window.location.reload();
+        }
+
+        // =====================================================
+        // SIMULATED LOGIN SYSTEM — localStorage sandbox-safe
+        // =====================================================
+
+        var safeStorage = {
+            setItem: function(key, val) { try { localStorage.setItem(key, val); } catch(e) { window['__' + key] = val; } },
+            getItem: function(key) {
+                try {
+                    return sessionStorage.getItem(key) || localStorage.getItem(key) || window['__' + key] || null;
+                } catch(e) {
+                    try { return localStorage.getItem(key) || window['__' + key] || null; } catch(e2) { return window['__' + key] || null; }
+                }
+            },
+            removeItem: function(key) { try { localStorage.removeItem(key); sessionStorage.removeItem(key); } catch(e) {} delete window['__' + key]; }
+        };
+
+        window.openMockLoginModal = function() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(function() {
+                    var inner = modal.querySelector('div');
+                    if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+                }, 10);
+            }
+        };
+
+        window.closeMockLoginModal = function() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) {
+                var inner = modal.querySelector('div');
+                if (inner) { inner.classList.remove('scale-100'); inner.classList.add('scale-95'); }
+                setTimeout(function() { modal.classList.add('hidden'); }, 200);
+            }
+        };
+
+        window.handleMockSubmit = function(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('mock-email-input');
+            var email = emailInput ? emailInput.value.trim() : '';
+            if (email && email.indexOf('@') !== -1) {
+                safeStorage.setItem('active_user_email', email);
+                closeMockLoginModal();
+                window.location.reload();
+            }
+        };
+
+        window.handleMockLogout = function() {
+            safeStorage.removeItem('active_user_email');
+            window.location.reload();
+        };
+
+        function renderAuthContainer() {
+            var container = document.getElementById('auth-container');
+            if (!container) return;
+            var activeEmail = safeStorage.getItem('active_user_email');
+
+            if (activeEmail) {
+                var namePrefix = activeEmail.split('@')[0];
+                var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
+                var initials = namePrefix.substring(0, 2).toUpperCase();
+
+                container.innerHTML = '<div class="flex flex-col gap-2">' +
+                    '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
+                        '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
+                        '<div class="flex flex-col min-w-0">' +
+                            '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
+                            '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                        '<i class="fa-solid fa-right-from-bracket"></i>' +
+                        '<span>Keluar Sesi</span>' +
+                    '</button>' +
+                '</div>';
+            } else {
+                container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+                    '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
+                        '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
+                        '<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>' +
+                        '<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>' +
+                    '</svg>' +
+                    '<span>Masuk Google</span>' +
+                '</button>';
+            }
+        }
+
+        function initSession() {
+            renderAuthContainer();
+        }
+
+        async function init() {
+            initSession();
+            cacheDomReferences();
+            initSidebarToggle();
+            bindEvents();
+            initSidebarActiveState();
+
+            // Grid layout switcher buttons
+            if (DOM.gridLayoutBtns) {
+                DOM.gridLayoutBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const cols = parseInt(btn.getAttribute('data-cols'), 10);
+                        if (cols) {
+                            setGridLayout(cols);
+                            localStorage.setItem('creations_grid_columns', cols);
+                        }
+                    });
+                });
+            }
+            // Restore saved column preference (1–3 only) or default to 3
+            const savedColumns = parseInt(localStorage.getItem('creations_grid_columns'), 10) || 3;
+            state.gridLayout = Math.min(savedColumns, 3);
+            setGridLayout(state.gridLayout);
+
+            // Wire confirm modal buttons
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const confirmOverlayBg = document.getElementById('confirm-overlay-bg');
+            if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmModal);
+            if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', executeDelete);
+            if (confirmOverlayBg) confirmOverlayBg.addEventListener('click', hideConfirmModal);
+
+            // Wire detail modal events
+            const detailModalClose    = document.getElementById('detail-modal-close');
+            const detailModalBg       = document.getElementById('detail-modal-bg');
+            const detailDownload      = document.getElementById('detail-modal-download');
+            const detailDelete        = document.getElementById('detail-modal-delete');
+            const detailModalFavorite = document.getElementById('detail-modal-favorite');
+            const detailModalPrev     = document.getElementById('detail-modal-prev');
+            const detailModalNext     = document.getElementById('detail-modal-next');
+            if (detailModalClose)    detailModalClose.addEventListener('click', closeDetailModal);
+            if (detailModalBg)       detailModalBg.addEventListener('click', closeDetailModal);
+            if (detailDownload)      detailDownload.addEventListener('click', modalDownloadImage);
+            if (detailDelete)        detailDelete.addEventListener('click', modalDeleteImage);
+            if (detailModalPrev)     detailModalPrev.addEventListener('click', () => navigateDetailModal(-1));
+            if (detailModalNext)     detailModalNext.addEventListener('click', () => navigateDetailModal(1));
+            if (detailModalFavorite) {
+                detailModalFavorite.addEventListener('click', () => {
+                    if (detailModalRecord) toggleFavorite(detailModalRecord.generation_id);
+                });
+            }
+
+            // Keyboard shortcuts — Escape closes modals, Arrow keys navigate
+            document.addEventListener('keydown', (e) => {
+                // Arrow key navigation (only when detail modal is open)
+                const detailModal = document.getElementById('detail-modal');
+                const detailOpen = detailModal && !detailModal.classList.contains('hidden');
+                if (detailOpen && e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    navigateDetailModal(-1);
+                    return;
+                }
+                if (detailOpen && e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    navigateDetailModal(1);
+                    return;
+                }
+
+                if (e.key === 'Escape') {
+                    const confirmModal = document.getElementById('confirm-modal');
+                    if (confirmModal && !confirmModal.classList.contains('hidden')) {
+                        hideConfirmModal();
+                        return;
+                    }
+                    if (detailOpen) {
+                        closeDetailModal();
+                    }
+                }
+            });
+
+            // Health check
+            const healthy = await checkBackendHealth();
+            console.log(healthy ? '✓ Server connected' : '✗ Server offline');
+
+            // Load gallery data
+            await loadGallery(true);
+
+            // Resume any in-progress generations
+            await resumePendingGenerations();
+        }
+
+        /**
+         * Check both the URL `?pending=` param and the server's in-memory
+         * active-generations store, then resume polling + stopwatch for any
+         * generation still in PENDING or PROCESSING state.
+         */
+        async function resumePendingGenerations() {
+            // 1) Check URL param (from a redirect like /my-creations?pending=gen_xxx)
+            const urlPendingId = parsePendingFromURL();
+            if (urlPendingId) {
+                console.log('Resuming from URL — pending:', urlPendingId);
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, '', '/gallery');
+                }
+                // Fetch the server record to get the accurate createdAt timestamp
+                try {
+                    const resp = await fetch(`${API_BASE}/api/status/${urlPendingId}`);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        const createdAt = data.createdAt || Date.now();
+                        startPendingPoll(urlPendingId, createdAt);
+                    } else {
+                        // Server doesn't know this ID — try without offset
+                        startPendingPoll(urlPendingId);
+                    }
+                } catch (_e) {
+                    startPendingPoll(urlPendingId);
+                }
+            }
+
+            // 2) Also ask the server for any other active generations not in the URL
+            try {
+                const resp = await fetch(`${API_BASE}/api/active-generations`);
+                if (resp.ok) {
+                    const { active } = await resp.json();
+                    for (const gen of active) {
+                        // Don't double-poll the URL one
+                        if (gen.generationId === urlPendingId) continue;
+                        console.log('Resuming from server — pending:', gen.generationId, gen.status);
+                        startPendingPoll(gen.generationId, gen.createdAt);
+                    }
+                }
+            } catch (_e) {
+                // Server unreachable — skip resume
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+    })();
+    </script>
+
+    <!-- ============================================================
+         DELETE CONFIRMATION MODAL
+         ============================================================ -->
+    <div id="confirm-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
+        <div class="confirm-overlay absolute inset-0" id="confirm-overlay-bg"></div>
+        <div class="relative z-10 bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-6 confirm-animate-in shadow-2xl">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-2xl text-error" style="font-variation-settings: 'FILL' 1;">delete_forever</span>
+                <h3 class="font-headline-md text-white text-lg">Delete Creation</h3>
+            </div>
+            <p class="text-text-secondary text-sm mb-6 leading-relaxed">
+                Delete this generation? The cover image and reference files will be permanently removed.
+            </p>
+            <div class="flex gap-3">
+                <button id="confirm-cancel-btn"
+                        class="flex-1 py-2.5 bg-surface-container border border-border-subtle text-text-primary rounded-xl font-semibold text-sm transition-all hover:bg-surface-container-high">
+                    Cancel
+                </button>
+                <button id="confirm-delete-btn"
+                        class="flex-1 py-2.5 bg-error-container border border-error/30 text-error rounded-xl font-semibold text-sm transition-all hover:bg-error/20 hover:border-error/50">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 503 Error Modal -->
+    <div class="modal-overlay" id="error503Modal">
+        <div class="modal-card">
+            <div class="w-16 h-16 rounded-full bg-error/10 border border-error/20 flex items-center justify-center mx-auto mb-5">
+                <span class="material-symbols-outlined text-3xl text-error">cloud_off</span>
+            </div>
+            <h3 class="text-white font-headline-md text-headline-md mb-3">Server Sibuk</h3>
+            <p class="text-text-secondary text-sm leading-relaxed mb-6">
+                Proses generate gagal. Server sedang dalam gangguan atau antrean sedang sangat padat. Silakan coba beberapa saat lagi.
+            </p>
+            <button class="px-8 py-3 bg-electric-cyan text-surface-background font-bold rounded-xl hover:brightness-110 transition-all active:scale-95"
+                    onclick="dismiss503Error()">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function showErrorModal503() {
+            var modal = document.getElementById('error503Modal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function dismiss503Error() {
+            // Hide the modal
+            var modal = document.getElementById('error503Modal');
+            if (modal) modal.classList.remove('active');
+
+            // Remove all failed/server-busy pending cards from the DOM
+            var failedCards = document.querySelectorAll('.pending-card.border-error\\/40');
+            failedCards.forEach(function(card) {
+                card.style.opacity = '0';
+                card.style.transition = 'opacity 0.35s ease-out';
+                setTimeout(function() {
+                    if (card.parentNode) card.remove();
+                }, 350);
+            });
+
+            // Also clean up any remaining pending cards that have error status text
+            var errorStatusCards = document.querySelectorAll('.pending-card [id^="pending-status-"]');
+            errorStatusCards.forEach(function(el) {
+                if (el.textContent && el.textContent.indexOf('Gagal') !== -1) {
+                    var card = el.closest('.pending-card');
+                    if (card && card.parentNode) {
+                        card.style.opacity = '0';
+                        card.style.transition = 'opacity 0.35s ease-out';
+                        setTimeout(function() {
+                            if (card.parentNode) card.remove();
+                        }, 350);
+                    }
+                }
+            });
+        }
+    </script>
+
+    <!-- ============================================================
+         DETAIL MODAL — opens on card click
+         ============================================================ -->
+    <div id="detail-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-4 sm:p-6">
+        <div class="detail-modal-overlay absolute inset-0" id="detail-modal-bg"></div>
+        <div class="detail-modal-panel relative z-10 w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl overflow-hidden">
+            <!-- Header bar: favorite (top-left) + close (top-right) -->
+            <button id="detail-modal-favorite"
+                    class="absolute top-4 left-4 z-20 p-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-red-400 hover:text-red-300 hover:border-red-500/30 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all"
+                    title="Toggle favorite">
+                <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 0;">favorite</span>
+            </button>
+            <button id="detail-modal-close"
+                    class="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-text-secondary hover:text-white hover:border-white/20 transition-all">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <!-- Left: large image with nav arrows — black theater frame -->
+            <div class="lg:w-[60%] bg-black flex items-center justify-center min-h-[200px] max-h-[320px] p-4 relative rounded-t-2xl">
+                <div class="w-full aspect-[3/4] max-h-[280px] overflow-hidden bg-black relative flex items-center justify-center">
+                    <img id="detail-modal-image" src="" alt="Generated artwork"
+                         class="w-full h-full object-contain max-h-[280px]" />
+                </div>
+                <!-- Prev / Next navigation arrows -->
+                <button id="detail-modal-prev" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all active:scale-90"
+                        aria-label="Previous image">
+                    <span class="material-symbols-outlined text-xl">chevron_left</span>
+                </button>
+                <button id="detail-modal-next" class="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all active:scale-90"
+                        aria-label="Next image">
+                    <span class="material-symbols-outlined text-xl">chevron_right</span>
+                </button>
+            </div>
+
+            <!-- Right: metadata + actions -->
+            <div class="lg:w-[40%] flex flex-col p-6 gap-5 border-t lg:border-t-0 lg:border-l border-border-subtle overflow-y-auto flex-1 min-h-0">
+
+                <!-- Reference Images + Metadata row (always side-by-side) -->
+                <div class="flex flex-row justify-between items-start gap-4 w-full">
+                    <!-- Reference Images (left) -->
+                    <div class="flex-shrink-0">
+                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2">Reference Images</p>
+                        <div id="detail-modal-refs" class="flex gap-3">
+                            <div class="w-20 h-20 rounded-lg border border-border-subtle bg-surface-container-low flex items-center justify-center">
+                                <span class="material-symbols-outlined text-sm text-text-secondary">image</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metadata (right): Aspect Ratio + Created -->
+                    <div class="flex flex-col gap-2 text-right items-end min-w-0 flex-shrink-0">
+                        <div id="modal-aspect-ratio" class="flex flex-col">
+                            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">Aspect Ratio</p>
+                            <p id="detail-modal-dims" class="text-sm text-text-primary font-medium">N/A</p>
+                        </div>
+                        <div class="flex flex-col">
+                            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">Created</p>
+                            <p id="detail-modal-date" class="text-sm text-text-primary">Unknown</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lighting (below the row) -->
+                <div id="detail-modal-lighting-row" class="flex flex-col">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-0.5">Lighting</p>
+                    <p id="detail-modal-lighting" class="text-sm text-text-primary font-medium">N/A</p>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="mt-auto pt-4 flex flex-row items-center gap-3">
+                    <button id="detail-modal-download"
+                            class="flex-1 py-3 bg-electric-cyan text-surface-background font-bold rounded-xl flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-sm">download</span>Download HD
+                    </button>
+                    <button id="detail-modal-delete"
+                            class="flex-shrink-0 w-12 h-12 bg-error-container border border-error/20 text-error rounded-xl flex items-center justify-center hover:bg-error/20 transition-all active:scale-[0.98]"
+                            title="Delete">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- ============================================================
+     MOCK LOGIN MODAL — Email + Password simulation
+     ============================================================ -->
+<div id="mock-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-sm w-full text-center flex flex-col gap-4 transition-all transform scale-95 duration-300">
+        <div class="h-12 w-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20 text-cyan-400 text-xl mx-auto">
+            <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="flex flex-col gap-1">
+            <h3 class="text-base font-bold text-white tracking-wide">Simulasi Masuk Sesi</h3>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+                Ketik email &amp; password acak untuk mensimulasikan login multi-user di localhost.
+            </p>
+        </div>
+        <form id="mock-login-form" class="flex flex-col gap-3 text-left mt-1" onsubmit="handleMockSubmit(event)">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alamat Email</label>
+                <input type="email" id="mock-email-input" required placeholder="budi@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kata Sandi</label>
+                <input type="password" id="mock-password-input" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+            </div>
+            <div class="flex gap-2 mt-2">
+                <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-95 shadow-lg shadow-cyan-500/10">
+                    Masuk Sesi
+                </button>
+                <button type="button" onclick="closeMockLoginModal()" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition-all border border-slate-700/50">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     PROFILE MANAGEMENT MODAL
+     ============================================================ -->
+<div id="profile-management-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeProfileModal()"></div>
+    <div class="relative z-10 bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl" style="animation: modalIn 0.25s ease-out forwards;">
+        <div id="profile-modal-guest">
+            <h3 class="font-headline-md text-white text-lg mb-1">Masuk Google</h3>
+            <p class="text-xs text-slate-400 mb-5">Simulasi login email untuk localhost.</p>
+            <input type="email" id="signin-email-input"
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors mb-3"
+                   placeholder="nama@email.com" />
+            <button id="btn-confirm-signin"
+                    class="w-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-semibold py-2.5 rounded-xl hover:bg-cyan-500/30 transition-all text-sm">
+                Masuk
+            </button>
+        </div>
+        <div id="profile-modal-logged-in" class="hidden">
+            <div class="flex items-center gap-4 mb-5">
+                <div id="modal-avatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">?</div>
+                <div class="min-w-0">
+                    <h3 id="modal-name" class="font-headline-md text-white text-lg truncate">User</h3>
+                    <p id="modal-email" class="text-xs text-slate-400 truncate">user@gmail.com</p>
+                </div>
+            </div>
+            <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-[10px] font-semibold text-cyan-400 mb-5">
+                Sesi Simulasi Lokal (Localhost)
+            </div>
+            <div class="space-y-2.5">
+                <button id="btn-logout"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 rounded-xl text-sm font-medium text-red-300 hover:text-red-200 transition-all">
+                    <span class="material-symbols-outlined text-base">logout</span>
+                    Logout / Keluar Sesi
+                </button>
+                <button id="btn-delete-account"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/40 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-300 transition-all">
+                    <span class="material-symbols-outlined text-base">delete_forever</span>
+                    Hapus Akun
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

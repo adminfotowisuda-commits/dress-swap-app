@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <script>
+        if (!localStorage.getItem('active_user_email')) {
+            window.location.href = '/';
+        }
+    </script>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Filter Gallery Factory — fotowisuda.ai</title>
+
+    <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN with Forms + Container Queries plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration: DESIGN.md tokens -->
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary": "#430089",
+                            "on-tertiary-fixed": "#171c23",
+                            "tertiary-fixed-dim": "#c2c7d0",
+                            "on-surface-variant": "#bbc9cf",
+                            "text-secondary": "#8B949E",
+                            "tertiary-fixed": "#dee2ec",
+                            "surface-container": "#1e2024",
+                            "inverse-surface": "#e2e2e8",
+                            "secondary-container": "#6205c3",
+                            "outline": "#859399",
+                            "surface-dim": "#111318",
+                            "on-error": "#690005",
+                            "on-error-container": "#ffdad6",
+                            "on-tertiary": "#2c3138",
+                            "inverse-on-surface": "#2f3035",
+                            "on-background": "#e2e2e8",
+                            "outline-variant": "#3c494e",
+                            "primary-fixed": "#b7eaff",
+                            "on-tertiary-fixed-variant": "#42474f",
+                            "tertiary": "#d8dce6",
+                            "surface-variant": "#333539",
+                            "surface-container-lowest": "#0c0e12",
+                            "vivid-purple": "#9D5BFF",
+                            "on-secondary-fixed": "#280057",
+                            "on-primary-container": "#00566a",
+                            "background": "#111318",
+                            "error": "#ffb4ab",
+                            "secondary-fixed-dim": "#d6baff",
+                            "surface-container-high": "#282a2e",
+                            "on-tertiary-container": "#494e57",
+                            "surface-background": "#0A0C10",
+                            "secondary-fixed": "#ecdcff",
+                            "primary-container": "#00d1ff",
+                            "surface-tint": "#4cd6ff",
+                            "surface-card": "#161B22",
+                            "primary-fixed-dim": "#4cd6ff",
+                            "secondary": "#d6baff",
+                            "on-surface": "#e2e2e8",
+                            "on-secondary-container": "#cba9ff",
+                            "surface-container-low": "#1a1c20",
+                            "surface-bright": "#37393e",
+                            "on-primary-fixed-variant": "#004e60",
+                            "electric-cyan": "#00D1FF",
+                            "tertiary-container": "#bcc0ca",
+                            "border-subtle": "#30363D",
+                            "surface": "#111318",
+                            "inverse-primary": "#00677f",
+                            "primary": "#a4e6ff",
+                            "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC",
+                            "on-primary-fixed": "#001f28",
+                            "on-primary": "#003543",
+                            "error-container": "#93000a",
+                            "on-secondary-fixed-variant": "#6000bf"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                        },
+                        "spacing": {
+                            "margin-desktop": "32px",
+                            "gutter": "24px",
+                            "base-unit": "4px",
+                            "container-max-width": "1440px",
+                            "margin-mobile": "16px"
+                        },
+                        "fontFamily": {
+                            "headline-xl": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "label-sm": ["Geist"],
+                            "label-md": ["Geist"],
+                            "headline-lg-mobile": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "body-md": ["Inter"],
+                            "body-lg": ["Inter"]
+                        },
+                        "fontSize": {
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                        },
+                        "animation": {
+                            "breathing": "breathing 4s ease-in-out infinite",
+                            "pulse-cyan": "pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                            "energy-pulse": "energy-pulse 2.5s infinite"
+                        },
+                        "keyframes": {
+                            "breathing": {
+                                "0%, 100%": { transform: "scale(1)", opacity: "1" },
+                                "50%": { transform: "scale(1.05)", opacity: "0.8" }
+                            },
+                            "pulse-cyan": {
+                                "0%, 100%": { opacity: "1", boxShadow: "0 0 0 0 rgba(0, 209, 255, 0.4)" },
+                                "50%": { opacity: "0.5", boxShadow: "0 0 20px 4px rgba(0, 209, 255, 0.2)" }
+                            },
+                            "energy-pulse": {
+                                "0%, 100%": { boxShadow: "0 0 15px 0px rgba(0, 209, 255, 0.3)" },
+                                "50%": { boxShadow: "0 0 35px 5px rgba(0, 209, 255, 0.6)" }
+                            }
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .progress-glow { box-shadow: 0 0 15px rgba(0, 209, 255, 0.5); }
+        .upload-preview-img { object-fit: contain; width: 100%; height: 100%; border-radius: 0.5rem; background: #0c0e12; }
+        .upload-zone-filled { border-style: solid !important; padding: 0 !important; }
+        .fade-transition { transition: opacity 0.5s ease; }
+
+        @keyframes errorFlash {
+            0%, 100% { border-color: #30363D; }
+            50% { border-color: #ffb4ab; }
+        }
+        .error-flash { animation: errorFlash 0.6s ease-in-out 3; }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .shimmer-overlay {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: shimmer 2s infinite;
+        }
+        /* Collapsible sidebar — translate-based for reliable mobile toggle */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-out;
+        }
+        #sidebar.sidebar-open {
+            transform: translateX(0);
+        }
+        #sidebar-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-out;
+        }
+        #sidebar-overlay.overlay-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
+
+    <!-- ============================================================
+         TOP NAVIGATION BAR
+         ============================================================ -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle" class="p-1.5 -ml-1 rounded-lg hover:bg-white/5 transition-colors" aria-label="Open menu">
+                <span class="material-symbols-outlined text-xl text-text-secondary">menu</span>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="backend-status" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm bg-surface-container border border-border-subtle text-text-secondary text-xs">
+                <span id="backend-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>API Connected</span>
+            </span>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         PERSISTENT SIDEBAR — Fixed left, 260px
+         ============================================================ -->
+    <aside id="sidebar" class="fixed top-0 left-0 w-[280px] h-full bg-[#131418] border-r border-border-subtle flex flex-col z-[100] overflow-y-auto hide-scrollbar">
+        <div class="px-5 py-6 border-b border-border-subtle/50 flex items-center justify-between">
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary mb-0">Navigation</p>
+            <button id="sidebar-close" class="p-1.5 rounded-lg hover:bg-white/5 transition-colors" aria-label="Close menu">
+                <span class="material-symbols-outlined text-lg text-text-secondary">close</span>
+            </button>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-1">
+            <!-- ═══ Section 1 — User Generators ═══ -->
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">✨ Generators</p>
+
+            <a href="/"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span>Home</span>
+            </a>
+
+            <a href="/swap-bg"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                  <path d="M9 19.5l4.5-4.5 5 5" />
+                  <circle cx="17.5" cy="13" r="0.5" fill="currentColor" stroke="none" />
+                  <circle cx="7.5" cy="7.5" r="4.5" />
+                  <path d="M6 7.5h3M7.5 6l1.5 1.5-1.5 1.5" />
+                </svg>
+                <span>Background Change</span>
+            </a>
+
+            <a href="/dress-swap"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <i class="fa-solid fa-shirt text-xl text-text-secondary group-hover:text-electric-cyan transition-colors"></i>
+                <span>Dress Replicate</span>
+            </a>
+
+            <a href="/filter-gallery"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-text-secondary group-hover:text-electric-cyan transition-colors">
+                  <path d="M2 19a1 1 0 0 0 1 1h12a1 1 0 0 0 .8-.4l-5.3-7.1a1.5 1.5 0 0 0-2.4 0L2.2 18.2A1 1 0 0 0 2 19z" />
+                  <path d="M11 19.5h9a1 1 0 0 0 .8-.4l-3.3-4.4a1.5 1.5 0 0 0-2.4 0l-1.3 1.7" />
+                  <circle cx="14" cy="6" r="2" fill="currentColor" stroke="none" />
+                </svg>
+                <span>Filter Gallery</span>
+            </a>
+
+            <!-- ═══ Divider ═══ -->
+            <div class="my-3 border-t border-slate-800/60"></div>
+
+            <!-- ═══ Section 2 — User Gallery ═══ -->
+
+            <a href="/my-creations"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
+                <i class="fa-solid fa-images text-xl text-text-secondary group-hover:text-electric-cyan transition-colors"></i>
+                <span>My Creations</span>
+            </a>
+
+            <!-- ═══ Divider ═══ -->
+            <div class="my-3 border-t border-slate-800/60"></div>
+
+            <!-- ═══ Section 3 — Admin & Power Tools ═══ -->
+            <div id="admin-menu-section" class="">
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-purple-400/60">⚡ Power Tools</p>
+
+            <a href="/generate"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-600/20 border border-purple-500/50 text-purple-300 shadow-lg shadow-purple-500/5">
+                <i class="fa-solid fa-cubes text-xl text-purple-300"></i>
+                <span>Filter Gallery Factory</span>
+                <span class="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_rgba(168,85,247,0.6)]"></span>
+            </a>
+
+            <a href="/admin-gallery-filter"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-950/20 border border-purple-500/20 text-purple-300 hover:bg-purple-900/30 hover:border-purple-500/40 hover:text-purple-200 group">
+                <i class="fa-solid fa-sliders text-xl text-purple-400 group-hover:text-purple-300 transition-colors"></i>
+                <span>Filter Gallery Admin</span>
+            </a>
+            </div>
+        </nav>
+        <!-- Auth Container -->
+        <div class="px-4 py-4 border-t border-border-subtle/50 space-y-3">
+            <div id="auth-container"></div>
+            <div class="flex items-center gap-2 text-[9px] text-text-secondary/40 uppercase tracking-wider">
+                <span class="w-1 h-1 rounded-full bg-emerald-500/40"></span>
+                <span>v2.0 — Filter Gallery Factory</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Sidebar overlay backdrop -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+    <!-- ============================================================
+         MAIN WORKSPACE — Centered dashboard
+         ============================================================ -->
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex flex-col lg:flex-row">
+
+        <!-- LEFT PANEL — Configuration -->
+        <section class="border-r border-border-subtle bg-surface-dim overflow-y-auto hide-scrollbar p-8 lg:w-1/2 w-full">
+            <div class="mx-auto space-y-8">
+
+                <header>
+                    <h3 class="font-headline-lg text-headline-lg text-white mb-2">Filter Gallery Factory</h3>
+                    <p class="text-text-secondary font-body-md">Create AI-powered artwork from text prompts with optional reference images.</p>
+                </header>
+
+                <!-- Prompt Input -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80" for="prompt-textarea">
+                            Prompt Text
+                        </label>
+                        <button
+                            class="p-1.5 -mr-1.5 rounded-lg text-text-secondary hover:text-error hover:bg-error/10 transition-colors"
+                            onclick="clearPrompt()"
+                            title="Clear Prompt">
+                            <span class="material-symbols-outlined text-lg">backspace</span>
+                        </button>
+                    </div>
+                    <div class="relative group">
+                        <textarea
+                            id="prompt-textarea"
+                            class="w-full h-40 bg-surface-container-lowest border border-border-subtle rounded-xl p-4 text-body-md focus:ring-1 focus:ring-electric-cyan focus:border-electric-cyan transition-all placeholder:text-text-secondary resize-none"
+                            placeholder="Describe the image you want to generate in detail…"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Custom Filter Title -->
+                <div class="space-y-4">
+                    <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80" for="filter-title-input">
+                        Judul Filter Kustom <span class="text-electric-cyan">*</span>
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="filter-title-input"
+                            class="w-full bg-surface-container-lowest border border-border-subtle rounded-xl px-4 py-3 text-body-md focus:ring-1 focus:ring-electric-cyan focus:border-electric-cyan transition-all placeholder:text-text-secondary"
+                            placeholder="Nama preset filter ini…"
+                            maxlength="60"
+                        />
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-text-secondary/50" id="filter-title-hint">Maks. 60 karakter</span>
+                    </div>
+                </div>
+
+                <!-- Image Reference Upload -->
+                <div class="space-y-4">
+                    <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80">
+                        Image References (Optional)
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div id="upload-zone-1"
+                             class="border-2 border-dashed border-border-subtle rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group hover:border-vivid-purple/50 transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden min-h-[120px]"
+                             onclick="document.getElementById('fileInput1').click()">
+                            <div id="upload-placeholder-1" class="flex flex-col items-center gap-1">
+                                <span class="material-symbols-outlined text-2xl text-text-secondary group-hover:text-vivid-purple transition-colors">add_photo_alternate</span>
+                                <span class="text-text-secondary text-xs">Image Reference 1</span>
+                            </div>
+                            <img id="upload-preview-1" class="upload-preview-img absolute inset-0 hidden" alt="Reference 1 preview" />
+                            <button id="upload-remove-1"
+                                    class="absolute top-2 right-2 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
+                                    onclick="event.stopPropagation(); removeReferenceImage(1)"
+                                    title="Remove image">
+                                <span class="material-symbols-outlined text-sm text-error">close</span>
+                            </button>
+                            <input type="file" id="fileInput1" accept="image/*" class="hidden" onchange="handleFileSelect(event, 1)">
+                        </div>
+                        <div id="upload-zone-2"
+                             class="border-2 border-dashed border-border-subtle rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group hover:border-vivid-purple/50 transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden min-h-[120px]"
+                             onclick="document.getElementById('fileInput2').click()">
+                            <div id="upload-placeholder-2" class="flex flex-col items-center gap-1">
+                                <span class="material-symbols-outlined text-2xl text-text-secondary group-hover:text-vivid-purple transition-colors">add_photo_alternate</span>
+                                <span class="text-text-secondary text-xs">Image Reference 2</span>
+                            </div>
+                            <img id="upload-preview-2" class="upload-preview-img absolute inset-0 hidden" alt="Reference 2 preview" />
+                            <button id="upload-remove-2"
+                                    class="absolute top-2 right-2 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
+                                    onclick="event.stopPropagation(); removeReferenceImage(2)"
+                                    title="Remove image">
+                                <span class="material-symbols-outlined text-sm text-error">close</span>
+                            </button>
+                            <input type="file" id="fileInput2" accept="image/*" class="hidden" onchange="handleFileSelect(event, 2)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aspect Ratio Selection -->
+                <div class="space-y-4">
+                    <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80">
+                        Aspect Ratio
+                    </label>
+                    <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden" id="ratio-container">
+                        <div class="absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-electric-cyan rounded-lg z-0 transition-transform duration-300 ease-out" id="ratioHighlight"></div>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300" data-ratio="2:3">2:3</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
+                    </div>
+                    <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">
+                        Dimensions: 1696 × 2528 px
+                    </p>
+                </div>
+
+                <!-- Background Category -->
+                <div class="space-y-4">
+                    <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80">
+                        Background Category
+                    </label>
+                    <div class="flex flex-wrap gap-2" id="tag-pills">
+                        <button class="tag-pill px-5 py-2.5 bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20 rounded-full text-sm font-semibold transition-all hover:bg-electric-cyan/20" data-tag="Studio">Studio</button>
+                        <button class="tag-pill px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-electric-cyan/30 hover:text-white" data-tag="Indoor">Indoor</button>
+                        <button class="tag-pill px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-electric-cyan/30 hover:text-white" data-tag="Outdoor">Outdoor</button>
+                        <button class="tag-pill px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-electric-cyan/30 hover:text-white" data-tag="Poster Film">Poster Film</button>
+                        <button class="tag-pill px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-electric-cyan/30 hover:text-white" data-tag="Animation">Animation</button>
+                    </div>
+                    <input type="hidden" name="selected_tag" id="selected-tag" value="Studio">
+                </div>
+
+                <!-- Lighting Style -->
+                <div class="space-y-4">
+                    <label class="font-label-md text-label-md text-text-primary uppercase tracking-widest opacity-80">
+                        Lighting Style
+                    </label>
+                    <div class="flex gap-2" id="lighting-pills">
+                        <button class="lighting-pill px-5 py-2.5 bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20 rounded-full text-sm font-semibold transition-all hover:bg-electric-cyan/20" data-lighting="Soft Light">Soft Light</button>
+                        <button class="lighting-pill px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-electric-cyan/30 hover:text-white" data-lighting="Strobist">Strobist</button>
+                        <button class="lighting-pill px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-electric-cyan/30 hover:text-white" data-lighting="Natural Ambient">Natural Ambient</button>
+                    </div>
+                    <input type="hidden" name="selected_lighting" id="selected-lighting" value="Soft Light">
+                </div>
+
+                <!-- GENERATE Button -->
+                <button id="generate-btn"
+                        class="relative w-full bg-electric-cyan text-surface-background font-black py-5 rounded-xl flex items-center justify-center gap-3 overflow-hidden animate-energy-pulse transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span class="material-symbols-outlined font-bold" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                    <span class="uppercase tracking-tighter text-lg">Generate Now</span>
+                </button>
+
+                <!-- Locked Config -->
+                <div class="rounded-2xl p-5 space-y-4 bg-surface-container/30 border border-white/5">
+                    <div class="flex items-center gap-2 text-text-secondary">
+                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">lock</span>
+                        <span class="text-xs uppercase tracking-widest font-bold">System Parameters (Locked)</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-6">
+                        <div class="space-y-1"><p class="text-[10px] text-text-secondary uppercase">Model</p><p class="text-sm font-bold text-text-primary">Nano Banana 2</p></div>
+                        <div class="space-y-1"><p class="text-[10px] text-text-secondary uppercase">Prompt Enhance</p><p class="text-sm font-bold text-text-primary">OFF</p></div>
+                        <div class="space-y-1"><p class="text-[10px] text-text-secondary uppercase">Style</p><p class="text-sm font-bold text-text-primary">Dynamic</p></div>
+                        <div class="space-y-1"><p class="text-[10px] text-text-secondary uppercase">Generations</p><p class="text-sm font-bold text-text-primary">1</p></div>
+                        <div class="space-y-1 col-span-2">
+                            <p class="text-[10px] text-text-secondary uppercase">Privacy</p>
+                            <p class="text-sm font-bold text-electric-cyan flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-electric-cyan shadow-[0_0_6px_#00D1FF]"></span>
+                                Private Mode ON
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL — Dynamic states -->
+        <section class="bg-surface-background relative flex flex-col p-8 lg:w-1/2 w-full min-h-[600px]">
+
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-headline-md text-headline-md text-white flex items-center gap-2">
+                    Result
+                    <span class="w-1.5 h-1.5 rounded-full bg-text-secondary opacity-30"></span>
+                    <span class="text-text-secondary font-body-md text-base font-normal" id="statusLabel">Pending Input</span>
+                </h3>
+                <button id="downloadBtn"
+                        class="px-6 py-2.5 rounded-xl border border-border-subtle text-text-secondary flex items-center gap-2 opacity-50 cursor-not-allowed font-bold text-sm transition-all"
+                        disabled onclick="downloadResultImage()">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    Download Full Res
+                </button>
+            </div>
+
+            <!-- Preview Area -->
+            <div class="flex-1 relative rounded-[2rem] border border-border-subtle overflow-hidden bg-surface-container-lowest flex items-center justify-center">
+
+                <!-- STATE: IDLE -->
+                <div class="relative z-10 flex flex-col items-center max-w-sm text-center px-6 fade-transition" id="placeholderContent">
+                    <div class="w-24 h-24 rounded-full bg-electric-cyan/5 border border-electric-cyan/20 flex items-center justify-center mb-6 animate-breathing">
+                        <span class="material-symbols-outlined text-4xl text-electric-cyan">image</span>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-3 tracking-tight">Ready to Generate</h4>
+                    <p class="text-text-secondary text-sm">Enter your prompt, optionally add reference images, and click <strong class="text-electric-cyan">GENERATE NOW</strong> to create AI-powered artwork.</p>
+                </div>
+
+                <!-- STATE: PROCESSING -->
+                <div class="absolute inset-0 z-20 bg-surface-container-lowest flex flex-col items-center justify-center px-12 fade-transition opacity-0 pointer-events-none" id="processingState">
+                    <div class="w-full max-w-md space-y-6">
+                        <div class="flex justify-between items-end">
+                            <div class="space-y-1">
+                                <p class="text-electric-cyan text-[10px] font-bold uppercase tracking-[0.3em]">Processing</p>
+                                <h4 class="text-xl font-bold" id="processingText">Synthesizing pixels...</h4>
+                            </div>
+                            <div class="text-right"><span class="text-3xl font-black text-white tabular-nums" id="progressPercentage">0%</span></div>
+                        </div>
+                        <div class="h-3 w-full bg-surface-container rounded-full overflow-hidden border border-white/5 relative">
+                            <div class="absolute top-0 left-0 h-full bg-electric-cyan progress-glow transition-all duration-300 ease-out" id="progressBar" style="width: 0%">
+                                <div class="shimmer-overlay absolute inset-0"></div>
+                            </div>
+                        </div>
+                        <p class="text-text-secondary text-xs text-center" id="progressDetail">Initializing pipeline...</p>
+                        <div class="flex gap-4 opacity-50">
+                            <div class="h-1 flex-1 bg-surface-variant rounded-full animate-pulse"></div>
+                            <div class="h-1 flex-1 bg-surface-variant rounded-full animate-pulse" style="animation-delay: 200ms;"></div>
+                            <div class="h-1 flex-1 bg-surface-variant rounded-full animate-pulse" style="animation-delay: 400ms;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATE: RESULT -->
+                <img id="resultImage"
+                     class="absolute inset-0 w-full h-full object-contain rounded-[2rem] hidden z-10"
+                     alt="Generated AI image" />
+
+                <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(#00D1FF 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
+            </div>
+
+            <!-- Footer Status Bar -->
+            <div class="mt-8 flex items-center justify-between text-xs text-text-secondary uppercase tracking-[0.2em] font-bold">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>API: Leonardo.ai Active</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    Status: <span id="footerStatus">IDLE</span>
+                    <span class="material-symbols-outlined text-[10px]" id="statusCircle">circle</span>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        const API_BASE = window.location.origin;
+
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        const state = {
+            selectedRatio: '2:3',
+            selectedDimensions: ASPECT_RATIO_DIMENSIONS['2:3'],
+            referenceImages: [null, null],
+            isGenerating: false,
+            generationId: null,
+            generatedImageUrl: null,
+            pollTimer: null
+        };
+
+        const DOM = {
+            ratioHighlight: null, ratioButtons: null, dimensionReadout: null,
+            generateBtn: null, promptTextarea: null, filterTitleInput: null,
+            placeholderContent: null, processingState: null, resultImage: null,
+            progressBar: null, progressPercentage: null, progressDetail: null, processingText: null,
+            statusLabel: null, footerStatus: null, statusCircle: null, downloadBtn: null
+        };
+
+        function cacheDomReferences() {
+            DOM.ratioHighlight     = document.getElementById('ratioHighlight');
+            DOM.ratioButtons       = document.querySelectorAll('.ratio-btn');
+            DOM.dimensionReadout   = document.getElementById('dimension-readout');
+            DOM.generateBtn        = document.getElementById('generate-btn');
+            DOM.promptTextarea     = document.getElementById('prompt-textarea');
+            DOM.filterTitleInput   = document.getElementById('filter-title-input');
+            DOM.placeholderContent = document.getElementById('placeholderContent');
+            DOM.processingState    = document.getElementById('processingState');
+            DOM.resultImage        = document.getElementById('resultImage');
+            DOM.progressBar        = document.getElementById('progressBar');
+            DOM.progressPercentage = document.getElementById('progressPercentage');
+            DOM.progressDetail     = document.getElementById('progressDetail');
+            DOM.processingText     = document.getElementById('processingText');
+            DOM.statusLabel        = document.getElementById('statusLabel');
+            DOM.footerStatus       = document.getElementById('footerStatus');
+            DOM.statusCircle       = document.getElementById('statusCircle');
+            DOM.downloadBtn        = document.getElementById('downloadBtn');
+        }
+
+        // =====================================================
+        // ASPECT RATIO
+        // =====================================================
+
+        function moveHighlight(index) {
+            if (!DOM.ratioHighlight) return;
+            DOM.ratioHighlight.style.transform = `translateX(${index * 100}%)`;
+            DOM.ratioButtons.forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.add('text-surface-background', 'font-bold');
+                    btn.classList.remove('text-text-secondary', 'font-medium');
+                } else {
+                    btn.classList.remove('text-surface-background', 'font-bold');
+                    btn.classList.add('text-text-secondary', 'font-medium');
+                }
+            });
+            const ratio = DOM.ratioButtons[index].getAttribute('data-ratio');
+            state.selectedRatio = ratio;
+            state.selectedDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
+            if (DOM.dimensionReadout) {
+                DOM.dimensionReadout.textContent = `Dimensions: ${state.selectedDimensions.width} × ${state.selectedDimensions.height} px`;
+            }
+        }
+
+        function initAspectRatio() {
+            DOM.ratioButtons.forEach((btn, idx) => btn.addEventListener('click', () => moveHighlight(idx)));
+            moveHighlight(0);
+        }
+
+        // =====================================================
+        // IMAGE REFERENCE HANDLING
+        // =====================================================
+
+        window.handleFileSelect = function(event, slotNumber) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showCustomAlert('Silakan pilih file gambar yang valid (PNG, JPG, atau WEBP).'); event.target.value = ''; return; }
+            state.referenceImages[slotNumber - 1] = file;
+            const preview = document.getElementById(`upload-preview-${slotNumber}`);
+            const placeholder = document.getElementById(`upload-placeholder-${slotNumber}`);
+            const removeBtn = document.getElementById(`upload-remove-${slotNumber}`);
+            const zone = document.getElementById(`upload-zone-${slotNumber}`);
+            if (preview && placeholder && removeBtn && zone) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result; preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden'); removeBtn.classList.remove('hidden');
+                    zone.classList.add('upload-zone-filled', 'border-vivid-purple/50');
+                    zone.classList.remove('border-dashed', 'border-border-subtle');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.removeReferenceImage = function(slotNumber) {
+            state.referenceImages[slotNumber - 1] = null;
+            const preview = document.getElementById(`upload-preview-${slotNumber}`);
+            const placeholder = document.getElementById(`upload-placeholder-${slotNumber}`);
+            const removeBtn = document.getElementById(`upload-remove-${slotNumber}`);
+            const zone = document.getElementById(`upload-zone-${slotNumber}`);
+            const fileInput = document.getElementById(`fileInput${slotNumber}`);
+            if (preview) { preview.classList.add('hidden'); preview.src = ''; }
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (removeBtn) removeBtn.classList.add('hidden');
+            if (zone) { zone.classList.remove('upload-zone-filled', 'border-vivid-purple/50'); zone.classList.add('border-dashed', 'border-border-subtle'); }
+            if (fileInput) fileInput.value = '';
+        };
+
+        window.clearPrompt = function() {
+            if (DOM.promptTextarea) { DOM.promptTextarea.value = ''; DOM.promptTextarea.focus(); }
+        };
+
+        // =====================================================
+        // PANEL STATE MANAGEMENT
+        // =====================================================
+
+        function showPlaceholder() {
+            if (DOM.placeholderContent) { DOM.placeholderContent.style.opacity = '1'; DOM.placeholderContent.classList.remove('pointer-events-none'); }
+            if (DOM.processingState) { DOM.processingState.style.opacity = '0'; DOM.processingState.classList.add('pointer-events-none'); }
+            if (DOM.resultImage) DOM.resultImage.classList.add('hidden');
+        }
+
+        function showProcessing() {
+            if (DOM.placeholderContent) { DOM.placeholderContent.style.opacity = '0'; DOM.placeholderContent.classList.add('pointer-events-none'); }
+            if (DOM.processingState) { DOM.processingState.style.opacity = '1'; DOM.processingState.classList.remove('pointer-events-none'); }
+            if (DOM.resultImage) DOM.resultImage.classList.add('hidden');
+        }
+
+        function showResult(imageUrl) {
+            if (DOM.placeholderContent) { DOM.placeholderContent.style.opacity = '0'; DOM.placeholderContent.classList.add('pointer-events-none'); }
+            if (DOM.processingState) { DOM.processingState.style.opacity = '0'; DOM.processingState.classList.add('pointer-events-none'); }
+            if (DOM.resultImage) { DOM.resultImage.src = imageUrl; DOM.resultImage.classList.remove('hidden'); }
+        }
+
+        // =====================================================
+        // PROGRESS UI
+        // =====================================================
+
+        function updateProgress(percent, detail, processingLabel) {
+            const pct = Math.min(100, Math.max(0, percent));
+            if (DOM.progressBar) DOM.progressBar.style.width = `${pct}%`;
+            if (DOM.progressPercentage) DOM.progressPercentage.textContent = `${Math.floor(pct)}%`;
+            if (detail && DOM.progressDetail) DOM.progressDetail.textContent = detail;
+            if (processingLabel && DOM.processingText) DOM.processingText.textContent = processingLabel;
+        }
+
+        function updateStatus(status) {
+            if (DOM.statusLabel) {
+                switch (status) {
+                    case 'PENDING': DOM.statusLabel.textContent = 'Queued...'; break;
+                    case 'PROCESSING': DOM.statusLabel.textContent = 'Processing...'; break;
+                    case 'COMPLETE': DOM.statusLabel.textContent = 'Completed'; break;
+                    case 'FAILED': DOM.statusLabel.textContent = 'Failed'; break;
+                    default: DOM.statusLabel.textContent = status;
+                }
+            }
+            if (DOM.footerStatus) {
+                switch (status) {
+                    case 'PENDING': case 'PROCESSING':
+                        DOM.footerStatus.textContent = 'RUNNING';
+                        if (DOM.statusCircle) DOM.statusCircle.classList.add('animate-pulse-cyan');
+                        break;
+                    case 'COMPLETE': case 'FAILED':
+                        DOM.footerStatus.textContent = 'IDLE';
+                        if (DOM.statusCircle) DOM.statusCircle.classList.remove('animate-pulse-cyan');
+                        break;
+                    default: DOM.footerStatus.textContent = 'IDLE';
+                }
+            }
+        }
+
+        // =====================================================
+        // GENERATION FLOW
+        // =====================================================
+
+        async function handleGenerate() {
+            // --- Login Gate ---
+            var activeEmail = safeStorage.getItem('active_user_email') || '';
+            if (!activeEmail) {
+                showCustomAlert('Silakan masuk sesi (login) terlebih dahulu menggunakan email Anda sebelum memulai proses generate.');
+                if (typeof openMockLoginModal === 'function') openMockLoginModal();
+                return;
+            }
+
+            const prompt = (DOM.promptTextarea && DOM.promptTextarea.value || '').trim();
+            if (!prompt) {
+                if (DOM.promptTextarea) { DOM.promptTextarea.classList.add('error-flash'); DOM.promptTextarea.focus(); setTimeout(() => DOM.promptTextarea.classList.remove('error-flash'), 2000); }
+                return;
+            }
+            if (prompt.length < 3) { showCustomAlert('Prompt terlalu pendek. Mohon berikan deskripsi yang lebih detail.'); return; }
+
+            // Validate custom filter title is required
+            const filterTitle = (DOM.filterTitleInput && DOM.filterTitleInput.value || '').trim();
+            if (!filterTitle) {
+                if (DOM.filterTitleInput) { DOM.filterTitleInput.classList.add('error-flash'); DOM.filterTitleInput.focus(); setTimeout(() => DOM.filterTitleInput.classList.remove('error-flash'), 2000); }
+                showCustomAlert('<strong>Judul Filter Kustom</strong> wajib diisi sebelum generate.');
+                return;
+            }
+
+            if (state.isGenerating) return;
+
+            state.isGenerating = true;
+            disableGenerateButton(true);
+            showProcessing();
+            updateStatus('PENDING');
+            updateProgress(2, 'Building request payload...', 'Initializing pipeline...');
+
+            try {
+                const formData = new FormData();
+                formData.append('prompt', prompt);
+                formData.append('filterTitle', filterTitle);
+                formData.append('width', state.selectedDimensions.width.toString());
+                formData.append('height', state.selectedDimensions.height.toString());
+                const selectedTag = document.getElementById('selected-tag');
+                if (selectedTag) formData.append('selected_tag', selectedTag.value);
+                const selectedLighting = document.getElementById('selected-lighting');
+                if (selectedLighting) formData.append('lighting', selectedLighting.value);
+                if (state.referenceImages[0]) formData.append('referenceImage1', state.referenceImages[0], state.referenceImages[0].name);
+                if (state.referenceImages[1]) formData.append('referenceImage2', state.referenceImages[1], state.referenceImages[1].name);
+
+                updateProgress(5, 'Uploading to server...', 'Sending request...');
+                const genResp = await fetch(`${API_BASE}/api/generate`, { method: 'POST', headers: { 'X-User-Email': activeEmail }, body: formData });
+                if (!genResp.ok) { const errData = await genResp.json().catch(() => ({})); throw new Error(errData.error || `Server returned ${genResp.status}`); }
+
+                const { jobId } = await genResp.json();
+                state.generationId = jobId;
+                updateProgress(10, 'Pipeline initialized — polling Leonardo...', 'Generating AI image...');
+                updateStatus('PROCESSING');
+                await pollGenerationStatus(jobId);
+
+            } catch (error) {
+                console.error('Generation failed:', error);
+                handleError(error.message || 'An unexpected error occurred.');
+            } finally {
+                state.isGenerating = false;
+                disableGenerateButton(false);
+                if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+            }
+        }
+
+        async function pollGenerationStatus(generationId) {
+            const POLL_INTERVAL_MS = 2000;
+            const MAX_POLL_TIME_MS = 360_000;
+            const startTime = Date.now();
+            let progressTarget = 10;
+            let currentDisplayed = 10;
+
+            const smoothInterval = setInterval(() => {
+                if (currentDisplayed < progressTarget) {
+                    currentDisplayed += 0.4;
+                    if (DOM.progressBar) DOM.progressBar.style.width = `${currentDisplayed}%`;
+                    if (DOM.progressPercentage) DOM.progressPercentage.textContent = `${Math.floor(currentDisplayed)}%`;
+                }
+            }, 100);
+
+            return new Promise((resolve, reject) => {
+                state.pollTimer = setInterval(async () => {
+                    try {
+                        if (Date.now() - startTime > MAX_POLL_TIME_MS) {
+                            clearInterval(smoothInterval); clearInterval(state.pollTimer); state.pollTimer = null;
+                            return reject(new Error('Generation timed out after 6 minutes.'));
+                        }
+                        const resp = await fetch(`${API_BASE}/api/status/${generationId}`);
+                        if (!resp.ok) {
+                            const errData = await resp.json().catch(() => ({}));
+                            clearInterval(smoothInterval); clearInterval(state.pollTimer); state.pollTimer = null;
+                            return reject(new Error(errData.error || 'Status check failed.'));
+                        }
+                        const data = await resp.json();
+                        const { status, imageUrl, error } = data;
+                        updateStatus(status);
+
+                        switch (status) {
+                            case 'COMPLETE':
+                                clearInterval(smoothInterval); clearInterval(state.pollTimer); state.pollTimer = null;
+                                updateProgress(100, 'Generation complete!', 'Complete!');
+                                if (imageUrl) { state.generatedImageUrl = imageUrl; showResult(imageUrl); enableDownload(); }
+                                else { reject(new Error('Generation completed but no image was returned.')); }
+                                return resolve();
+                            case 'FAILED':
+                                clearInterval(smoothInterval); clearInterval(state.pollTimer); state.pollTimer = null;
+                                updateProgress(0, 'Generation failed.', 'Failed');
+                                return reject(new Error(error || 'Generation failed on the server.'));
+                            case 'PROCESSING':
+                                progressTarget = Math.min(85, progressTarget + (70 / (MAX_POLL_TIME_MS / POLL_INTERVAL_MS)));
+                                updateProgress(progressTarget, 'AI model is generating...', 'Synthesizing pixels...');
+                                break;
+                            case 'PENDING':
+                            default:
+                                progressTarget = Math.min(30, progressTarget + 3);
+                                updateProgress(progressTarget, 'Job queued on Leonardo.ai...', 'Waiting in queue...');
+                                break;
+                        }
+                    } catch (err) {
+                        if (Date.now() - startTime > MAX_POLL_TIME_MS) {
+                            clearInterval(smoothInterval); clearInterval(state.pollTimer); state.pollTimer = null;
+                            return reject(err);
+                        }
+                        console.warn('Poll attempt failed, retrying...', err.message);
+                    }
+                }, POLL_INTERVAL_MS);
+            });
+        }
+
+        function enableDownload() {
+            if (!DOM.downloadBtn) return;
+            DOM.downloadBtn.disabled = false;
+            DOM.downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            DOM.downloadBtn.classList.add('hover:border-electric-cyan', 'hover:text-electric-cyan', 'cursor-pointer');
+        }
+
+        function disableDownload() {
+            if (!DOM.downloadBtn) return;
+            DOM.downloadBtn.disabled = true;
+            DOM.downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            DOM.downloadBtn.classList.remove('hover:border-electric-cyan', 'hover:text-electric-cyan', 'cursor-pointer');
+        }
+
+        window.downloadResultImage = async function() {
+            if (!state.generatedImageUrl) return;
+            try {
+                const resp = await fetch(state.generatedImageUrl);
+                const blob = await resp.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = blobUrl; a.download = `fotowisuda-${Date.now()}.jpg`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+            } catch (_err) {
+                const a = document.createElement('a'); a.href = state.generatedImageUrl; a.download = `fotowisuda-${Date.now()}.jpg`;
+                a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            }
+        };
+
+        function handleError(message) {
+            updateStatus('FAILED'); updateProgress(0, message, 'Error');
+            showCustomAlert('Generasi gagal: ' + message);
+            setTimeout(() => { showPlaceholder(); updateStatus('IDLE'); updateProgress(0, '', ''); disableDownload(); }, 3000);
+        }
+
+        function disableGenerateButton(disabled) {
+            if (!DOM.generateBtn) return;
+            DOM.generateBtn.disabled = disabled;
+        }
+
+        function initDragDrop() {
+            [1, 2].forEach(slot => {
+                const zone = document.getElementById(`upload-zone-${slot}`);
+                if (!zone) return;
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); zone.classList.add('border-vivid-purple/50'); });
+                zone.addEventListener('dragleave', (e) => { e.preventDefault(); e.stopPropagation(); if (!zone.classList.contains('upload-zone-filled')) zone.classList.remove('border-vivid-purple/50'); });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (!zone.classList.contains('upload-zone-filled')) zone.classList.remove('border-vivid-purple/50');
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const input = document.getElementById(`fileInput${slot}`);
+                        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+                        handleFileSelect({ target: input }, slot);
+                    }
+                });
+            });
+        }
+
+        function initSidebarActiveState() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('aside nav a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (href === '/generate' && (currentPath === '/generate' || currentPath === '/generate.html'))) {
+                    link.classList.add('bg-purple-600/20', 'border', 'border-purple-500/50', 'text-purple-300', 'shadow-lg');
+                    link.style.boxShadow = '0 0 10px rgba(168,85,247,0.3)';
+                    link.classList.remove('text-text-secondary', 'hover:text-white', 'hover:bg-white/[0.04]', 'bg-purple-950/20', 'border-purple-500/20', 'hover:bg-purple-900/30', 'hover:border-purple-500/40', 'hover:text-purple-200', 'group');
+                    if (!link.querySelector('.ml-auto')) {
+                        const dot = document.createElement('span');
+                        dot.className = 'ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_rgba(168,85,247,0.6)]';
+                        link.appendChild(dot);
+                    }
+                }
+            });
+        }
+
+        function initTagPills() {
+            const pills = document.querySelectorAll('.tag-pill');
+            const hiddenInput = document.getElementById('selected-tag');
+            pills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pills.forEach(p => {
+                        p.classList.remove('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                        p.classList.add('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    });
+                    pill.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                    pill.classList.remove('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    if (hiddenInput) hiddenInput.value = pill.getAttribute('data-tag');
+                });
+            });
+        }
+
+        function initLightingPills() {
+            const pills = document.querySelectorAll('.lighting-pill');
+            const hiddenInput = document.getElementById('selected-lighting');
+            pills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pills.forEach(p => {
+                        p.classList.remove('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                        p.classList.add('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    });
+                    pill.classList.add('bg-electric-cyan/10', 'text-electric-cyan', 'border-electric-cyan/20');
+                    pill.classList.remove('bg-surface-card', 'border-border-subtle', 'text-text-secondary');
+                    if (hiddenInput) hiddenInput.value = pill.getAttribute('data-lighting');
+                });
+            });
+        }
+
+        function initSidebarToggle() {
+            var sb = document.getElementById('sidebar');
+            var ov = document.getElementById('sidebar-overlay');
+            var tb = document.getElementById('sidebar-toggle');
+            var cb = document.getElementById('sidebar-close');
+            if (!sb || !ov) return;
+            function open(){ sb.classList.add('sidebar-open'); ov.classList.add('overlay-visible'); document.body.classList.add('overflow-hidden'); }
+            function close(){ sb.classList.remove('sidebar-open'); ov.classList.remove('overlay-visible'); document.body.classList.remove('overflow-hidden'); }
+            if (tb) tb.addEventListener('click', open);
+            if (cb) cb.addEventListener('click', close);
+            ov.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && sb.classList.contains('sidebar-open')) close(); });
+        }
+
+        // =====================================================
+        // SIMULATED LOGIN SYSTEM — localStorage sandbox-safe
+        // =====================================================
+
+        var safeStorage = {
+            setItem: function(key, val) { try { localStorage.setItem(key, val); } catch(e) { window['__' + key] = val; } },
+            getItem: function(key) {
+                try {
+                    return sessionStorage.getItem(key) || localStorage.getItem(key) || window['__' + key] || null;
+                } catch(e) {
+                    try { return localStorage.getItem(key) || window['__' + key] || null; } catch(e2) { return window['__' + key] || null; }
+                }
+            },
+            removeItem: function(key) { try { localStorage.removeItem(key); sessionStorage.removeItem(key); } catch(e) {} delete window['__' + key]; }
+        };
+
+        window.openMockLoginModal = function() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(function() {
+                    var inner = modal.querySelector('div');
+                    if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+                }, 10);
+            }
+        };
+
+        window.closeMockLoginModal = function() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) {
+                var inner = modal.querySelector('div');
+                if (inner) { inner.classList.remove('scale-100'); inner.classList.add('scale-95'); }
+                setTimeout(function() { modal.classList.add('hidden'); }, 200);
+            }
+        };
+
+        window.handleMockSubmit = function(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('mock-email-input');
+            var email = emailInput ? emailInput.value.trim() : '';
+            if (email && email.indexOf('@') !== -1) {
+                safeStorage.setItem('active_user_email', email);
+                closeMockLoginModal();
+                window.location.reload();
+            }
+        };
+
+        window.handleMockLogout = function() {
+            safeStorage.removeItem('active_user_email');
+            window.location.reload();
+        };
+
+        window.showCustomAlert = function(message) {
+            var modal = document.getElementById('custom-alert-modal');
+            var messageEl = document.getElementById('custom-alert-message');
+            if (!modal || !messageEl) return;
+            messageEl.innerHTML = message;
+            modal.classList.remove('hidden');
+            var card = modal.querySelector('div');
+            if (card) {
+                setTimeout(function() {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }, 10);
+            }
+        };
+
+        window.closeCustomAlert = function() {
+            var modal = document.getElementById('custom-alert-modal');
+            if (!modal) return;
+            var card = modal.querySelector('div');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(function() { modal.classList.add('hidden'); }, 200);
+        };
+
+        function applyAdminVisibility() {
+            var email = safeStorage.getItem('active_user_email');
+            var section = document.getElementById('admin-menu-section');
+            if (!section) return;
+            if (email === 'admin.fotowisuda@gmail.com') {
+                section.style.display = '';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function renderAuthContainer() {
+            var container = document.getElementById('auth-container');
+            if (!container) return;
+            var activeEmail = safeStorage.getItem('active_user_email');
+
+            if (activeEmail) {
+                var namePrefix = activeEmail.split('@')[0];
+                var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
+                var initials = namePrefix.substring(0, 2).toUpperCase();
+
+                container.innerHTML = '<div class="flex flex-col gap-2">' +
+                    '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
+                        '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
+                        '<div class="flex flex-col min-w-0">' +
+                            '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
+                            '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                        '<i class="fa-solid fa-right-from-bracket"></i>' +
+                        '<span>Keluar Sesi</span>' +
+                    '</button>' +
+                '</div>';
+            } else {
+                container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+                    '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
+                        '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
+                        '<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>' +
+                        '<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>' +
+                    '</svg>' +
+                    '<span>Masuk Google</span>' +
+                '</button>';
+            }
+        }
+
+        function initSession() {
+            try { renderAuthContainer(); } catch(e) { console.error('[Factory] renderAuthContainer failed:', e); }
+            try { applyAdminVisibility(); } catch(e) { console.error('[Factory] applyAdminVisibility failed:', e); }
+        }
+
+        // OLD SESSION CODE REMOVED — using safeStorage above
+        var _old_session_removed_
+            var USERS_KEY = 'simulated_users';
+            var CREATIONS_KEY = 'my_creations';
+
+            function safeGet(storage, key) {
+                try { var v = storage.getItem(key); return v ? JSON.parse(v) : null; } catch(_) { return null; }
+            }
+            function safeSet(storage, key, val) {
+                try { storage.setItem(key, JSON.stringify(val)); } catch(_) {}
+            }
+
+            function getActiveEmail() {
+                try { return sessionStorage.getItem(ACTIVE_KEY) || null; } catch(_) { return null; }
+            }
+            function setActiveEmail(email) {
+                try { sessionStorage.setItem(ACTIVE_KEY, email); } catch(_) {}
+            }
+            function clearActiveEmail() {
+                try { sessionStorage.removeItem(ACTIVE_KEY); } catch(_) {}
+            }
+
+            function getUsers() { return safeGet(localStorage, USERS_KEY) || {}; }
+            function saveUsers(u) { safeSet(localStorage, USERS_KEY, u); }
+
+            function getOrCreateUser(email) {
+                var users = getUsers();
+                if (!users[email]) {
+                    var colors = ['from-cyan-500 to-purple-600','from-purple-500 to-pink-600','from-emerald-500 to-cyan-600','from-amber-500 to-rose-600','from-blue-500 to-indigo-600'];
+                    var namePart = email.split('@')[0];
+                    var dn = namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/[._-]/g, ' ');
+                    users[email] = { displayName: dn, gradient: colors[Math.floor(Math.random()*colors.length)], initial: dn.charAt(0).toUpperCase(), createdAt: new Date().toISOString() };
+                    saveUsers(users);
+                    seedDemoCreations(email);
+                }
+                return users[email];
+            }
+
+            function seedDemoCreations(email) {
+                var creations = safeGet(localStorage, CREATIONS_KEY) || [];
+                var hasExisting = creations.some(function(c) { return c.owner_email === email; });
+                if (hasExisting) return;
+                var demos = [
+                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 × 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 × 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 × 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
+                ];
+                safeSet(localStorage, CREATIONS_KEY, creations.concat(demos));
+            }
+
+            return {
+                getActiveEmail: getActiveEmail, setActiveEmail: setActiveEmail, clearActiveEmail: clearActiveEmail,
+                getOrCreateUser: getOrCreateUser, safeGet: safeGet, safeSet: safeSet
+            };
+        })();
+
+        function openProfileModal() {
+            var modal = document.getElementById('profile-management-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden'); modal.style.display = 'flex';
+            var email = Session.getActiveEmail();
+            var gp = document.getElementById('profile-modal-guest');
+            var lp = document.getElementById('profile-modal-logged-in');
+            if (email) {
+                if (gp) gp.classList.add('hidden');
+                if (lp) lp.classList.remove('hidden');
+                var user = Session.getOrCreateUser(email);
+                updateProfileUI(user, email);
+            } else {
+                if (gp) gp.classList.remove('hidden');
+                if (lp) lp.classList.add('hidden');
+                var inp = document.getElementById('signin-email-input');
+                if (inp) inp.value = '';
+            }
+        }
+
+        function closeProfileModal() {
+            var m = document.getElementById('profile-management-modal');
+            if (m) { m.classList.add('hidden'); m.style.display = 'none'; }
+        }
+
+        function updateProfileUI(user, email) {
+            var pa = document.getElementById('profile-avatar');
+            var ma = document.getElementById('modal-avatar');
+            if (pa) { pa.className = 'w-8 h-8 rounded-full bg-gradient-to-br ' + user.gradient + ' flex items-center justify-center text-white text-xs font-bold shrink-0'; pa.textContent = user.initial; }
+            if (ma) { ma.className = 'w-14 h-14 rounded-full bg-gradient-to-br ' + user.gradient + ' flex items-center justify-center text-white text-xl font-bold shrink-0'; ma.textContent = user.initial; }
+            var nel = document.querySelectorAll('#profile-name, #modal-name');
+            var eel = document.querySelectorAll('#profile-email, #modal-email');
+            nel.forEach(function(el) { el.textContent = user.displayName; });
+            eel.forEach(function(el) { el.textContent = email; });
+        }
+
+        function renderGuestState() {
+            var g = document.getElementById('profile-guest');
+            var l = document.getElementById('profile-logged-in');
+            if (g) g.classList.remove('hidden');
+            if (l) l.classList.add('hidden');
+        }
+
+        function renderLoggedInState(email) {
+            var g = document.getElementById('profile-guest');
+            var l = document.getElementById('profile-logged-in');
+            if (g) g.classList.add('hidden');
+            if (l) l.classList.remove('hidden');
+            updateProfileUI(Session.getOrCreateUser(email), email);
+        }
+
+        function handleSignIn() {
+            var inp = document.getElementById('signin-email-input');
+            if (!inp) return;
+            var email = inp.value.trim();
+            if (!email || email.indexOf('@') === -1) { alert('Silakan masukkan alamat email yang valid.'); return; }
+            Session.setActiveEmail(email);
+            Session.getOrCreateUser(email);
+            renderLoggedInState(email);
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function handleLogout() {
+            Session.clearActiveEmail();
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function handleDeleteAccount() {
+            if (!confirm('Hapus semua data kreasi untuk akun ini? Tindakan ini tidak dapat dibatalkan.')) return;
+            var email = Session.getActiveEmail();
+            if (email) {
+                var creations = Session.safeGet(localStorage, 'my_creations') || [];
+                creations = creations.filter(function(c) { return c.owner_email !== email; });
+                Session.safeSet(localStorage, 'my_creations', creations);
+                Session.clearActiveEmail();
+            }
+            closeProfileModal();
+            window.location.reload();
+        }
+
+        function bindProfileModalEvents() {
+            var cb = document.getElementById('btn-confirm-signin');
+            var lb = document.getElementById('btn-logout');
+            var db = document.getElementById('btn-delete-account');
+            var si = document.getElementById('signin-email-input');
+            if (cb) cb.addEventListener('click', handleSignIn);
+            if (lb) lb.addEventListener('click', handleLogout);
+            if (db) db.addEventListener('click', handleDeleteAccount);
+            if (si) si.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleSignIn(); });
+        }
+
+        // =====================================================
+        // MOCK LOGIN MODAL
+        // =====================================================
+
+        function __dead_openMockLoginModal() {
+            var modal = document.getElementById('mock-login-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            var inp = document.getElementById('mock-email-input');
+            if (inp) { inp.value = ''; inp.focus(); }
+            var pwd = document.getElementById('mock-password-input');
+            if (pwd) pwd.value = '';
+        }
+
+        function __dead_closeMockLoginModal() {
+            var modal = document.getElementById('mock-login-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function __dead_handleMockSubmit(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('mock-email-input');
+            var email = emailInput ? emailInput.value.trim() : '';
+            if (!email || email.indexOf('@') === -1) return;
+            safeStorage.setItem('active_user_email', email);
+            closeMockLoginModal();
+            window.location.reload();
+        }
+
+        // =====================================================
+        // ADMIN VISIBILITY
+        // =====================================================
+
+        function applyAdminVisibility_old() {
+            var email = safeStorage.getItem('active_user_email');
+            var section = document.getElementById('admin-menu-section');
+            if (!section) return;
+            if (email === 'admin.fotowisuda@gmail.com') {
+                section.style.display = '';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function initSession_old() {
+            var email = safeStorage.getItem('active_user_email');
+            if (email) { } else { }
+        }
+
+        function init() {
+            cacheDomReferences();
+            initSidebarToggle();
+            initAspectRatio();
+            initTagPills();
+            initLightingPills();
+            initDragDrop();
+            initSidebarActiveState();
+            if (DOM.generateBtn) DOM.generateBtn.addEventListener('click', handleGenerate);
+            showPlaceholder();
+            updateStatus('IDLE');
+            disableDownload();
+            console.log('Generate Image Tool initialized.');
+            console.log(`API base: ${API_BASE}`);
+        }
+
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    })();
+    </script>
+
+
+<!-- ============================================================
+     MOCK LOGIN MODAL — Email + Password simulation
+     ============================================================ -->
+<div id="mock-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-sm w-full text-center flex flex-col gap-4 transition-all transform scale-95 duration-300">
+        <div class="h-12 w-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20 text-cyan-400 text-xl mx-auto">
+            <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="flex flex-col gap-1">
+            <h3 class="text-base font-bold text-white tracking-wide">Simulasi Masuk Sesi</h3>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+                Ketik email &amp; password acak untuk mensimulasikan login multi-user di localhost.
+            </p>
+        </div>
+        <form id="mock-login-form" class="flex flex-col gap-3 text-left mt-1" onsubmit="handleMockSubmit(event)">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alamat Email</label>
+                <input type="email" id="mock-email-input" required placeholder="budi@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kata Sandi</label>
+                <input type="password" id="mock-password-input" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+            </div>
+            <div class="flex gap-2 mt-2">
+                <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-95 shadow-lg shadow-cyan-500/10">
+                    Masuk Sesi
+                </button>
+                <button type="button" onclick="closeMockLoginModal()" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-2.5 px-4 rounded-xl text-xs transition-all border border-slate-700/50">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     PROFILE MANAGEMENT MODAL
+     ============================================================ -->
+<div id="profile-management-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeProfileModal()"></div>
+    <div class="relative z-10 bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl" style="animation: modalIn 0.25s ease-out forwards;">
+        <div id="profile-modal-guest">
+            <h3 class="font-headline-md text-white text-lg mb-1">Masuk Google</h3>
+            <p class="text-xs text-slate-400 mb-5">Simulasi login email untuk localhost.</p>
+            <input type="email" id="signin-email-input"
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors mb-3"
+                   placeholder="nama@email.com" />
+            <button id="btn-confirm-signin"
+                    class="w-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-semibold py-2.5 rounded-xl hover:bg-cyan-500/30 transition-all text-sm">
+                Masuk
+            </button>
+        </div>
+        <div id="profile-modal-logged-in" class="hidden">
+            <div class="flex items-center gap-4 mb-5">
+                <div id="modal-avatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">?</div>
+                <div class="min-w-0">
+                    <h3 id="modal-name" class="font-headline-md text-white text-lg truncate">User</h3>
+                    <p id="modal-email" class="text-xs text-slate-400 truncate">user@gmail.com</p>
+                </div>
+            </div>
+            <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-[10px] font-semibold text-cyan-400 mb-5">
+                Sesi Simulasi Lokal (Localhost)
+            </div>
+            <div class="space-y-2.5">
+                <button id="btn-logout"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 rounded-xl text-sm font-medium text-red-300 hover:text-red-200 transition-all">
+                    <span class="material-symbols-outlined text-base">logout</span>
+                    Logout / Keluar Sesi
+                </button>
+                <button id="btn-delete-account"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/40 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-300 transition-all">
+                    <span class="material-symbols-outlined text-base">delete_forever</span>
+                    Hapus Akun
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ============================================================
+     CUSTOM ALERT MODAL (Purple Theme)
+     ============================================================ -->
+<div id="custom-alert-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-purple-500/30 shadow-2xl shadow-purple-500/10 rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-5 transition-all transform scale-95 duration-300">
+        <div class="h-16 w-16 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20 text-purple-400 text-2xl animate-pulse">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white tracking-wide">Unggah Foto Terlebih Dahulu</h3>
+        <p id="custom-alert-message" class="text-slate-400 text-sm leading-relaxed px-2">Please upload a subject image first.</p>
+        <button id="custom-alert-close" onclick="closeCustomAlert()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-purple-600/20 active:scale-95 text-xs tracking-wider uppercase">
+            Mengerti
+        </button>
+    </div>
+</div>
+</body>
+</html>

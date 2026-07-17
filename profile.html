@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Profile — fotowisuda.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-background":"#0A0C10","surface-card":"#161B22","border-subtle":"#30363D","text-primary":"#F0F6FC","text-secondary":"#8B949E","electric-cyan":"#00D1FF","vivid-purple":"#9D5BFF"}}}}</script>
+    <style>
+        html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .animate-in{animation:fadeIn 0.4s ease-out}
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header style="display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #30363D;background:#0B0F19;position:sticky;top:0;z-index:50;">
+    <div style="display:flex;align-items:center;gap:12px;">
+        <button id="sidebar-toggle-btn" style="background:none;border:none;color:#8B949E;cursor:pointer;padding:4px;" aria-label="Open menu">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="/" style="font-size:20px;font-weight:700;color:#fff;text-decoration:none;">fotowisuda.ai</a>
+    </div>
+</header>
+
+<!-- ═══ Unified Sidebar ═══ -->
+<script src="/sidebar.js"></script>
+<script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('profile');loadProfile();});</script>
+
+<!-- MAIN -->
+<main style="min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:#161B22;border:1px solid #30363D;border-radius:24px;padding:36px 28px;max-width:440px;width:100%;" class="animate-in">
+
+        <!-- ═══ LOGIN STATE (shown when NOT logged in) ═══ -->
+        <div id="login-state">
+            <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px;">
+                <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(0,209,255,0.12),rgba(157,91,255,0.12));border:2px solid rgba(0,209,255,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;color:#00D1FF;margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
+                <h2 style="font-size:22px;font-weight:800;">Masuk Sesi</h2>
+                <p style="font-size:12px;color:#8B949E;max-width:260px;text-align:center;line-height:1.5;">Masuk dengan email dan password Anda untuk mengakses profil, kredit, dan kreasi.</p>
+            </div>
+            <form onsubmit="handleLogin(event)" style="display:flex;flex-direction:column;gap:12px;">
+                <div>
+                    <label style="font-size:11px;font-weight:600;color:#8B949E;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">Email</label>
+                    <input id="login-email-input" type="email" required placeholder="budi@gmail.com" style="width:100%;background:#0c0e12;border:1px solid #30363D;border-radius:12px;padding:12px 16px;color:#F0F6FC;font-size:14px;box-sizing:border-box;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#00D1FF'" onblur="this.style.borderColor='#30363D'">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:600;color:#8B949E;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">Password</label>
+                    <input id="login-password-input" type="password" required placeholder="••••••••" style="width:100%;background:#0c0e12;border:1px solid #30363D;border-radius:12px;padding:12px 16px;color:#F0F6FC;font-size:14px;box-sizing:border-box;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#9D5BFF'" onblur="this.style.borderColor='#30363D'">
+                </div>
+                <p id="login-error" style="font-size:11px;color:#ffb4ab;display:none;text-align:center;"></p>
+                <button type="submit" id="login-submit-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,#00D1FF,#9D5BFF);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,209,255,0.2);" onmouseover="this.style.boxShadow='0 6px 24px rgba(157,91,255,0.3)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 16px rgba(0,209,255,0.2)';this.style.transform='translateY(0)'">Masuk</button>
+            </form>
+            <p style="font-size:10px;color:#8B949E;text-align:center;margin-top:16px;">Belum punya akun? Masukkan email dan password baru untuk mendaftar otomatis.</p>
+        </div>
+
+        <!-- ═══ PROFILE STATE (shown when logged in) ═══ -->
+        <div id="profile-state" style="display:none;">
+            <!-- Avatar -->
+            <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:28px;">
+                <div id="profile-avatar" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#00D1FF,#9D5BFF);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin-bottom:12px;">—</div>
+                <h2 style="font-size:20px;font-weight:700;">Account Profile</h2>
+                <p style="font-size:12px;color:#8B949E;">Kelola informasi akun Anda</p>
+            </div>
+
+            <!-- Details -->
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#0c0e12;border:1px solid #30363D;border-radius:14px;">
+                    <div style="width:40px;height:40px;background:rgba(0,209,255,0.08);border:1px solid rgba(0,209,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#00D1FF;font-size:16px;"><i class="fa-solid fa-envelope"></i></div>
+                    <div style="min-width:0;"><div style="font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:0.08em;">Email</div><div id="profile-email" style="font-size:14px;font-weight:600;color:#F0F6FC;word-break:break-all;">—</div></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#0c0e12;border:1px solid #30363D;border-radius:14px;">
+                    <div style="width:40px;height:40px;background:rgba(157,91,255,0.08);border:1px solid rgba(157,91,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#9D5BFF;font-size:16px;"><i class="fa-solid fa-coins"></i></div>
+                    <div style="min-width:0;"><div style="font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:0.08em;">Sisa Kredit</div><div id="profile-credits" style="font-size:14px;font-weight:600;color:#F0F6FC;">— Credits</div></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#0c0e12;border:1px solid #30363D;border-radius:14px;">
+                    <div style="width:40px;height:40px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fbbf24;font-size:16px;"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div style="min-w-0;"><div style="font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:0.08em;">Akun Dibuat</div><div id="profile-created" style="font-size:14px;font-weight:600;color:#F0F6FC;">—</div></div>
+                </div>
+            </div>
+
+            <!-- Logout + Delete -->
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid #30363D;">
+                <button onclick="doLogout()" style="width:100%;padding:12px;background:rgba(0,209,255,0.06);border:1px solid rgba(0,209,255,0.15);color:#00D1FF;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi
+                </button>
+                <button id="delete-account-btn" onclick="deleteAccount()" style="width:100%;padding:12px;background:rgba(255,180,171,0.04);border:1px solid rgba(255,180,171,0.15);color:#ffb4ab;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Akun
+                </button>
+                <p style="font-size:10px;color:#8B949E;text-align:center;">Tindakan ini akan menghapus semua data dan kredit Anda secara permanen.</p>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- ═══ DELETE CONFIRMATION MODAL ═══ -->
+<div id="delete-confirm-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);">
+    <div style="background:#161B22;border:1px solid #30363D;border-radius:20px;padding:28px;max-width:400px;width:100%;text-align:center;animation:fadeIn 0.3s ease-out;">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,180,171,0.1);border:2px solid rgba(255,180,171,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:#ffb4ab;font-size:24px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 style="font-size:16px;font-weight:700;color:#fff;margin:0 0 8px;line-height:1.4;">Apakah Anda yakin ingin menghapus akun secara permanen?</h3>
+        <p style="font-size:13px;color:#8B949E;margin:0 0 24px;line-height:1.5;">Semua data, kredit, dan kreasi Anda akan dihapus dan tidak dapat dikembalikan.</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button id="delete-cancel-btn" onclick="hideDeleteModal()" style="padding:10px 20px;background:transparent;border:1px solid #30363D;color:#8B949E;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#8B949E';this.style.color='#F0F6FC'" onmouseout="this.style.borderColor='#30363D';this.style.color='#8B949E'">Cancel</button>
+            <button id="delete-ok-btn" onclick="confirmDeleteAccount()" style="padding:10px 20px;background:#b91c1c;border:none;color:#fff;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#b91c1c'">
+                <i class="fa-solid fa-trash-can text-xs"></i> OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+var API_BASE = window.location.origin;
+
+function getEmail() { try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; } }
+function setEmail(e) { try { localStorage.setItem('active_user_email', e); } catch(_) {} }
+function clearEmail() { try { localStorage.removeItem('active_user_email'); } catch(_) {} }
+
+function showLoginState() {
+    document.getElementById('login-state').style.display = 'block';
+    document.getElementById('profile-state').style.display = 'none';
+}
+
+function showProfileState() {
+    document.getElementById('login-state').style.display = 'none';
+    document.getElementById('profile-state').style.display = 'block';
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    var email = document.getElementById('login-email-input').value.trim();
+    var password = document.getElementById('login-password-input').value;
+    var errorEl = document.getElementById('login-error');
+
+    if (!email || email.indexOf('@') === -1) { showError('Masukkan alamat email yang valid.'); return; }
+    if (!password || password.length < 3) { showError('Password minimal 3 karakter.'); return; }
+
+    var btn = document.getElementById('login-submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+    errorEl.style.display = 'none';
+
+    try {
+        var resp = await fetch(API_BASE + '/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+        });
+        var data = await resp.json();
+
+        if (!data.success) { showError(data.error || 'Login gagal.'); btn.disabled = false; btn.textContent = 'Masuk'; return; }
+
+        setEmail(email);
+
+        // Update sidebar dynamically
+        if (window._refreshCredits) window._refreshCredits();
+        if (window._renderUserProfile) window._renderUserProfile();
+
+        // Transition to profile view
+        loadProfile();
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+    } catch(err) {
+        showError('Gagal terhubung ke server.');
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+    }
+}
+
+function showError(msg) {
+    var el = document.getElementById('login-error');
+    if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+async function loadProfile() {
+    var email = getEmail();
+    if (!email) { showLoginState(); return; }
+
+    showProfileState();
+
+    var namePart = email.split('@')[0];
+    var initials = namePart.substring(0, 2).toUpperCase();
+    document.getElementById('profile-avatar').textContent = initials;
+    document.getElementById('profile-email').textContent = email;
+
+    try {
+        var resp = await fetch(API_BASE + '/api/credits/balance?email=' + encodeURIComponent(email));
+        var data = await resp.json();
+        document.getElementById('profile-credits').textContent = 'Sisa Kredit: ' + (data.credits_balance || 0) + ' Credits';
+        if (data.created_at) {
+            var d = new Date(data.created_at);
+            var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+        } else {
+            document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+        }
+    } catch(err) {
+        document.getElementById('profile-credits').textContent = 'Sisa Kredit: — Credits';
+        document.getElementById('profile-created').textContent = 'Akun dibuat pada: —';
+    }
+}
+
+function doLogout() {
+    clearEmail();
+    if (typeof renderUserProfile === 'function') renderUserProfile();
+    if (window._refreshCredits) window._refreshCredits();
+    showLoginState();
+}
+
+function deleteAccount() {
+    if (!getEmail()) return;
+    document.getElementById('delete-confirm-modal').classList.remove('hidden');
+}
+
+function hideDeleteModal() {
+    document.getElementById('delete-confirm-modal').classList.add('hidden');
+}
+
+async function confirmDeleteAccount() {
+    var email = getEmail();
+    if (!email) return;
+    hideDeleteModal();
+
+    var btn = document.getElementById('delete-account-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span style="width:16px;height:16px;border:2px solid rgba(255,180,171,0.3);border-top-color:#ffb4ab;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;"></span> Menghapus...';
+
+    try {
+        var resp = await fetch(API_BASE + '/api/user/delete-account', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) });
+        var data = await resp.json();
+        if (data.success) {
+            // ── Dynamic success toast ─────────────────────────
+            var toast = document.createElement('div');
+            toast.className = 'fixed top-5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white font-medium px-6 py-3 rounded-lg shadow-xl z-50 transition-all duration-300';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, -12px)';
+            toast.textContent = 'Akun Anda telah berhasil dihapus.';
+            document.body.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(function() {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translate(-50%, 0)';
+            });
+
+            // Auto-fade after 2.5s, then clear session + redirect
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -12px)';
+                setTimeout(function() {
+                    if (toast.parentNode) toast.remove();
+                    clearEmail();
+                    if (window._renderUserProfile) window._renderUserProfile();
+                    if (window._refreshCredits) window._refreshCredits();
+                    window.location.href = window.location.origin + '/';
+                }, 300);
+            }, 2500);
+        } else {
+            alert('Gagal: ' + (data.error || 'Unknown error'));
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Hapus Akun';
+        }
+    } catch(err) {
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Hapus Akun';
+    }
+}
+
+var style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

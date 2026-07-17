@@ -1,0 +1,884 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>fotowisuda.ai Ã¢â‚¬" AI Image Generation Dashboard</title>
+
+    <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Geist:wght@500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN with Forms + Container Queries plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration: DESIGN.md colors, typography, spacing, radii -->
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "tertiary-container": "#bcc0ca",
+                            "on-primary-container": "#00566a",
+                            "surface-container-lowest": "#0c0e12",
+                            "tertiary": "#d8dce6",
+                            "surface-container-low": "#1a1c20",
+                            "surface-container": "#1e2024",
+                            "border-subtle": "#30363D",
+                            "on-tertiary-fixed-variant": "#42474f",
+                            "vivid-purple": "#9D5BFF",
+                            "outline-variant": "#3c494e",
+                            "on-tertiary": "#2c3138",
+                            "on-error-container": "#ffdad6",
+                            "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC",
+                            "on-secondary-fixed-variant": "#6000bf",
+                            "surface-bright": "#37393e",
+                            "primary": "#a4e6ff",
+                            "error-container": "#93000a",
+                            "on-primary": "#003543",
+                            "on-secondary": "#430089",
+                            "on-secondary-fixed": "#280057",
+                            "on-error": "#690005",
+                            "secondary-fixed": "#ecdcff",
+                            "electric-cyan": "#00D1FF",
+                            "on-surface-variant": "#bbc9cf",
+                            "surface-variant": "#333539",
+                            "on-tertiary-fixed": "#171c23",
+                            "background": "#111318",
+                            "tertiary-fixed-dim": "#c2c7d0",
+                            "secondary-fixed-dim": "#d6baff",
+                            "tertiary-fixed": "#dee2ec",
+                            "on-background": "#e2e2e8",
+                            "outline": "#859399",
+                            "surface": "#111318",
+                            "surface-container-high": "#282a2e",
+                            "text-secondary": "#8B949E",
+                            "error": "#ffb4ab",
+                            "primary-fixed-dim": "#4cd6ff",
+                            "inverse-surface": "#e2e2e8",
+                            "inverse-on-surface": "#2f3035",
+                            "on-tertiary-container": "#494e57",
+                            "surface-background": "#0A0C10",
+                            "surface-dim": "#111318",
+                            "on-surface": "#e2e2e8",
+                            "primary-fixed": "#b7eaff",
+                            "on-primary-fixed": "#001f28",
+                            "secondary-container": "#6205c3",
+                            "primary-container": "#00d1ff",
+                            "on-primary-fixed-variant": "#004e60",
+                            "on-secondary-container": "#cba9ff",
+                            "inverse-primary": "#00677f",
+                            "surface-tint": "#4cd6ff",
+                            "secondary": "#d6baff",
+                            "surface-card": "#161B22"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                        },
+                        "spacing": {
+                            "base-unit": "4px",
+                            "gutter": "24px",
+                            "container-max-width": "1440px",
+                            "margin-desktop": "32px",
+                            "margin-mobile": "16px"
+                        },
+                        "fontFamily": {
+                            "body-lg": ["Inter"],
+                            "label-md": ["Geist"],
+                            "headline-lg": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "headline-xl": ["Inter"],
+                            "headline-lg-mobile": ["Inter"],
+                            "body-md": ["Inter"],
+                            "label-sm": ["Geist"]
+                        },
+                        "fontSize": {
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        /* ============================================================
+           Keyframe Animations Ã¢â‚¬" DESIGN.md glassmorphic + synthwave feel
+           ============================================================ */
+
+        /* Pulsing glow for the lightning icon */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* Shimmer sweep across the progress bar */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Fade-in for panel transitions */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Utility classes */
+        .shimmer-overlay {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-bar-fill {
+            transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .lightning-animate {
+            font-variation-settings: "FILL" 1;
+            color: #FACC15;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Custom scrollbar for dark theme */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #30363D;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #484F58;
+        }
+
+        /* Image preview thumbnail inside upload zones */
+        .upload-preview-img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+        }
+
+        /* Hide scrollbar for sidebar */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Disabled state for generate button */
+        .generate-btn-active:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(30%);
+        }
+
+        /* Flash animation for validation errors */
+        @keyframes errorFlash {
+            0%, 100% { border-color: #30363D; }
+            50% { border-color: #ffb4ab; }
+        }
+        .error-flash {
+            animation: errorFlash 0.6s ease-in-out 3;
+        }
+        /* Before-After Slideshow Animation â€" Cinema Zoom-Out Crossfade (4s cycle) */
+        @keyframes zoomOutBefore {
+            /* 0sâ€"1.5s: Stable BEFORE hold */
+            0%, 37.5% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            /* 1.5sâ€"2.0s: Zoom-out + fade out â†’ AFTER reveals */
+            /* 2.0sâ€"3.5s: Fully hidden behind AFTER */
+            50%, 87.5% {
+                opacity: 0;
+                transform: scale(1.25);
+            }
+            /* 3.5sâ€"4.0s: Zoom-in + fade in â†’ BEFORE returns */
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        @keyframes zoomOutAfter {
+            /* 0sâ€"1.5s: Fully hidden behind BEFORE */
+            0%, 37.5% {
+                opacity: 0;
+                transform: scale(1.25);
+            }
+            /* 1.5sâ€"2.0s: Zoom-in + fade in â†’ AFTER reveals */
+            /* 2.0sâ€"3.5s: Stable AFTER hold */
+            50%, 87.5% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            /* 3.5sâ€"4.0s: Fade out â†’ BEFORE returns */
+            100% {
+                opacity: 0;
+                transform: scale(1.25);
+            }
+        }
+        .slideshow-before {
+            animation: zoomOutBefore 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+        .slideshow-after {
+            animation: zoomOutAfter 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        /* â•â•â• Payment UI â€" Package Cards â•â•â• */
+        @keyframes successPop {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes successRing {
+            0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+            100% { box-shadow: 0 0 0 24px rgba(34,197,94,0); }
+        }
+        .pkg-card {
+            cursor: pointer; transition: all 0.25s ease;
+            background: #161B22; border: 1px solid #30363D; border-radius: 1.25rem;
+        }
+        .pkg-card:hover { border-color: #00D1FF; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,209,255,0.1); }
+        .pkg-card.selected { border-color: #00D1FF; box-shadow: 0 0 20px rgba(0,209,255,0.2); background: rgba(0,209,255,0.04); }
+        .pkg-card.popular { border-color: rgba(157,91,255,0.4); }
+        .pkg-card.popular:hover { border-color: #9D5BFF; box-shadow: 0 8px 24px rgba(157,91,255,0.15); }
+        .pkg-badge {
+            position: absolute; top: -1px; right: 16px;
+            background: linear-gradient(135deg, #9D5BFF, #00D1FF);
+            color: #fff; font-size: 10px; font-weight: 700; padding: 3px 10px;
+            border-radius: 0 0 8px 8px; letter-spacing: 0.05em;
+        }
+        .va-display {
+            font-family: 'Courier New', monospace; font-size: 1.25rem; font-weight: 700;
+            letter-spacing: 0.15em; color: #F0F6FC;
+            background: #0c0e12; border: 1px dashed #30363D; border-radius: 12px;
+            padding: 14px 18px; text-align: center; word-break: break-all;
+        }
+        .copied-flash { animation: successPop 0.4s ease-out; }
+        .countdown-warn { color: #fbbf24 !important; }
+        .countdown-danger { color: #ffb4ab !important; animation: dotGlow 0.6s ease-in-out infinite; }
+    </style>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
+
+    <!-- ============================================================
+         TOP NAVIGATION BAR Ã¢â‚¬" Full-width, glassmorphic
+         ============================================================ -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle-btn" class="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+        
+    </header>
+
+    <!-- ═══ Unified Sidebar — injected by sidebar.js ═══ -->
+    <script src="/sidebar.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('home');});</script>
+
+    <!-- ════════════════════════════════════════════════════════════
+         MAIN WORKSPACE â€" Centered welcome dashboard
+         ============================================================ -->
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex items-center justify-center bg-surface-background overflow-y-auto">
+        <!-- Ambient background glows -->
+        <div class="absolute top-1/4 right-0 w-64 h-64 bg-electric-cyan/5 blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 left-0 w-64 h-64 bg-vivid-purple/5 blur-[120px] pointer-events-none"></div>
+
+        <div class="relative z-10 text-center px-4 pt-12 pb-12 w-full max-w-lg mx-auto">
+
+            <!-- ═══ Card 1: Background Change ═══ -->
+            <div class="flex flex-col items-center">
+                <div class="w-full max-w-[240px]">
+                    <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-cyan-500/5">
+                        <img src="/image_display/menu_image_bg/menu_before_bg.jpg" alt="Before" class="slideshow-before absolute inset-0 w-full h-full object-cover" />
+                        <img src="/image_display/menu_image_bg/menu_after_bg.webp" alt="After" class="slideshow-after absolute inset-0 w-full h-full object-cover" />
+                        <div class="slideshow-before absolute top-2 left-2 bg-slate-900/85 border border-slate-600/40 text-[9px] font-bold text-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none">BEFORE</div>
+                        <div class="slideshow-after absolute top-2 right-2 bg-cyan-500/20 border border-cyan-500/40 text-[9px] font-bold text-cyan-300 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-cyan-500/10">AFTER</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spacer -->
+            <div class="my-10"></div>
+
+            <!-- Hero Text 1 -->
+            <p class="text-base font-bold text-white leading-snug max-w-[280px] mx-auto mb-4">
+                Ubah <span class="text-electric-cyan">background</span> foto wisuda sesuai referensi-mu
+            </p>
+            <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 26px;background:linear-gradient(135deg,#00D1FF,#0088cc);color:#0A0C10;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 14px rgba(0,209,255,0.2);" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,209,255,0.35)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 14px rgba(0,209,255,0.2)';this.style.transform='translateY(0)'">
+                Coba Gratis
+            </a>
+
+            <!-- Spacer -->
+            <div class="my-12"></div>
+
+            <!-- ═══ Card 2: Dress Replicate ═══ -->
+            <div class="flex flex-col items-center">
+                <div class="w-full max-w-[240px]">
+                    <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-purple-500/5">
+                        <img src="/image_display/menu_image_dress/menu_before_dress.jpg" alt="Before" class="slideshow-before absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
+                        <img src="/image_display/menu_image_dress/menu_after_dress.jpg" alt="After" class="slideshow-after absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
+                        <div class="slideshow-before absolute top-2 left-2 bg-slate-900/85 border border-slate-600/40 text-[9px] font-bold text-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none" style="animation-delay:-2s">BEFORE</div>
+                        <div class="slideshow-after absolute top-2 right-2 bg-purple-500/20 border border-purple-500/40 text-[9px] font-bold text-purple-300 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-purple-500/10" style="animation-delay:-2s">AFTER</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spacer -->
+            <div class="my-10"></div>
+
+            <!-- Hero Text 2 -->
+            <p class="text-base font-bold text-white leading-snug max-w-[280px] mx-auto mb-4">
+                Ubah <span class="text-vivid-purple">dress</span> foto wisuda sesuai referensi-mu
+            </p>
+            <a href="/dress-swap" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 26px;background:linear-gradient(135deg,#9D5BFF,#7c3aed);color:#fff;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 14px rgba(157,91,255,0.2);" onmouseover="this.style.boxShadow='0 6px 20px rgba(157,91,255,0.35)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 14px rgba(157,91,255,0.2)';this.style.transform='translateY(0)'">
+                Coba Gratis
+            </a>
+
+        </div>
+    </main>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // =====================================================
+        // CONFIGURATION
+        // =====================================================
+
+        const API_BASE = window.location.origin;
+
+        // =====================================================
+        
+        // =====================================================
+        // BACKEND HEALTH CHECK
+        // =====================================================
+
+        async function checkBackendHealth() {
+            try {
+                const resp = await fetch(`${API_BASE}/api/gallery?limit=1`, { method: 'GET' });
+                if (DOM.backendDot) DOM.backendDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                if (DOM.backendLabel) DOM.backendLabel.textContent = 'Server connected';
+                return true;
+            } catch (_err) {
+                if (DOM.backendDot) DOM.backendDot.className = 'w-2 h-2 rounded-full bg-error';
+                if (DOM.backendLabel) DOM.backendLabel.textContent = 'Server offline';
+                return false;
+            }
+        }
+
+        // =====================================================
+        // SIDEBAR ACTIVE STATE
+        // =====================================================
+
+        // Active state is handled statically in the HTML â€" the active link
+        // already has the correct classes. No dynamic init needed.
+
+        // =====================================================
+        // DOM REFERENCES
+        // =====================================================
+
+        const DOM = {
+            backendDot: null,
+            backendLabel: null
+        };
+
+        function cacheDomReferences() {
+            DOM.backendDot   = document.getElementById('backend-dot');
+            DOM.backendLabel = document.getElementById('backend-label');
+        }
+
+        // =====================================================
+        // BOOTSTRAP
+        // =====================================================
+
+        function initSidebarToggle() {
+            const sidebarBtn = document.getElementById('sidebar-toggle-btn');
+            const closeBtn   = document.getElementById('sidebar-close-btn');
+            const sidebar    = document.getElementById('sidebar-menu');
+            const overlay    = document.getElementById('sidebar-overlay');
+            if (!sidebar || !overlay) return;
+            function open(){ sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
+            function close(){ sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); }
+            if (sidebarBtn) sidebarBtn.addEventListener('click', open);
+            if (closeBtn)   closeBtn.addEventListener('click', close);
+            if (overlay)    overlay.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !sidebar.classList.contains('-translate-x-full')) close(); });
+        }
+
+        // =====================================================
+        // SIMULATED LOGIN SYSTEM â€" localStorage sandbox-safe
+        // =====================================================
+
+        var safeStorage = {
+            setItem: function(key, val) { try { localStorage.setItem(key, val); } catch(e) { window['__' + key] = val; } },
+            getItem: function(key) {
+                try {
+                    return sessionStorage.getItem(key) || localStorage.getItem(key) || window['__' + key] || null;
+                } catch(e) {
+                    try { return localStorage.getItem(key) || window['__' + key] || null; } catch(e2) { return window['__' + key] || null; }
+                }
+            },
+            removeItem: function(key) { try { localStorage.removeItem(key); sessionStorage.removeItem(key); } catch(e) {} delete window['__' + key]; }
+        };
+
+        // mock login removed
+
+        // mock login removed
+
+        // mock login removed
+
+        // mock login removed
+
+        function renderAuthContainer() {
+            var container = document.getElementById('auth-container');
+            if (!container) return;
+            var activeEmail = safeStorage.getItem('active_user_email');
+
+            if (activeEmail) {
+                var namePrefix = activeEmail.split('@')[0];
+                var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
+                var initials = namePrefix.substring(0, 2).toUpperCase();
+
+                container.innerHTML = '<div class="flex flex-col gap-2">' +
+                    '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
+                        '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
+                        '<div class="flex flex-col min-w-0">' +
+                            '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
+                            '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                        '<i class="fa-solid fa-right-from-bracket"></i>' +
+                        '<span>Keluar Sesi</span>' +
+                    '</button>' +
+                '</div>';
+            } else {
+                container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+                    '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
+                        '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
+                        '<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>' +
+                        '<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>' +
+                    '</svg>' +
+                    '<span>Masuk Google</span>' +
+                '</button>';
+            }
+        }
+
+        function initSession() {
+            renderAuthContainer();
+        }
+
+        function init() {
+            initSession();
+            cacheDomReferences();
+            initSidebarToggle();
+            checkBackendHealth();
+            fetchCreditBalance();
+            console.log('Dashboard initialized.');
+            console.log(`API base: ${API_BASE}`);
+        }
+
+        // â•â•â• Credit Balance â•â•â•
+        function getActiveEmail() {
+            return safeStorage.getItem('active_user_email') || '';
+        }
+
+        // â•â•â• Payment State â•â•â•
+        var _paymentState = {
+            invoiceNumber: null,
+            vaNumber: null,
+            packageId: null,
+            creditsGiven: 0,
+            countdownTimer: null,
+            expiresAt: null
+        };
+
+        async function fetchCreditBalance() {
+            var display = document.getElementById('credit-balance-display');
+            if (!display) return;
+            var email = getActiveEmail();
+            if (!email) { display.textContent = '0'; return; }
+            try {
+                var resp = await fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}`);
+                var data = await resp.json();
+                display.textContent = data.credits_balance || 0;
+            } catch (_) { display.textContent = 'â€"'; }
+        }
+
+        // â•â•â• Package Selection Modal â•â•â•
+        window.openTopUpModal = function() {
+            var email = getActiveEmail();
+            if (!email) { if (typeof openMockLoginModal === 'function') openMockLoginModal(); return; }
+            var modal = document.getElementById('top-up-modal');
+            var inner = document.getElementById('top-up-modal-inner');
+            var packagesEl = document.getElementById('top-up-packages');
+            if (!modal || !packagesEl) return;
+
+            fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}`)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var popularIdx = 1; // middle package is "popular"
+                    var html = '';
+                    (data.packages || []).forEach(function(pkg, idx) {
+                        var isPopular = idx === popularIdx;
+                        var priceFormatted = 'Rp ' + pkg.price.toLocaleString('id-ID');
+                        var perCredit = (pkg.price / pkg.credits_given).toFixed(0);
+                        html += '<div class="pkg-card relative p-4' + (isPopular ? ' popular' : '') + '" onclick="selectPackage(\''+pkg.package_id+'\', '+pkg.price+', '+pkg.credits_given+', \''+pkg.name.replace(/'/g, '\\\'')+'\')">'+
+                            (isPopular ? '<div class="pkg-badge">â˜… POPULER</div>' : '') +
+                            '<div class="flex items-center justify-between mb-2">'+
+                                '<span class="text-sm font-bold text-white">'+pkg.name+'</span>'+
+                                '<span class="text-lg font-extrabold text-cyan-400">+'+pkg.credits_given.toLocaleString('id-ID')+'</span>'+
+                            '</div>'+
+                            '<div class="flex items-center justify-between">'+
+                                '<span class="text-lg font-bold text-white">'+priceFormatted+'</span>'+
+                                '<span class="text-[10px] text-slate-500">â‰ˆ Rp '+perCredit+' / kredit</span>'+
+                            '</div>'+
+                        '</div>';
+                    });
+                    packagesEl.innerHTML = html;
+                }).catch(function() {
+                    packagesEl.innerHTML = '<div class="text-center text-red-400 text-xs py-4">Gagal memuat paket.</div>';
+                });
+
+            modal.classList.remove('hidden');
+            if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+        };
+
+        window.closeTopUpModal = function() {
+            var modal = document.getElementById('top-up-modal');
+            var inner = document.getElementById('top-up-modal-inner');
+            if (!modal) return;
+            if (inner) { inner.classList.remove('scale-100'); inner.classList.add('scale-95'); }
+            setTimeout(function() { modal.classList.add('hidden'); }, 200);
+        };
+
+        // â•â•â• Select Package â†’ Open Invoice â•â•â•
+        window.selectPackage = async function(packageId, price, credits, packageName) {
+            var email = getActiveEmail();
+            if (!email) return;
+
+            // Highlight selected card
+            document.querySelectorAll('.pkg-card').forEach(function(c) { c.classList.remove('selected'); });
+            var cards = document.querySelectorAll('.pkg-card');
+            for (var i = 0; i < cards.length; i++) {
+                if (cards[i].textContent.indexOf(packageName) !== -1) { cards[i].classList.add('selected'); break; }
+            }
+
+            // Request VA from backend
+            var statusEl = document.getElementById('top-up-status');
+            if (statusEl) { statusEl.classList.remove('hidden'); statusEl.textContent = 'Menghubungkan ke bank...'; statusEl.className = 'text-[10px] text-cyan-400'; }
+
+            try {
+                var resp = await fetch(`${API_BASE}/api/payment/request-va`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, package_id: packageId })
+                });
+                var data = await resp.json();
+
+                if (!data.success) {
+                    if (statusEl) { statusEl.textContent = data.error || 'Gagal membuat VA.'; statusEl.className = 'text-[10px] text-red-400'; }
+                    return;
+                }
+
+                // Store payment state
+                _paymentState.invoiceNumber = data.invoice_number;
+                _paymentState.vaNumber = data.va_number;
+                _paymentState.packageId = packageId;
+                _paymentState.creditsGiven = data.credits_given;
+                _paymentState.expiresAt = new Date(data.expires_at).getTime();
+
+                // Populate invoice modal
+                document.getElementById('invoice-va').textContent = data.va_number ? formatVA(data.va_number) : 'â€"';
+                document.getElementById('invoice-bank').textContent = data.bank_name;
+                document.getElementById('invoice-amount').textContent = data.amount_formatted;
+                document.getElementById('invoice-package').textContent = data.package_name + ' (+' + data.credits_given + ' kredit)';
+
+                // Instructions
+                var instrHtml = '';
+                (data.instructions || []).forEach(function(inst) {
+                    instrHtml += '<div class="flex gap-3 text-xs"><span class="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-bold shrink-0">'+inst.step+'</span><span class="text-slate-300">'+inst.text+'</span></div>';
+                });
+                document.getElementById('invoice-instructions').innerHTML = instrHtml;
+
+                // Reset UI state
+                document.getElementById('invoice-content').style.display = 'block';
+                document.getElementById('invoice-success').classList.add('hidden');
+                document.getElementById('simulate-pay-btn').disabled = false;
+                document.getElementById('simulate-pay-btn').innerHTML = '<i class="fa-solid fa-flask"></i> Simulate Successful Payment';
+                document.getElementById('invoice-status-badge').textContent = 'Menunggu';
+                document.getElementById('invoice-status-badge').className = 'ml-auto text-[10px] text-slate-500 uppercase tracking-wider';
+
+                // Start countdown
+                startInvoiceCountdown();
+
+                // Show invoice modal
+                closeTopUpModal();
+                var im = document.getElementById('invoice-modal');
+                var imi = document.getElementById('invoice-modal-inner');
+                im.classList.remove('hidden');
+                if (imi) { imi.classList.remove('scale-95'); imi.classList.add('scale-100'); }
+
+                if (statusEl) { statusEl.classList.add('hidden'); }
+            } catch (err) {
+                if (statusEl) { statusEl.textContent = 'Error: ' + err.message; statusEl.className = 'text-[10px] text-red-400'; }
+            }
+        };
+
+        // â•â•â• Invoice Modal â•â•â•
+        window.closeInvoiceModal = function() {
+            clearInvoiceCountdown();
+            var modal = document.getElementById('invoice-modal');
+            var inner = document.getElementById('invoice-modal-inner');
+            if (!modal) return;
+            if (inner) { inner.classList.remove('scale-100'); inner.classList.add('scale-95'); }
+            setTimeout(function() { modal.classList.add('hidden'); }, 200);
+            fetchCreditBalance();
+        };
+
+        function formatVA(va) {
+            if (!va) return 'â€"';
+            return va.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+        }
+
+        window.copyVANumber = function() {
+            var vaEl = document.getElementById('invoice-va');
+            var raw = _paymentState.vaNumber || '';
+            if (!raw) return;
+
+            navigator.clipboard.writeText(raw).then(function() {
+                var btn = document.getElementById('copy-va-btn');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Tersalin!</span>';
+                btn.classList.add('text-green-400');
+                setTimeout(function() {
+                    btn.innerHTML = '<i class="fa-solid fa-copy"></i> <span>Salin Nomor VA</span>';
+                    btn.classList.remove('text-green-400');
+                }, 2000);
+            }).catch(function() {
+                // Fallback
+                var ta = document.createElement('textarea');
+                ta.value = raw; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                var btn = document.getElementById('copy-va-btn');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Tersalin!</span>';
+                setTimeout(function() { btn.innerHTML = '<i class="fa-solid fa-copy"></i> <span>Salin Nomor VA</span>'; }, 2000);
+            });
+        };
+
+        function startInvoiceCountdown() {
+            clearInvoiceCountdown();
+            var countdownEl = document.getElementById('invoice-countdown');
+            if (!countdownEl) return;
+
+            _paymentState.countdownTimer = setInterval(function() {
+                var now = Date.now();
+                var remaining = Math.max(0, _paymentState.expiresAt - now);
+                var mins = Math.floor(remaining / 60000);
+                var secs = Math.floor((remaining % 60000) / 1000);
+                countdownEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+                countdownEl.classList.remove('countdown-warn', 'countdown-danger');
+                if (remaining < 60000) { countdownEl.classList.add('countdown-danger'); }
+                else if (remaining < 180000) { countdownEl.classList.add('countdown-warn'); }
+
+                if (remaining <= 0) {
+                    clearInvoiceCountdown();
+                    countdownEl.textContent = 'Kadaluarsa';
+                    countdownEl.classList.add('countdown-danger');
+                    document.getElementById('simulate-pay-btn').disabled = true;
+                    document.getElementById('invoice-status-badge').textContent = 'Kadaluarsa';
+                    document.getElementById('invoice-status-badge').className = 'ml-auto text-[10px] text-red-400 uppercase tracking-wider';
+                }
+            }, 1000);
+        }
+
+        function clearInvoiceCountdown() {
+            if (_paymentState.countdownTimer) { clearInterval(_paymentState.countdownTimer); _paymentState.countdownTimer = null; }
+        }
+
+        // â•â•â• Simulate Successful Payment â•â•â•
+        window.simulatePayment = async function() {
+            var btn = document.getElementById('simulate-pay-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></span> Memproses...';
+
+            try {
+                var url = `${API_BASE}/api/payments/doku-callback?simulate=1&invoice=${encodeURIComponent(_paymentState.invoiceNumber)}&email=${encodeURIComponent(getActiveEmail())}&package=${encodeURIComponent(_paymentState.packageId)}`;
+                var resp = await fetch(url, { method: 'POST' });
+                var data = await resp.json();
+
+                if (data.success) {
+                    // Show success state
+                    clearInvoiceCountdown();
+                    document.getElementById('invoice-content').style.display = 'none';
+                    document.getElementById('invoice-success').classList.remove('hidden');
+                    document.getElementById('invoice-success-credits').textContent = '+' + _paymentState.creditsGiven;
+
+                    // Refresh balance
+                    await fetchCreditBalance();
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Gagal â€" Coba Lagi';
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error â€" Coba Lagi';
+            }
+        };
+
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+    })();
+    </script>
+
+
+<!-- mock-login-modal removed -->
+
+<!-- ============================================================
+     PROFILE MANAGEMENT MODAL
+     ============================================================ -->
+
+</div>
+
+<!-- â•â•â• TOP-UP MODAL â€" Package Selection â•â•â• -->
+<div id="top-up-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+    <div class="bg-[#0B0F19] border border-slate-800/80 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 transition-all transform scale-95 duration-300" id="top-up-modal-inner">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-cyan-500/10 rounded-xl flex items-center justify-center border border-cyan-500/20 text-cyan-400 text-lg"><i class="fa-solid fa-coins"></i></div>
+                <div><h3 class="text-base font-bold text-white">Isi Ulang Kredit</h3><p class="text-[10px] text-slate-400">Pilih paket top-up</p></div>
+            </div>
+            <button onclick="closeTopUpModal()" class="text-slate-400 hover:text-white transition-colors text-xl">&times;</button>
+        </div>
+
+        <div id="top-up-packages" class="flex flex-col gap-3">
+            <div class="text-center text-slate-500 text-xs py-4">Memuat paket...</div>
+        </div>
+
+        <p id="top-up-status" class="text-[10px] text-slate-500 hidden text-center"></p>
+    </div>
+</div>
+
+<!-- â•â•â• PAYMENT INVOICE MODAL â•â•â• -->
+<div id="invoice-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+    <div class="bg-[#0B0F19] border border-slate-800/80 shadow-2xl shadow-cyan-500/10 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 transition-all transform scale-95 duration-300 max-h-[90vh] overflow-y-auto" id="invoice-modal-inner">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-white flex items-center gap-2"><span class="material-symbols-outlined text-cyan-400 text-lg">receipt_long</span> Invoice Pembayaran</h3>
+            <button onclick="closeInvoiceModal()" class="text-slate-400 hover:text-white transition-colors text-xl">&times;</button>
+        </div>
+
+        <!-- Success State (hidden by default) -->
+        <div id="invoice-success" class="hidden flex flex-col items-center gap-4 py-6">
+            <div class="w-20 h-20 rounded-full bg-green-500/10 border-4 border-green-500 flex items-center justify-center" style="animation: successRing 1.5s ease-out infinite;">
+                <svg class="w-10 h-10 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="animation: successPop 0.5s ease-out;"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-green-400">Pembayaran Berhasil!</h3>
+            <p class="text-sm text-slate-400 text-center"><span id="invoice-success-credits"></span> kredit telah ditambahkan ke akun Anda.</p>
+            <button onclick="closeInvoiceModal()" class="px-6 py-2.5 bg-green-500/20 border border-green-500/30 text-green-400 rounded-xl text-sm font-bold hover:bg-green-500/30 transition-all">Tutup</button>
+        </div>
+
+        <!-- Invoice Content -->
+        <div id="invoice-content">
+            <!-- Bank + VA -->
+            <div class="bg-[#0c0e12] border border-slate-800/80 rounded-2xl p-5 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center border border-blue-500/30">
+                        <span class="text-blue-400 font-extrabold text-xs">M</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-white" id="invoice-bank">Bank Mandiri</p>
+                        <p class="text-[10px] text-slate-400">Virtual Account</p>
+                    </div>
+                    <span class="ml-auto text-[10px] text-slate-500 uppercase tracking-wider" id="invoice-status-badge">Menunggu</span>
+                </div>
+
+                <div>
+                    <p class="text-[9px] text-slate-500 uppercase tracking-wider mb-1.5">Nomor Virtual Account</p>
+                    <div class="va-display" id="invoice-va">â€"</div>
+                    <button onclick="copyVANumber()" class="mt-2 w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2" id="copy-va-btn">
+                        <i class="fa-solid fa-copy text-[10px]"></i> <span>Salin Nomor VA</span>
+                    </button>
+                </div>
+
+                <div class="flex justify-between text-sm border-t border-slate-800/60 pt-3">
+                    <span class="text-slate-400 text-xs">Jumlah Tagihan</span>
+                    <span class="text-white font-bold" id="invoice-amount">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-400 text-xs">Paket</span>
+                    <span class="text-slate-300 text-xs" id="invoice-package">â€"</span>
+                </div>
+
+                <!-- Countdown -->
+                <div class="flex justify-between text-sm border-t border-slate-800/60 pt-3">
+                    <span class="text-slate-400 text-xs">Batas Waktu</span>
+                    <span class="text-white font-mono text-xs font-bold" id="invoice-countdown">15:00</span>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="bg-[#0c0e12] border border-slate-800/80 rounded-2xl p-5 mt-4 space-y-2">
+                <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Cara Pembayaran</p>
+                <div id="invoice-instructions" class="space-y-2"></div>
+            </div>
+
+            <!-- Simulate Button -->
+            <div class="mt-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
+                <p class="text-[10px] text-amber-400/70 uppercase tracking-wider mb-2">Dev Tool â€" Simulasi</p>
+                <button onclick="simulatePayment()" id="simulate-pay-btn" class="w-full py-3 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-flask"></i> Simulate Successful Payment
+                </button>
+                <p class="text-[9px] text-amber-400/40 text-center mt-1.5">Klik untuk mensimulasikan pembayaran sukses (development)</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

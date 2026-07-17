@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Filter Gallery Factory — fotowisuda.ai</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "surface-background": "#0A0C10",
+                            "surface-card": "#161B22",
+                            "surface-container": "#1e2024",
+                            "border-subtle": "#30363D",
+                            "text-primary": "#F0F6FC",
+                            "text-secondary": "#8B949E",
+                            "electric-cyan": "#00D1FF",
+                            "vivid-purple": "#9D5BFF"
+                        }
+                    }
+                }
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes adminGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Loading overlay */
+        @keyframes overlayFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .loading-overlay {
+            background: rgba(10, 12, 16, 0.88);
+            backdrop-filter: blur(16px);
+            animation: overlayFadeIn 0.3s ease-out;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50%      { opacity: 1; transform: scale(1); }
+        }
+        @keyframes sparklePulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50%      { opacity: 1; transform: scale(1.08); }
+        }
+
+        .admin-glowing-title {
+            background: linear-gradient(135deg, #a855f7, #06b6d4, #6366f1, #a855f7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: adminGradientFlow 5s ease infinite;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-surface-background text-text-primary" style="font-family: 'Inter','Plus Jakarta Sans',system-ui,sans-serif;">
+
+    <!-- ============================================================
+         TEXT-ONLY SIDEBAR
+         ============================================================ -->
+    <aside id="sidebar" class="hidden md:flex w-60 bg-slate-950/40 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 h-screen sticky top-0 z-30 transition-transform duration-300">
+        <nav class="flex flex-col gap-8">
+            <div>
+                <p class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-4">System Controls</p>
+                <a href="/admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Home</a>
+                <a href="/filter-gallery-admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Admin</a>
+                <a href="/filter-gallery-factory" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
+                <a href="/admin-creations" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Creations</a>
+            </div>
+        </nav>
+        <div class="pt-6 border-t border-slate-800/60">
+            <p class="text-[9px] text-slate-600 tracking-wider font-medium">fotowisuda.ai &mdash; Admin</p>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden" onclick="closeSidebar()"></div>
+
+    <!-- Mobile header bar -->
+    <div class="md:hidden fixed top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-surface-background/95 backdrop-blur-md border-b border-border-subtle">
+        <span class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase">fotowisuda.ai</span>
+        <button id="menu-toggle" onclick="toggleSidebar()" class="text-xs font-bold text-slate-400 hover:text-white tracking-widest uppercase transition-all">Menu</button>
+    </div>
+
+    <!-- ============================================================
+         MAIN WORKSPACE
+         ============================================================ -->
+    <main class="flex-grow overflow-y-auto mt-12 md:mt-0 p-8">
+        <div class="w-full max-w-[1400px] mx-auto">
+
+            <!-- Page Title -->
+            <div class="mb-8">
+                <h2 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight mb-2">Filter Gallery Factory</h2>
+                <p class="text-text-secondary text-sm">Create a new background filter preset for the public gallery.</p>
+            </div>
+
+            <!-- ==========================================
+                 2-COLUMN GRID (desktop)
+                 ========================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+
+                <!-- ======================================
+                     LEFT COLUMN — Input Form (lg:col-span-6)
+                     ====================================== -->
+                <div class="lg:col-span-6">
+                    <div class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-8 space-y-8 shadow-2xl">
+
+                        <!-- [B.2] Prompt Text Box -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Prompt</label>
+                            <textarea id="factory-prompt"
+                                      rows="5"
+                                      placeholder="Describe the background scene, lighting, and atmosphere for this filter preset…"
+                                      class="w-full bg-surface-card border border-border-subtle rounded-xl p-4 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 resize-none transition-all"></textarea>
+                        </div>
+
+                        <!-- [B.3] Title Text Box -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Filter Preset Name</label>
+                            <input type="text" id="factory-title"
+                                   placeholder="e.g. Grand Ballroom, Sunset Garden, Neon Studio…"
+                                   class="w-full bg-surface-card border border-border-subtle rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 transition-all">
+                        </div>
+
+                        <!-- Image Upload Zone -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Upload Reference Image</label>
+                            <div id="filter-upload-zone"
+                                 class="relative border-2 border-dashed border-purple-500/20 bg-slate-950 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-purple-500/40 transition-all cursor-pointer min-h-[180px] overflow-hidden">
+                                <input type="file" id="filter-upload-input" accept="image/*" class="hidden">
+                                <div id="filter-upload-placeholder" class="flex flex-col items-center gap-3 text-center">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-purple-400/60 group-hover:text-purple-400 transition-colors"></i>
+                                    <div>
+                                        <p class="text-sm font-bold text-purple-400">Upload Reference Image</p>
+                                        <p class="text-xs text-slate-500 mt-1">Drag &amp; drop or click to upload target visual preset</p>
+                                    </div>
+                                </div>
+                                <img id="filter-upload-preview" class="absolute inset-0 w-full h-full object-cover rounded-2xl hidden" alt="Uploaded reference preview" />
+                                <button id="filter-upload-remove"
+                                        class="absolute top-3 right-3 p-1.5 bg-slate-950/90 rounded-full hidden z-10 hover:bg-red-900/80 transition-colors border border-slate-700/50"
+                                        title="Remove image">
+                                    <i class="fa-solid fa-xmark text-sm text-slate-400 hover:text-red-400 transition-colors"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- [B.4] Tag 1 — Category -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 block">Category</label>
+                            <div id="tag1-group" class="flex flex-wrap gap-2">
+                                <button class="tag1-btn px-4 py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-sm font-medium transition-all hover:bg-purple-500/20 active" data-tag="Studio">Studio</button>
+                                <button class="tag1-btn px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-purple-500/30 hover:text-white" data-tag="Indoor">Indoor</button>
+                                <button class="tag1-btn px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-purple-500/30 hover:text-white" data-tag="Outdoor">Outdoor</button>
+                                <button class="tag1-btn px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-purple-500/30 hover:text-white" data-tag="Poster Film">Poster Film</button>
+                                <button class="tag1-btn px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-medium transition-all hover:border-purple-500/30 hover:text-white" data-tag="Animation">Animation</button>
+                            </div>
+                        </div>
+
+                        <!-- [B.5] Tag 2 — Lighting/Ambient -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 block">Lighting &amp; Ambient Style</label>
+                            <div id="tag2-group" class="flex flex-wrap gap-2">
+                                <button class="tag2-btn px-4 py-2 bg-amber-500/20 border border-amber-400 text-amber-200 rounded-full text-sm font-medium transition-all hover:bg-amber-500/30 shadow-lg shadow-amber-500/5 active" data-tag="Soft Light">Soft Light</button>
+                                <button class="tag2-btn px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-tag="Strobist">Strobist</button>
+                                <button class="tag2-btn px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-tag="Natural Ambient">Natural Ambient</button>
+                            </div>
+                        </div>
+
+                        <!-- [B.6] Aspect Ratio -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 block">Aspect Ratio</label>
+                            <div id="ratio-group" class="flex flex-wrap gap-2">
+                                <button class="ratio-btn px-5 py-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full text-sm font-semibold transition-all hover:bg-cyan-500/20 active" data-ratio="2:3">2:3</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="4:5">4:5</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="4:3">4:3</button>
+                            </div>
+                        </div>
+
+                        <!-- [B.7] Generate Now Button -->
+                        <button id="factory-generate-btn"
+                                class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 shadow-lg shadow-purple-600/20 active:scale-95 text-sm tracking-wider uppercase border border-purple-400/20 disabled:opacity-60 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL':1;">bolt</span>
+                            <span id="factory-btn-text">Generate Now</span>
+                        </button>
+
+                        <!-- Toast message area -->
+                        <div id="factory-toast" class="hidden text-center text-xs text-emerald-400 font-semibold tracking-wide mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- ======================================
+                     RIGHT COLUMN — Process & Result Panel (lg:col-span-6)
+                     ====================================== -->
+                <div class="lg:col-span-6">
+                    <div id="result-panel" class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-6 min-h-[500px] flex flex-col justify-between relative overflow-hidden shadow-2xl">
+
+                        <!-- ==================================
+                             STATE A — IDLE (default)
+                             ================================== -->
+                        <div id="panel-idle" class="flex flex-col items-center justify-center flex-grow gap-6 text-center">
+                            <div class="relative w-24 h-24 flex items-center justify-center">
+                                <div class="absolute inset-0 rounded-full border-2 border-dashed border-purple-500/25"></div>
+                                <i class="fa-solid fa-wand-magic-sparkles text-4xl text-purple-400/50" style="animation: sparklePulse 2.5s ease-in-out infinite;"></i>
+                            </div>
+                            <div class="space-y-2">
+                                <h3 class="text-lg font-bold text-white tracking-wide">Menunggu Input Parameter</h3>
+                                <p class="text-sm text-slate-500 max-w-xs leading-relaxed">
+                                    Lengkapi formulir di sebelah kiri dan klik <span class="text-purple-400 font-semibold">Generate Now</span> untuk memulai pembuatan filter wisuda.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- ==================================
+                             STATE B — PROCESSING (hidden)
+                             ================================== -->
+                        <div id="panel-processing" class="hidden flex flex-col flex-grow gap-6">
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-12 h-12 shrink-0">
+                                    <div class="absolute inset-0 border-3 border-purple-500/20 rounded-full"></div>
+                                    <div class="absolute inset-0 border-3 border-transparent border-t-purple-500 rounded-full animate-spin"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-white">Sedang Memproses…</p>
+                                    <p id="panel-timer" class="text-xs text-purple-400 font-mono tabular-nums">0.0s</p>
+                                </div>
+                            </div>
+                            <!-- Rolling logs -->
+                            <div id="panel-logs" class="flex-grow space-y-1.5 overflow-y-auto hide-scrollbar text-xs font-mono text-slate-500 max-h-[240px]"></div>
+                            <!-- Animated dots -->
+                            <div class="flex items-center justify-center gap-1.5 pb-2">
+                                <span class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style="animation-delay:0s;"></span>
+                                <span class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style="animation-delay:0.2s;"></span>
+                                <span class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style="animation-delay:0.4s;"></span>
+                            </div>
+                        </div>
+
+                        <!-- ==================================
+                             STATE C — COMPLETED (hidden)
+                             ================================== -->
+                        <div id="panel-completed" class="hidden flex flex-col gap-5">
+                            <!-- Image viewport -->
+                            <div class="relative bg-black/60 border border-purple-500/20 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(168,85,247,0.08)]">
+                                <img id="panel-result-image" src="" alt="Generated filter preview"
+                                     class="w-full h-auto object-cover rounded-2xl" />
+                                <!-- Status badge -->
+                                <div class="absolute top-3 left-3 px-2.5 py-1 bg-slate-950/85 border border-amber-500/30 text-[10px] font-bold text-amber-400 rounded-lg backdrop-blur-sm tracking-wider uppercase">
+                                    DRAFT: STATUS OFF
+                                </div>
+                            </div>
+                            <!-- Metadata -->
+                            <div class="space-y-2 px-1">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-slate-500 uppercase tracking-wider">Title</span>
+                                    <span id="panel-meta-title" class="text-white font-semibold">—</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-slate-500 uppercase tracking-wider">Category</span>
+                                    <span id="panel-meta-tag1" class="text-purple-400 font-semibold">—</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-slate-500 uppercase tracking-wider">Lighting</span>
+                                    <span id="panel-meta-tag2" class="text-amber-300 font-semibold">—</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-slate-500 uppercase tracking-wider">Ratio</span>
+                                    <span id="panel-meta-ratio" class="text-cyan-400 font-semibold">—</span>
+                                </div>
+                            </div>
+                            <!-- Action buttons -->
+                            <div class="flex flex-col sm:flex-row gap-2.5 pt-2">
+                                <a href="/filter-gallery-admin"
+                                   class="flex-1 text-center bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/20 active:scale-95 text-xs tracking-wider uppercase">
+                                    Lihat di Dashboard Admin
+                                </a>
+                                <button id="panel-download-btn"
+                                        class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold py-3 px-4 rounded-xl transition-all text-xs tracking-wider uppercase flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-download text-xs"></i>
+                                    <span>Download Image</span>
+                                </button>
+                                <button id="panel-reset-btn"
+                                        class="flex-1 bg-transparent border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white font-semibold py-3 px-4 rounded-xl transition-all text-xs tracking-wider uppercase">
+                                    Reset &amp; Buat Baru
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div><!-- /grid -->
+
+        </div>
+    </main>
+
+    </main>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        // ---- Selection state ----
+        const selection = {
+            prompt: '',
+            title: '',
+            tag1: 'Studio',
+            tag2: 'Soft Light',
+            ratio: '2:3',
+            uploadedImageData: null,
+            uploadedFile: null
+        };
+
+        // ---- Mutually exclusive group helpers ----
+
+        function initMutualGroup(selector, activeClass, inactiveClass, onSelect) {
+            const buttons = document.querySelectorAll(selector);
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => {
+                        b.classList.remove(...activeClass);
+                        b.classList.add(...inactiveClass);
+                    });
+                    btn.classList.add(...activeClass);
+                    btn.classList.remove(...inactiveClass);
+                    if (onSelect) onSelect(btn);
+                });
+            });
+        }
+
+        function initTag1Group() {
+            const active   = ['bg-purple-500/10', 'text-purple-400', 'border-purple-500/20'];
+            const inactive = ['bg-surface-card', 'border-border-subtle', 'text-text-secondary'];
+            initMutualGroup('.tag1-btn', active, inactive, btn => {
+                selection.tag1 = btn.getAttribute('data-tag');
+            });
+        }
+
+        function initTag2Group() {
+            const active   = ['bg-amber-500/20', 'border-amber-400', 'text-amber-200', 'shadow-lg', 'shadow-amber-500/5'];
+            const inactive = ['bg-amber-950/10', 'border-amber-500/20', 'text-amber-300/90'];
+            initMutualGroup('.tag2-btn', active, inactive, btn => {
+                selection.tag2 = btn.getAttribute('data-tag');
+            });
+        }
+
+        function initRatioGroup() {
+            const active   = ['bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/20'];
+            const inactive = ['bg-surface-card', 'border-border-subtle', 'text-text-secondary'];
+            initMutualGroup('.ratio-btn', active, inactive, btn => {
+                selection.ratio = btn.getAttribute('data-ratio');
+            });
+        }
+
+        // ---- localStorage helpers ----
+
+        function getAllFilters() {
+            try {
+                const raw = localStorage.getItem('all_filters');
+                return raw ? JSON.parse(raw) : [];
+            } catch (_) { return []; }
+        }
+
+        function saveAllFilters(filters) {
+            try {
+                localStorage.setItem('all_filters', JSON.stringify(filters));
+            } catch (_) {}
+        }
+
+        function setFilterVisibilityOff(filterId) {
+            try {
+                const raw = localStorage.getItem('filter_visibility_states');
+                const states = raw ? JSON.parse(raw) : {};
+                states[filterId] = false;
+                localStorage.setItem('filter_visibility_states', JSON.stringify(states));
+            } catch (_) {}
+        }
+
+        // ---- Image upload zone handlers ----
+
+        function initImageUpload() {
+            const zone    = document.getElementById('filter-upload-zone');
+            const input   = document.getElementById('filter-upload-input');
+            const preview = document.getElementById('filter-upload-preview');
+            const placeholder = document.getElementById('filter-upload-placeholder');
+            const removeBtn  = document.getElementById('filter-upload-remove');
+
+            if (!zone || !input || !preview || !placeholder || !removeBtn) return;
+
+            function handleFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+
+                // Preserve the raw File object for S3 upload
+                selection.uploadedFile = file;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selection.uploadedImageData = e.target.result;
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    preview.style.opacity = '0';
+                    // Smooth fade-in
+                    requestAnimationFrame(() => {
+                        preview.style.transition = 'opacity 0.3s ease-out';
+                        preview.style.opacity = '1';
+                    });
+                    placeholder.classList.add('hidden');
+                    removeBtn.classList.remove('hidden');
+                    zone.classList.add('border-purple-400/40');
+                    zone.classList.remove('border-purple-500/20', 'border-dashed');
+                    zone.style.cursor = 'default';
+                    console.log('[Factory] Reference image loaded:', file.name, '(' + (file.size / 1024).toFixed(1) + ' KB)');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function clearImage() {
+                selection.uploadedImageData = null;
+                selection.uploadedFile = null;
+                preview.classList.add('hidden');
+                preview.src = '';
+                preview.style.opacity = '';
+                placeholder.classList.remove('hidden');
+                removeBtn.classList.add('hidden');
+                zone.classList.remove('border-purple-400/40');
+                zone.classList.add('border-purple-500/20', 'border-dashed');
+                zone.style.cursor = 'pointer';
+                input.value = '';
+                console.log('[Factory] Reference image cleared.');
+            }
+
+            // Click to open file dialog
+            zone.addEventListener('click', (e) => {
+                if (e.target === removeBtn || removeBtn.contains(e.target)) return;
+                if (!selection.uploadedImageData) input.click();
+            });
+
+            // File input change
+            input.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+
+            // Remove button
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                clearImage();
+            });
+
+            // Drag-and-drop
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.add('border-purple-400/60', 'bg-purple-500/5');
+            });
+
+            zone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('border-purple-400/60', 'bg-purple-500/5');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('border-purple-400/60', 'bg-purple-500/5');
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        // ---- Panel state management ----
+
+        const panelStates = {
+            elIdle:       document.getElementById('panel-idle'),
+            elProcessing: document.getElementById('panel-processing'),
+            elCompleted:  document.getElementById('panel-completed')
+        };
+
+        function showPanel(state) {
+            if (panelStates.elIdle)       panelStates.elIdle.classList.add('hidden');
+            if (panelStates.elProcessing) panelStates.elProcessing.classList.add('hidden');
+            if (panelStates.elCompleted)  panelStates.elCompleted.classList.add('hidden');
+            if (state === 'idle' && panelStates.elIdle) {
+                panelStates.elIdle.classList.remove('hidden');
+                panelStates.elIdle.classList.add('flex');
+            } else if (state === 'processing' && panelStates.elProcessing) {
+                panelStates.elProcessing.classList.remove('hidden');
+                panelStates.elProcessing.classList.add('flex');
+            } else if (state === 'completed' && panelStates.elCompleted) {
+                panelStates.elCompleted.classList.remove('hidden');
+                panelStates.elCompleted.classList.add('flex');
+            }
+        }
+
+        // ---- Timer & logs ----
+
+        let panelTimerInterval = null;
+        let panelTimerStart    = 0;
+
+        function startPanelTimer() {
+            panelTimerStart = Date.now();
+            const el = document.getElementById('panel-timer');
+            if (el) el.textContent = '0.0s';
+            panelTimerInterval = setInterval(() => {
+                const elapsed = ((Date.now() - panelTimerStart) / 1000).toFixed(1);
+                if (el) el.textContent = elapsed + 's';
+            }, 100);
+        }
+
+        function stopPanelTimer() {
+            if (panelTimerInterval) { clearInterval(panelTimerInterval); panelTimerInterval = null; }
+        }
+
+        function getElapsedStr() {
+            return ((Date.now() - panelTimerStart) / 1000).toFixed(1) + 's';
+        }
+
+        const SIMULATED_LOGS = [
+            'Menghubungkan ke API REST Leonardo.ai...',
+            'Mengunggah gambar referensi subjek (The Graduate)...',
+            'Menyelaraskan model nano-banana-2...',
+            'Memproses transfer busana kebaya & pencahayaan...',
+            'Menyusun hasil pratinjau resolusi tinggi...'
+        ];
+
+        async function runProcessingLogs() {
+            const logContainer = document.getElementById('panel-logs');
+            if (!logContainer) return;
+            logContainer.innerHTML = '';
+            for (let i = 0; i < SIMULATED_LOGS.length; i++) {
+                await new Promise(r => setTimeout(r, 400));
+                const stamp = getElapsedStr();
+                const line = document.createElement('p');
+                line.textContent = stamp + ': ' + SIMULATED_LOGS[i];
+                line.className = 'text-slate-500';
+                logContainer.appendChild(line);
+                // Highlight latest line
+                const prev = logContainer.querySelector('.text-purple-400\\/80');
+                if (prev) prev.className = 'text-slate-500';
+                line.className = 'text-purple-400/80 font-semibold';
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }
+
+        // ---- Shared helpers ----
+
+        function showToast(message, type) {
+            const toastEl = document.getElementById('factory-toast');
+            if (!toastEl) return;
+            toastEl.textContent = message;
+            toastEl.classList.remove('hidden', 'text-emerald-400', 'text-amber-400', 'text-red-400');
+            toastEl.classList.add(type === 'error' ? 'text-red-400' : type === 'warn' ? 'text-amber-400' : 'text-emerald-400');
+        }
+
+        function lockGenerateButton() {
+            const btn = document.getElementById('factory-generate-btn');
+            const btnText = document.getElementById('factory-btn-text');
+            if (btn) btn.disabled = true;
+            if (btnText) btnText.innerHTML = '<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Memproses…';
+        }
+
+        function unlockGenerateButton() {
+            const btn = document.getElementById('factory-generate-btn');
+            const btnText = document.getElementById('factory-btn-text');
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.innerHTML = 'Generate Now';
+        }
+
+        // ---- Local persistence ----
+
+        function persistFilterLocally(filterObject) {
+            const allFilters = getAllFilters();
+            allFilters.push(filterObject);
+            saveAllFilters(allFilters);
+            // Use generation_id for visibility key — matches server database record ID
+            const visibilityKey = filterObject.generation_id || filterObject.id;
+            setFilterVisibilityOff(visibilityKey);
+
+            // Also stamp into all_creations with admin ownership
+            try {
+                const raw = localStorage.getItem('all_creations');
+                const creations = raw ? JSON.parse(raw) : [];
+                creations.push(Object.assign({}, filterObject, {
+                    owner_email: 'admin.fotowisuda@gmail.com',
+                    isAdmin: true
+                }));
+                localStorage.setItem('all_creations', JSON.stringify(creations));
+            } catch (_) {}
+
+            console.log('[Factory] Filter saved — visibilityKey:', visibilityKey, '| title:', filterObject.title, '| OFF');
+        }
+
+        // ---- Populate completed panel ----
+
+        function populateCompletedPanel(filterObject) {
+            const img = document.getElementById('panel-result-image');
+            if (img) {
+                img.src = filterObject.image || '';
+                // Dynamic aspect ratio class
+                const ratioMap = { '2:3': 'aspect-[2/3]', '4:5': 'aspect-[4/5]', '4:3': 'aspect-[4/3]' };
+                img.className = 'w-full h-auto object-cover rounded-2xl ' + (ratioMap[filterObject.ratio] || 'aspect-[2/3]');
+            }
+            const setMeta = (id, val, cls) => {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = val || '—'; }
+            };
+            setMeta('panel-meta-title', filterObject.title);
+            setMeta('panel-meta-tag1',  (filterObject.tags && filterObject.tags[0]) ? filterObject.tags[0] : '—');
+            setMeta('panel-meta-tag2',  (filterObject.tags && filterObject.tags[1]) ? filterObject.tags[1] : '—');
+            setMeta('panel-meta-ratio', filterObject.ratio);
+        }
+
+        // ---- Reset form ----
+
+        function resetFactoryForm() {
+            // Clear text inputs
+            const promptEl = document.getElementById('factory-prompt');
+            const titleEl  = document.getElementById('factory-title');
+            if (promptEl) promptEl.value = '';
+            if (titleEl)  titleEl.value  = '';
+
+            // Clear uploaded image
+            selection.uploadedImageData = null;
+            selection.uploadedFile = null;
+            const preview     = document.getElementById('filter-upload-preview');
+            const placeholder = document.getElementById('filter-upload-placeholder');
+            const removeBtn   = document.getElementById('filter-upload-remove');
+            const zone        = document.getElementById('filter-upload-zone');
+            const input       = document.getElementById('filter-upload-input');
+            if (preview)     { preview.classList.add('hidden'); preview.src = ''; }
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (removeBtn)   removeBtn.classList.add('hidden');
+            if (zone)        { zone.classList.remove('border-purple-400/40'); zone.classList.add('border-purple-500/20', 'border-dashed'); zone.style.cursor = 'pointer'; }
+            if (input)       input.value = '';
+
+            // Reset panel to IDLE
+            showPanel('idle');
+            stopPanelTimer();
+        }
+
+        // ---- Server proxy (API key secured in .env, like swap-bg) ----
+        const API_BASE = window.location.origin;
+
+        // ---- Generate flow (server-side proxy pattern) ----
+
+        async function handleGenerate() {
+            const promptEl = document.getElementById('factory-prompt');
+            const titleEl  = document.getElementById('factory-title');
+            const prompt   = (promptEl?.value || '').trim();
+            const title    = (titleEl?.value || '').trim();
+
+            // --- Validation ---
+            if (!prompt)  { showToast('Please enter a prompt describing the background scene.', 'warn'); return; }
+            if (!title)   { showToast('Please enter a filter preset name.', 'warn'); return; }
+            if (!selection.uploadedFile) { showToast('Please upload a reference image.', 'warn'); return; }
+
+            // --- Transition to PROCESSING ---
+            lockGenerateButton();
+            showPanel('processing');
+            startPanelTimer();
+
+            // Clear previous logs
+            const logContainer = document.getElementById('panel-logs');
+            if (logContainer) logContainer.innerHTML = '';
+
+            // --- Map aspect ratio ---
+            const dims = ASPECT_RATIO_DIMENSIONS[selection.ratio];
+            const selectedWidth  = dims.width;
+            const selectedHeight = dims.height;
+
+            // --- Track server job ID for visibility key alignment ---
+            const localFilterId = 'filter-' + Date.now();
+            let serverJobId = null;
+            let apiSuccess = false;
+            let generatedImageUrl = null;
+
+            try {
+                // ============================================================
+                //  POST to server — server handles Leonardo securely (.env key)
+                // ============================================================
+                appendLog('Connecting to server proxy...');
+
+                const formData = new FormData();
+                formData.append('prompt', prompt);
+                formData.append('filterTitle', title);
+                formData.append('width', selectedWidth.toString());
+                formData.append('height', selectedHeight.toString());
+                formData.append('selected_tag', selection.tag1);
+                formData.append('lighting', selection.tag2);
+                formData.append('referenceImage1', selection.uploadedFile, selection.uploadedFile.name);
+
+                appendLog('Uploading reference image & prompt to server...');
+
+                const genResp = await fetch(API_BASE + '/api/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!genResp.ok) {
+                    const errData = await genResp.json().catch(() => ({}));
+                    throw new Error(errData.error || 'Server returned HTTP ' + genResp.status);
+                }
+
+                const { jobId } = await genResp.json();
+                serverJobId = jobId;
+                appendLog('Pipeline initialized — jobId: ' + jobId);
+                console.log('[Factory] Server job accepted:', jobId);
+
+                // ============================================================
+                //  Poll server for status (server polls Leonardo in background)
+                // ============================================================
+                appendLog('Polling generation status via server...');
+
+                const MAX_POLLS = 120;         // 120 × 3 s = 6 minutes
+                const POLL_INTERVAL = 3000;
+
+                for (let attempt = 1; attempt <= MAX_POLLS; attempt++) {
+                    await new Promise(r => setTimeout(r, POLL_INTERVAL));
+
+                    try {
+                        const pollResp = await fetch(API_BASE + '/api/status/' + serverJobId);
+                        if (!pollResp.ok) {
+                            appendLog('Poll ' + attempt + '/' + MAX_POLLS + ' — HTTP ' + pollResp.status);
+                            continue;
+                        }
+
+                        const data = await pollResp.json();
+                        const status = (data.status || '').toUpperCase();
+
+                        if (attempt % 2 === 0) {
+                            appendLog('Poll ' + attempt + '/' + MAX_POLLS + ' — status: ' + status);
+                        }
+
+                        if (status === 'COMPLETE') {
+                            generatedImageUrl = data.imageUrl || null;
+                            if (generatedImageUrl) {
+                                appendLog('Generation complete — image received!');
+                                apiSuccess = true;
+                            }
+                            break;
+                        } else if (status === 'FAILED') {
+                            appendLog('Generation FAILED: ' + (data.error || 'unknown'));
+                            break;
+                        }
+                    } catch (pollErr) {
+                        appendLog('Poll ' + attempt + ' error: ' + (pollErr.message || 'unknown'));
+                    }
+                }
+
+                if (!generatedImageUrl) {
+                    appendLog('Polling finished — no result, falling back to local');
+                }
+
+            } catch (err) {
+                console.warn('[Factory] Server proxy error:', err.message);
+                appendLog('Server error: ' + (err.message || 'unknown') + ' — falling back to local');
+            }
+
+            // ============================================================
+            //  Build final filter object & show COMPLETED
+            // ============================================================
+            const finalImageUrl = generatedImageUrl || selection.uploadedImageData;
+
+            // Use server jobId as generation_id so visibility key matches admin/public pages
+            const effectiveId = serverJobId || localFilterId;
+
+            const filterObject = {
+                id: effectiveId,
+                title: title, prompt: prompt,
+                tags: [selection.tag1, selection.tag2],
+                ratio: selection.ratio,
+                dimensions: dims.width + '×' + dims.height,
+                image: finalImageUrl,
+                cover_image_path: finalImageUrl,
+                image_url: finalImageUrl,
+                model: 'nano-banana-2',
+                style_id: '111dc692-d470-4eec-b791-3475abac4c46',
+                lighting: selection.tag2,
+                generation_id: effectiveId,
+                status: 'complete',
+                created_at: new Date().toISOString()
+            };
+
+            stopPanelTimer();
+            persistFilterLocally(filterObject);
+            populateCompletedPanel(filterObject);
+            unlockGenerateButton();
+            showPanel('completed');
+
+            const downloadBtn = document.getElementById('panel-download-btn');
+            if (downloadBtn) {
+                downloadBtn.setAttribute('data-image-url', finalImageUrl);
+            }
+
+            if (apiSuccess) {
+                showToast('Filter "' + title + '" generated via Leonardo.ai! Status: OFF.', 'success');
+            } else {
+                showToast('Filter "' + title + '" saved with local fallback. Status: OFF.', 'warn');
+            }
+
+            console.log('[Factory] Filter created — id:', effectiveId,
+                        '| api:', apiSuccess ? 'server-proxy' : 'local-fallback',
+                        '| visibility: OFF (filter_visibility_states[' + effectiveId + '] = false)');
+        }
+
+        // ---- Append log to processing panel ----
+        function appendLog(message) {
+            const logContainer = document.getElementById('panel-logs');
+            if (!logContainer) return;
+            const stamp = getElapsedStr();
+            const line = document.createElement('p');
+            line.textContent = stamp + ': ' + message;
+            line.className = 'text-slate-500';
+            // Highlight latest
+            const prev = logContainer.querySelector('.text-purple-400\\/80');
+            if (prev) prev.className = 'text-slate-500';
+            line.className = 'text-purple-400/80 font-semibold';
+            logContainer.appendChild(line);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // ---- Download generated image ----
+        async function downloadGeneratedImage() {
+            const btn = document.getElementById('panel-download-btn');
+            const url  = btn?.getAttribute('data-image-url');
+            if (!url) {
+                showToast('Tidak ada gambar untuk diunduh.', 'warn');
+                return;
+            }
+
+            try {
+                // Show download spinner on button
+                const labelEl = btn?.querySelector('span');
+                const iconEl  = btn?.querySelector('i');
+                if (labelEl) labelEl.textContent = 'Mengunduh…';
+                if (iconEl)  iconEl.className = 'fa-solid fa-spinner fa-spin text-xs';
+
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const blob = await resp.blob();
+
+                // Force browser download
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = 'filter-wisuda-' + Date.now() + '.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+
+                if (labelEl) labelEl.textContent = 'Download Image';
+                if (iconEl)  iconEl.className = 'fa-solid fa-download text-xs';
+                showToast('Gambar berhasil diunduh!', 'success');
+            } catch (err) {
+                console.error('[Factory] Download failed:', err);
+                if (btn) {
+                    const labelEl = btn.querySelector('span');
+                    const iconEl  = btn.querySelector('i');
+                    if (labelEl) labelEl.textContent = 'Download Image';
+                    if (iconEl)  iconEl.className = 'fa-solid fa-download text-xs';
+                }
+                showToast('Gagal mengunduh gambar: ' + (err.message || 'unknown'), 'error');
+            }
+        }
+
+        // ---- Init ----
+
+        function init() {
+            showPanel('idle');
+            initTag1Group();
+            initTag2Group();
+            initRatioGroup();
+            initImageUpload();
+
+            const genBtn = document.getElementById('factory-generate-btn');
+            if (genBtn) genBtn.addEventListener('click', handleGenerate);
+
+            const resetBtn = document.getElementById('panel-reset-btn');
+            if (resetBtn) resetBtn.addEventListener('click', resetFactoryForm);
+
+            const downloadBtn = document.getElementById('panel-download-btn');
+            if (downloadBtn) downloadBtn.addEventListener('click', downloadGeneratedImage);
+
+            console.log('Filter Gallery Factory initialized.');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+
+    <!-- ============================================================
+         MOBILE SIDEBAR TOGGLE SCRIPT
+         ============================================================ -->
+    <script>
+        function openSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('hidden')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        }
+    </script>
+
+</body>
+</html>

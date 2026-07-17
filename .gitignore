@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment secrets
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated uploads (keep directory structure, ignore runtime files)
+public/uploads/thumbnails/*
+public/uploads/references/*
+!public/uploads/thumbnails/.gitkeep
+!public/uploads/references/.gitkeep
+
+# Local generation ledger
+database.json
+
+# IDE
+.vscode/
+.idea/

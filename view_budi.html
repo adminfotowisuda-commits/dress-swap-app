@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budi's Creations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+  body { background: #0A0C10; color: #F0F6FC; font-family: Inter, system-ui, sans-serif; margin: 0; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 16px; }
+  @media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1024px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+  .card { background: #161B22; border: 1px solid #30363D; border-radius: 16px; overflow: hidden; }
+  .card img { display: block; width: 100%; aspect-ratio: 3/4; object-fit: cover; }
+</style>
+</head>
+<body>
+<header style="padding:16px 24px;border-bottom:1px solid #30363D;">
+  <h1 style="font-size:20px;font-weight:700;">Budi's Creations</h1>
+  <p style="color:#8B949E;font-size:13px;" id="status">Loading...</p>
+</header>
+<div class="grid" id="grid"></div>
+<script>
+(async function() {
+  var status = document.getElementById('status');
+  var grid = document.getElementById('grid');
+  try {
+    var resp = await fetch('/api/user-creations?email=budi@gmail.com');
+    var data = await resp.json();
+    status.textContent = data.length + ' images found for budi@gmail.com';
+    data.forEach(function(item) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      var img = document.createElement('img');
+      img.src = item.url;
+      img.alt = item.name;
+      img.onerror = function() { this.src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22><rect fill=%22%23161B22%22 width=%22300%22 height=%22400%22/><text fill=%22%238B949E%22 x=%22150%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2214%22>Broken</text></svg>'; };
+      card.appendChild(img);
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    status.textContent = 'Error: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>

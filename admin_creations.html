@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Admin Creations — fotowisuda.ai</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "surface-background": "#0A0C10", "surface-card": "#161B22",
+                            "surface-container": "#1e2024", "border-subtle": "#30363D",
+                            "text-primary": "#F0F6FC", "text-secondary": "#8B949E",
+                            "electric-cyan": "#00D1FF", "vivid-purple": "#9D5BFF"
+                        }
+                    }
+                }
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes adminGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .admin-glowing-title {
+            background: linear-gradient(135deg, #a855f7, #06b6d4, #6366f1, #a855f7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: adminGradientFlow 5s ease infinite;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+            font-weight: 800;
+        }
+        @keyframes detailModalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(16px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .detail-modal-panel {
+            animation: detailModalIn 0.28s ease-out forwards;
+        }
+        @keyframes confirmModalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .confirm-animate-in {
+            animation: confirmModalIn 0.25s ease-out forwards;
+        }
+        @keyframes cardDeleteOut {
+            from { opacity: 1; transform: scale(1); }
+            to   { opacity: 0; transform: scale(0.85) translateY(-10px); }
+        }
+        .card-delete-out {
+            animation: cardDeleteOut 0.25s ease-in forwards;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-surface-background text-text-primary" style="font-family:'Inter','Plus Jakarta Sans',system-ui,sans-serif;">
+
+    <!-- ============================================================
+         TEXT-ONLY SIDEBAR
+         ============================================================ -->
+    <aside id="sidebar" class="hidden md:flex w-60 bg-slate-950/40 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 h-screen sticky top-0 z-30 transition-transform duration-300">
+        <nav class="flex flex-col gap-8">
+            <div>
+                <p class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-4">System Controls</p>
+                <a href="/admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Home</a>
+                <a href="/filter-gallery-admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Admin</a>
+                <a href="/filter-gallery-factory" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
+                <a href="/admin-creations" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">Admin Creations</a>
+            </div>
+        </nav>
+        <div class="pt-6 border-t border-slate-800/60">
+            <p class="text-[9px] text-slate-600 tracking-wider font-medium">fotowisuda.ai &mdash; Admin</p>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden" onclick="closeSidebar()"></div>
+
+    <!-- Mobile header bar -->
+    <div class="md:hidden fixed top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-surface-background/95 backdrop-blur-md border-b border-border-subtle">
+        <span class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase">fotowisuda.ai</span>
+        <button id="menu-toggle" onclick="toggleSidebar()" class="text-xs font-bold text-slate-400 hover:text-white tracking-widest uppercase transition-all">Menu</button>
+    </div>
+
+    <!-- ============================================================
+         MAIN WORKSPACE
+         ============================================================ -->
+    <main class="flex-grow overflow-y-auto mt-12 md:mt-0 p-8">
+        <div class="w-full max-w-[1400px] mx-auto">
+
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight mb-2">Admin Creations</h2>
+                    <div class="flex items-center gap-2 text-text-secondary font-label-md">
+                        <span id="creations-count" class="text-purple-400 font-bold">—</span>
+                        <span>Admin Generations stored</span>
+                    </div>
+                </div>
+                <button id="refresh-btn" onclick="loadAdminCreations()"
+                        class="flex items-center gap-2 px-4 py-2 bg-surface-card border border-border-subtle rounded-lg text-text-secondary hover:text-purple-400 hover:border-purple-500/30 transition-all text-xs font-medium">
+                    <span class="material-symbols-outlined text-sm">refresh</span>
+                    Refresh
+                </button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div id="admin-creations-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-start">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Loading -->
+            <div id="grid-loading" class="flex items-center justify-center py-20">
+                <div class="flex flex-col items-center gap-4 text-text-secondary">
+                    <div class="w-10 h-10 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                    <span class="text-sm">Loading admin creations...</span>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="grid-empty" class="hidden flex items-center justify-center py-20">
+                <div class="text-center space-y-3">
+                    <span class="material-symbols-outlined text-5xl text-text-secondary">imagesmode</span>
+                    <p class="text-text-secondary">Belum ada hasil kreasi admin.</p>
+                    <p class="text-xs text-slate-500">Silakan coba memproses gambar dari Filter Gallery Admin terlebih dahulu.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================
+         DETAIL MODAL
+         ============================================================ -->
+    <div id="detail-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4 sm:p-6">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+        <div class="detail-modal-panel relative z-10 bg-surface-card border border-border-subtle rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <div class="relative">
+                <img id="detail-image" src="" alt="Creation preview" class="w-full h-auto object-cover rounded-t-3xl" />
+                <button onclick="closeDetailModal()" class="absolute top-4 right-4 p-2 bg-slate-950/80 rounded-full hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-text-secondary">close</span>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <h3 id="detail-title" class="text-lg font-bold text-white"></h3>
+                    <p id="detail-prompt" class="text-sm text-text-secondary mt-1 line-clamp-3"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div class="flex justify-between"><span class="text-slate-500">Dimensions</span><span id="detail-dims" class="text-white font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Ratio</span><span id="detail-ratio" class="text-white font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Tags</span><span id="detail-tags" class="text-purple-400 font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Created</span><span id="detail-date" class="text-white font-semibold">—</span></div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button id="detail-download-btn" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold py-2.5 px-4 rounded-xl transition-all text-xs tracking-wider uppercase flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download text-xs"></i> Download HD
+                    </button>
+                    <button id="detail-delete-btn" class="flex-1 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/30 text-rose-400 font-bold py-2.5 px-4 rounded-xl transition-all text-xs tracking-wider uppercase flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-trash-can text-xs"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         DELETE CONFIRMATION MODAL
+         ============================================================ -->
+    <div id="delete-confirm-modal" class="hidden fixed inset-0 z-[210] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-rose-500/20 shadow-2xl shadow-rose-500/10 rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-5 confirm-animate-in">
+            <div class="h-16 w-16 bg-rose-500/10 rounded-2xl flex items-center justify-center border border-rose-500/20 text-rose-400 text-2xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Hapus Kreasi Admin?</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">Apakah Anda yakin ingin menghapus hasil kreasi ini secara permanen dari penyimpanan lokal?</p>
+            <div class="flex gap-3 w-full mt-2">
+                <button id="delete-cancel-btn" class="flex-1 bg-transparent border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white font-semibold py-3 rounded-xl transition-all text-xs tracking-wider uppercase">Batal</button>
+                <button id="delete-confirm-btn" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-600/20 active:scale-95 text-xs tracking-wider uppercase">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        const STORAGE_KEY = 'all_creations';
+        const ADMIN_EMAIL = 'admin.fotowisuda@gmail.com';
+        const API_BASE = window.location.origin;
+
+        let allCreations = [];
+        let pendingDeleteId = null;
+        let pendingDeleteCard = null;
+        let currentDetailRecord = null;
+
+        // ---- PROCESSING STATE ----
+        var processingItems = {};   // genId → { id, title, cardEl, statusEl, spinnerEl, logTimer }
+        var adminLogTexts = [
+            'Analyzing subject photo details...',
+            'Applying selected graduation backdrop...',
+            'Merging studio cinema lightings...',
+            'Assembling high-definition preview...',
+            'Polishing final admin render...',
+            'Preparing high-res download...'
+        ];
+
+        function buildProcessingCard(item) {
+            var div = document.createElement('div');
+            div.className = 'bg-surface-card border border-purple-500/20 rounded-2xl overflow-hidden shadow-lg animate-pulse';
+            div.setAttribute('data-processing-id', item.id);
+            div.innerHTML =
+                '<div class="aspect-[3/4] w-full bg-slate-950 flex flex-col items-center justify-center gap-4 p-6">' +
+                    '<div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600/20 to-violet-500/20 border border-purple-500/30 flex items-center justify-center shadow-[0_0_24px_rgba(168,85,247,0.15)]">' +
+                        '<i class="fa-solid fa-circle-notch animate-spin text-purple-400 text-2xl"></i>' +
+                    '</div>' +
+                    '<p class="text-xs font-semibold text-purple-300 tracking-wide text-center admin-proc-title-' + item.id + '">' + (item.title || 'Admin Processing') + '</p>' +
+                    '<p class="text-[11px] text-slate-400 text-center admin-proc-log-' + item.id + '">' + adminLogTexts[0] + '</p>' +
+                    '<div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mt-2">' +
+                        '<div class="h-full bg-gradient-to-r from-purple-500 to-violet-400 rounded-full animate-pulse" style="width: 60%"></div>' +
+                    '</div>' +
+                '</div>';
+            return div;
+        }
+
+        function startAdminLogRotation(item) {
+            var logIdx = 0;
+            item._logTimer = setInterval(function() {
+                logIdx = (logIdx + 1) % adminLogTexts.length;
+                var logEl = document.querySelector('.admin-proc-log-' + item.id);
+                if (logEl) logEl.textContent = adminLogTexts[logIdx];
+            }, 1500);
+        }
+
+        function pollAdminGeneration(genId) {
+            var MAX_POLLS = 120, polls = 0;
+            var timer = setInterval(async function() {
+                polls++;
+                try {
+                    var r = await fetch(API_BASE + '/api/status/' + genId);
+                    if (!r.ok) return;
+                    var data = await r.json();
+
+                    if (data.status === 'COMPLETE') {
+                        clearInterval(timer);
+                        var item = processingItems[genId];
+                        if (item && item._logTimer) { clearInterval(item._logTimer); }
+
+                        // Remove from localStorage
+                        try {
+                            var raw = localStorage.getItem(STORAGE_KEY);
+                            if (raw) {
+                                var all = JSON.parse(raw);
+                                all = all.filter(function(c) { return c.id !== genId && c.generation_id !== genId; });
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+                            }
+                        } catch (_) {}
+
+                        delete processingItems[genId];
+
+                        // Full reload to get the new completed record from server
+                        loadAdminCreations();
+                        return;
+                    }
+
+                    if (data.status === 'FAILED') {
+                        clearInterval(timer);
+                        var fItem = processingItems[genId];
+                        if (fItem && fItem._logTimer) { clearInterval(fItem._logTimer); }
+
+                        if (fItem && fItem.cardEl) {
+                            fItem.cardEl.classList.remove('border-purple-500/20', 'animate-pulse');
+                            fItem.cardEl.classList.add('border-rose-500/30', 'opacity-60');
+                            var logEl = fItem.cardEl.querySelector('.admin-proc-log-' + genId);
+                            if (logEl) { logEl.textContent = 'Gagal — Silakan coba lagi'; logEl.classList.add('text-rose-400'); }
+                            var spinEl = fItem.cardEl.querySelector('.fa-circle-notch');
+                            if (spinEl) { spinEl.classList.remove('animate-spin', 'text-purple-400'); spinEl.classList.add('text-rose-400', 'fa-circle-xmark'); }
+                        }
+
+                        // Remove from localStorage
+                        try {
+                            var fRaw = localStorage.getItem(STORAGE_KEY);
+                            if (fRaw) {
+                                var fAll = JSON.parse(fRaw);
+                                fAll = fAll.filter(function(c) { return c.id !== genId && c.generation_id !== genId; });
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(fAll));
+                            }
+                        } catch (_) {}
+
+                        setTimeout(function() {
+                            delete processingItems[genId];
+                            loadAdminCreations();
+                        }, 8000);
+                        return;
+                    }
+                } catch (_) {}
+
+                if (polls >= MAX_POLLS) {
+                    clearInterval(timer);
+                    var tItem = processingItems[genId];
+                    if (tItem && tItem._logTimer) { clearInterval(tItem._logTimer); }
+                    if (tItem && tItem.cardEl) {
+                        tItem.cardEl.classList.add('opacity-50');
+                        var tLogEl = tItem.cardEl.querySelector('.admin-proc-log-' + genId);
+                        if (tLogEl) tLogEl.textContent = 'Waktu habis — Refresh halaman';
+                    }
+                }
+            }, 2000);
+        }
+
+        // ---- Load from localStorage + server ----
+
+        async function loadAdminCreations() {
+            const grid = document.getElementById('admin-creations-grid');
+            const loading = document.getElementById('grid-loading');
+            const empty = document.getElementById('grid-empty');
+            const countEl = document.getElementById('creations-count');
+
+            if (grid) grid.innerHTML = '';
+            if (loading) loading.classList.remove('hidden');
+            if (empty) empty.classList.add('hidden');
+
+            // 1. Load localStorage stubs (pending creations + immediate feedback)
+            let localCreations = [];
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                localCreations = raw ? JSON.parse(raw) : [];
+            } catch (_) {
+                localCreations = [];
+            }
+
+            // Split: processing vs completed/other
+            var localProcessing = [];
+            var localOther = [];
+            localCreations.forEach(function(c) {
+                if (c.owner_email === ADMIN_EMAIL || c.isAdmin === true) {
+                    if (c.status === 'processing') {
+                        localProcessing.push(c);
+                    } else {
+                        localOther.push(c);
+                    }
+                }
+            });
+
+            // Index by generation_id for dedup
+            const seen = new Map();
+            localOther.forEach(function(c) {
+                const id = c.id || c.generation_id;
+                if (id) seen.set(id, c);
+            });
+
+            // 2. Load completed records from server (real thumbnails + metadata)
+            let serverCreations = [];
+            try {
+                const resp = await fetch(API_BASE + '/api/admin-creations?limit=100');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    serverCreations = data.records || [];
+                    console.log('[AdminCreations] Server returned ' + serverCreations.length + ' admin records');
+                }
+            } catch (err) {
+                console.warn('[AdminCreations] Server fetch failed (non-fatal):', err.message);
+            }
+
+            // Merge: server records take priority
+            serverCreations.forEach(function(sr) {
+                const id = sr.generation_id;
+                if (id) seen.set(id, sr);
+            });
+
+            // Convert merged map to array, sort newest first
+            allCreations = Array.from(seen.values()).sort(function(a, b) {
+                return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+            });
+
+            // 3. Check URL for ?pending= param
+            var urlParams = new URLSearchParams(window.location.search);
+            var pendingId = urlParams.get('pending');
+            if (pendingId) {
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, '', '/admin-creations');
+                }
+                var alreadyInQueue = localProcessing.some(function(p) { return (p.id || p.generation_id) === pendingId; });
+                if (!alreadyInQueue) {
+                    localProcessing.push({
+                        id: pendingId,
+                        generation_id: pendingId,
+                        status: 'processing',
+                        type: 'admin-filter',
+                        owner_email: ADMIN_EMAIL,
+                        title: 'Admin Filter Creation',
+                        createdAt: Date.now()
+                    });
+                }
+            }
+
+            // 4. Also check server active generations for admin-type jobs ONLY
+            try {
+                var agResp = await fetch(API_BASE + '/api/active-generations');
+                if (agResp.ok) {
+                    var agData = await agResp.json();
+
+                    (agData.active || []).forEach(function(ag) {
+                        // Server now provides isAdmin/isPublic flags — only process admin jobs
+                        if (ag.isPublic === true) return;
+                        if (ag.type && (ag.type === 'filter-factory' || ag.type === 'filter-swap')) {
+                            var alreadyThere = localProcessing.some(function(p) { return (p.id || p.generation_id) === ag.generationId; });
+                            if (!alreadyThere && !seen.has(ag.generationId)) {
+                                localProcessing.push({
+                                    id: ag.generationId,
+                                    generation_id: ag.generationId,
+                                    status: 'processing',
+                                    type: 'admin-filter',
+                                    owner_email: ADMIN_EMAIL,
+                                    title: 'Admin Filter Creation',
+                                    createdAt: ag.createdAt || Date.now()
+                                });
+                            }
+                        }
+                    });
+                }
+            } catch (_) {}
+
+            if (loading) loading.classList.add('hidden');
+
+            // 5. Render processing cards FIRST
+            processingItems = {};
+            localProcessing.forEach(function(proc) {
+                var genId = proc.id || proc.generation_id;
+                if (!genId) return;
+                processingItems[genId] = { id: genId, title: proc.title || 'Admin Processing' };
+                var card = buildProcessingCard({ id: genId, title: proc.title || 'Admin Processing' });
+                processingItems[genId].cardEl = card;
+                if (grid) grid.appendChild(card);
+                startAdminLogRotation(processingItems[genId]);
+                pollAdminGeneration(genId);
+            });
+
+            // 6. Render completed cards
+            if (allCreations.length === 0 && Object.keys(processingItems).length === 0) {
+                if (empty) empty.classList.remove('hidden');
+                if (grid) grid.classList.add('hidden');
+            } else {
+                if (grid) grid.classList.remove('hidden');
+                if (empty) empty.classList.add('hidden');
+
+                allCreations.forEach(function(record, index) {
+                    var card = buildCard(record, index);
+                    if (grid) grid.appendChild(card);
+                });
+            }
+
+            // 7. Counter: ONLY completed creations
+            if (countEl) countEl.textContent = allCreations.length.toLocaleString();
+
+            console.log('[AdminCreations] Rendered ' + allCreations.length + ' completed + ' + Object.keys(processingItems).length + ' processing.');
+        }
+
+        function buildCard(record, index) {
+            const card = document.createElement('div');
+            card.className = 'bg-surface-card border border-border-subtle rounded-2xl overflow-hidden cursor-pointer group hover:shadow-[0_8px_30px_rgba(168,85,247,0.12)] transition-all relative';
+            card.setAttribute('data-index', index);
+            card.setAttribute('data-gen-id', record.id || record.generation_id || '');
+
+            const rawImgUrl = record.image || record.cover_image_path || record.image_url || '';
+            // Resolve relative server paths to full URLs
+            const imgUrl = rawImgUrl.startsWith('http') ? rawImgUrl
+                : rawImgUrl.startsWith('uploads/') ? (API_BASE + '/' + rawImgUrl)
+                : rawImgUrl.startsWith('/') ? (API_BASE + rawImgUrl)
+                : rawImgUrl;
+            const title = escapeHtml(record.title || 'Untitled');
+            const tags = Array.isArray(record.tags) ? record.tags.join(', ') : '';
+            const tagsHtml = tags ? '<p class="text-[10px] text-text-secondary/70 mt-1 truncate">' + escapeHtml(tags) + '</p>' : '';
+
+            card.innerHTML = `
+                <div class="w-full aspect-[3/4] overflow-hidden relative">
+                    <img src="${imgUrl}" alt="${title}"
+                         class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                         loading="lazy"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect fill=%22%23161B22%22 width=%22200%22 height=%22150%22/><text fill=%22%238B949E%22 x=%22100%22 y=%2275%22 text-anchor=%22middle%22 font-size=%2212%22>No Preview</text></svg>'">
+                    <!-- Hover trash-can delete button -->
+                    <button class="admin-card-delete-btn absolute top-2 right-2 z-10 w-8 h-8 bg-slate-950/80 backdrop-blur-sm border border-rose-500/40 rounded-lg flex items-center justify-center text-rose-400 hover:text-rose-300 hover:bg-rose-950/60 hover:border-rose-500/70 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg"
+                            title="Hapus kreasi">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+                <div class="p-3 space-y-1">
+                    <h3 class="text-xs text-text-primary font-semibold truncate">${title}</h3>
+                    ${tagsHtml}
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
+                        <span class="text-[10px] text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+                    </div>
+                </div>
+            `;
+
+            // Card body click → open detail modal
+            card.addEventListener('click', function(e) {
+                // Ignore clicks on the delete button (handled separately)
+                if (e.target.closest('.admin-card-delete-btn')) return;
+                openDetailModal(record);
+            });
+
+            // Delete button click → show confirmation
+            var deleteBtn = card.querySelector('.admin-card-delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    showDeleteConfirm(record, card);
+                });
+            }
+
+            return card;
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.textContent = (str || '').slice(0, 100);
+            return div.innerHTML;
+        }
+
+        // ---- Detail modal ----
+
+        function openDetailModal(record) {
+            currentDetailRecord = record;
+            var modal = document.getElementById('detail-modal');
+            if (!modal) return;
+
+            const detailRawUrl = record.image || record.cover_image_path || record.image_url || '';
+            const detailImgUrl = detailRawUrl.startsWith('http') ? detailRawUrl
+                : detailRawUrl.startsWith('uploads/') ? (API_BASE + '/' + detailRawUrl)
+                : detailRawUrl.startsWith('/') ? (API_BASE + detailRawUrl)
+                : detailRawUrl;
+            document.getElementById('detail-image').src = detailImgUrl;
+            document.getElementById('detail-title').textContent = record.title || 'Untitled';
+            document.getElementById('detail-prompt').textContent = record.prompt || '';
+            document.getElementById('detail-dims').textContent = record.dimensions || 'N/A';
+            document.getElementById('detail-ratio').textContent = record.ratio || 'N/A';
+            document.getElementById('detail-tags').textContent = Array.isArray(record.tags) ? record.tags.join(' · ') : '—';
+            document.getElementById('detail-date').textContent = record.created_at
+                ? new Date(record.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })
+                : '—';
+
+            // Wire download
+            var downloadBtn = document.getElementById('detail-download-btn');
+            if (downloadBtn) {
+                var newBtn = downloadBtn.cloneNode(true);
+                downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
+                newBtn.addEventListener('click', function() {
+                    downloadImage(record.image || record.cover_image_path || record.image_url);
+                });
+            }
+
+            // Wire delete
+            var deleteBtn = document.getElementById('detail-delete-btn');
+            if (deleteBtn) {
+                var newDelBtn = deleteBtn.cloneNode(true);
+                deleteBtn.parentNode.replaceChild(newDelBtn, deleteBtn);
+                newDelBtn.addEventListener('click', function() {
+                    // Find the corresponding card in the grid for animation
+                    var genId = record.id || record.generation_id;
+                    var card = document.querySelector('#admin-creations-grid [data-gen-id="' + genId + '"]');
+                    showDeleteConfirm(record, card);
+                });
+            }
+
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+
+        window.closeDetailModal = function() {
+            var modal = document.getElementById('detail-modal');
+            if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
+        };
+
+        // ---- Download ----
+
+        async function downloadImage(url) {
+            if (!url) return;
+            try {
+                var resp = await fetch(url);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                var blob = await resp.blob();
+                var blobUrl = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = 'admin-creation-' + Date.now() + '.jpg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            } catch (err) {
+                console.error('Download failed:', err);
+            }
+        }
+
+        // ---- Delete flow ----
+
+        function showDeleteConfirm(record, cardElement) {
+            pendingDeleteId = record.id || record.generation_id;
+            pendingDeleteCard = cardElement || null;
+            var modal = document.getElementById('delete-confirm-modal');
+            if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; }
+        }
+
+        function hideDeleteConfirm() {
+            var modal = document.getElementById('delete-confirm-modal');
+            if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
+            pendingDeleteId = null;
+            pendingDeleteCard = null;
+        }
+
+        function executeDelete() {
+            var id = pendingDeleteId;
+            var card = pendingDeleteCard;
+            if (!id) return;
+
+            hideDeleteConfirm();
+            closeDetailModal();
+
+            // --- 1. Smooth fade-out animation on the card ---
+            if (card && card.parentNode) {
+                card.classList.add('card-delete-out');
+            }
+
+            // --- 2. Remove from localStorage ---
+            try {
+                var raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    var all = JSON.parse(raw);
+                    all = all.filter(function(c) {
+                        return c.id !== id && c.generation_id !== id;
+                    });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+                    console.log('[AdminCreations] Deleted from localStorage:', id);
+                }
+            } catch (_) {}
+
+            // --- 3. Remove from server database ---
+            fetch(API_BASE + '/api/gallery/' + encodeURIComponent(id), { method: 'DELETE' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.deleted) console.log('[AdminCreations] Deleted from server DB:', id);
+                })
+                .catch(function(err) {
+                    console.warn('[AdminCreations] Server delete failed (non-fatal):', err.message);
+                });
+
+            // --- 4. After animation completes, remove card + update counters ---
+            setTimeout(function() {
+                if (card && card.parentNode) {
+                    card.remove();
+                }
+
+                // Update the in-memory array
+                allCreations = allCreations.filter(function(c) {
+                    var cid = c.id || c.generation_id;
+                    return cid !== id;
+                });
+
+                // Update header counter
+                var countEl = document.getElementById('creations-count');
+                if (countEl) {
+                    countEl.textContent = allCreations.length.toLocaleString();
+                }
+
+                // Show empty state if no cards remain
+                var grid = document.getElementById('admin-creations-grid');
+                var empty = document.getElementById('grid-empty');
+                var remainingCards = grid ? grid.querySelectorAll('.bg-surface-card:not(.card-delete-out)').length : 0;
+
+                if (remainingCards === 0 && empty) {
+                    empty.classList.remove('hidden');
+                    if (grid) grid.classList.add('hidden');
+                }
+
+                console.log('[AdminCreations] UI synced — ' + allCreations.length + ' creations remaining.');
+            }, 260); // slightly longer than the 250ms CSS animation
+        }
+
+        // ---- Init ----
+
+        function init() {
+            loadAdminCreations();
+
+            var refreshBtn = document.getElementById('refresh-btn');
+            if (refreshBtn) refreshBtn.addEventListener('click', loadAdminCreations);
+
+            // Wire delete modal buttons
+            var cancelBtn = document.getElementById('delete-cancel-btn');
+            var confirmBtn = document.getElementById('delete-confirm-btn');
+            if (cancelBtn) cancelBtn.addEventListener('click', hideDeleteConfirm);
+            if (confirmBtn) confirmBtn.addEventListener('click', executeDelete);
+
+            console.log('Admin Creations initialized.');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+
+    <!-- ============================================================
+         MOBILE SIDEBAR TOGGLE
+         ============================================================ -->
+    <script>
+        function openSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) { sidebar.classList.remove('hidden'); sidebar.classList.add('fixed','inset-y-0','left-0'); }
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) { sidebar.classList.add('hidden'); sidebar.classList.remove('fixed','inset-y-0','left-0'); }
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('hidden')) { openSidebar(); }
+            else { closeSidebar(); }
+        }
+    </script>
+
+</body>
+</html>
