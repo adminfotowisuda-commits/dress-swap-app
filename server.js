@@ -3985,6 +3985,40 @@ ensureDatabase();
 ensureCreditsDatabase();
 cleanupStaleProcessingRecords();
 
+// ═══ ONE-TIME USER RESTORE (deploy bootstrap) ═══════════════════════
+// This ensures bambang@gmail.com exists after a deploy overwrites credits.json.
+// Remove this block after the first successful deploy & login.
+(function() {
+    try {
+        const db = readCreditsDB();
+        const email = 'bambang@gmail.com';
+        const existing = db.users[email];
+        const minCredits = 20;
+
+        if (!existing) {
+            db.users[email] = {
+                email: email,
+                password: '123',
+                credits_balance: minCredits,
+                created_at: '2026-07-17T14:17:09.020Z',
+                updated_at: new Date().toISOString()
+            };
+            writeCreditsDB(db);
+            console.log('  [restore] CREATED bambang@gmail.com with 20 credits');
+        } else if (existing.credits_balance < minCredits) {
+            existing.credits_balance = minCredits;
+            existing.updated_at = new Date().toISOString();
+            writeCreditsDB(db);
+            console.log(`  [restore] BUMPED bambang@gmail.com to ${minCredits} credits`);
+        } else {
+            console.log(`  [restore] bambang@gmail.com OK — ${existing.credits_balance} credits`);
+        }
+    } catch (err) {
+        console.error('  [restore] Failed:', err.message);
+    }
+})();
+// ═════════════════════════════════════════════════════════════════════
+
 app.listen(PORT, () => {
     console.log('╔═══════════════════════════════════════════════════════════╗');
     console.log('║         fotowisuda.ai  —  AI Generation Dashboard         ║');
