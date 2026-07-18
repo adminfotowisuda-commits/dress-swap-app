@@ -72,7 +72,7 @@ const DOKU_MERCHANT_PRIVATE_KEY_PATH = process.env.DOKU_MERCHANT_PRIVATE_KEY_PAT
 const DOKU_PUBLIC_KEY_PATH      = process.env.DOKU_PUBLIC_KEY_PATH || './keys/doku-public.pem';
 const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api.doku.com';
 const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authorization/v1/access-token/b2b';
-const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/v1.0/transfer-va/create-va';
+const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
 
 // Credit cost mapping — per-generation pricing (trial phase)
 const CREDIT_COSTS = {
@@ -652,11 +652,11 @@ async function createDokuPaymentLink(accessToken, orderData) {
     // Build request body based on API type
     const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
 
-    // Auto-select endpoint: SNAP BI Direct always uses /v1.0/transfer-va/create-va.
+    // Auto-select endpoint: SNAP BI Direct uses the dedicated VA endpoint.
     // DOKU Checkout uses the env var (defaults to /checkout/v1/payment).
     const endpointPath = apiType === 'checkout'
         ? DOKU_CREATE_VA_PATH
-        : '/v1.0/transfer-va/create-va';
+        : '/doku-virtual-account/v2/payment-code';
 
     const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00');
     const requestId = 'REQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
