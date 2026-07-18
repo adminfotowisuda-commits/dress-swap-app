@@ -3920,6 +3920,15 @@ app.listen(PORT, () => {
     console.log('║    DELETE /api/gallery/:id  Delete a generation            ║');
     console.log('║    DELETE /api/user-creations/:filename  Delete user image  ║');
     console.log('╚═══════════════════════════════════════════════════════════╝');
+    console.log('');
+    console.log('╔═══════════════════════════════════════════════════════════╗');
+    console.log('║                                                           ║');
+    console.log('║  🔔 COPY THIS WEBHOOK URL TO DOKU DASHBOARD:               ║');
+    console.log('║                                                           ║');
+    console.log('║  https://fotowisuda.ai/api/payments/doku-callback          ║');
+    console.log('║                                                           ║');
+    console.log('╚═══════════════════════════════════════════════════════════╝');
+    console.log('');
     console.log(`  API key configured : ${LEONARDO_API_KEY ? '✓ Yes' : '✗ No  (create .env from .env.example)'}`);
     console.log(`  Gemini key configured: ${GEMINI_API_KEY ? '✓ Yes' : '✗ No  (required for Background Change)'}`);
 
