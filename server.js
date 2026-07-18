@@ -727,7 +727,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
         // ═══ SNAP BI Direct: HMAC-SHA256 ═══
         // requestBody is the exact JSON.stringify output sent to DOKU — same string
         // is used for bodyHash and for the fetch body, guaranteeing no mismatch.
-        const bodyHash = crypto.createHash('sha256').update(requestBody).digest('hex').toLowerCase();
+        const bodyHash = crypto.createHash('sha256').update(requestBody).digest('base64');
         const cleanToken = accessToken.replace(/^Bearer\s+/i, '');
         const snapStringToSign = [
             'POST',
