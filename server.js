@@ -473,18 +473,21 @@ function getCreditPackages() {
 }
 
 function ensureCreditsDatabase() {
+    const defaultPackages = [
+        { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
+        { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
+        { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+    ];
+
     if (!fs.existsSync(CREDITS_DB_PATH)) {
-        const initial = {
-            users: {},
-            transactions: [],
-            packages: [
-                { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
-                { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
-                { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
-            ]
-        };
-        writeCreditsDB(initial);
-        console.log('  [init] Created empty credits.json');
+        writeCreditsDB({ users: {}, transactions: [], packages: defaultPackages });
+        console.log('  [init] Created credits.json with packages:', defaultPackages.map(p => p.package_id).join(', '));
+    } else {
+        // Always sync packages to latest pricing on server restart
+        const db = readCreditsDB();
+        db.packages = defaultPackages;
+        writeCreditsDB(db);
+        console.log('  [init] Synced credits.json packages to:', defaultPackages.map(p => p.package_id).join(', '));
     }
 }
 
