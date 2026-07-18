@@ -625,6 +625,13 @@
                 // Store payment state
                 _paymentState.invoiceNumber = data.invoice_number;
                 _paymentState.vaNumber = data.va_number;
+
+                // If DOKU returned a redirect payment URL, open it directly — no invoice modal needed
+                if (data.payment_url) {
+                    window.open(data.payment_url, '_blank');
+                    if (statusEl) { statusEl.classList.add('hidden'); }
+                    return;
+                }
                 _paymentState.packageId = packageId;
                 _paymentState.creditsGiven = data.credits_given;
                 _paymentState.expiresAt = new Date(data.expires_at).getTime();
