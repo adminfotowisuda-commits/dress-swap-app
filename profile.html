@@ -233,7 +233,9 @@ async function handleLogin(e) {
         }
 
         if (!data.success) {
-            showError(data.error || 'Login gagal. Periksa email dan password Anda.');
+            var errMsg = data.error || 'Login gagal. Periksa email dan password Anda.';
+            showError(errMsg);
+            alert('❌ Gagal masuk: ' + errMsg);
             btn.disabled = false;
             btn.textContent = 'Masuk';
             clearTimeout(window._loginSafetyTimer);
@@ -241,6 +243,7 @@ async function handleLogin(e) {
         }
 
         clearTimeout(window._loginSafetyTimer);
+        alert('✅ Login Berhasil! Selamat datang, ' + (data.email || email));
         setEmail(email);
 
         // Update sidebar dynamically
@@ -254,15 +257,11 @@ async function handleLogin(e) {
     } catch(err) {
         clearTimeout(window._loginSafetyTimer);
         console.error('[LOGIN] Catch block —', err.message);
-        showError('Gagal terhubung ke server. (' + err.message + ')');
+        var netErrMsg = 'Kesalahan jaringan: ' + err.message;
+        showError(netErrMsg);
+        alert('❌ ' + netErrMsg + '\n\nSilakan muat ulang halaman dan coba lagi.');
         btn.disabled = false;
         btn.textContent = 'Masuk';
-
-        // Fallback: if the inline error element is somehow unreachable,
-        // show an alert so the user is never left wondering.
-        if (errorEl.style.display === 'none' || !errorEl.textContent) {
-            alert('❌ Gagal login: ' + err.message + '\n\nSilakan muat ulang halaman dan coba lagi.');
-        }
     }
 }
 
@@ -383,33 +382,6 @@ async function openTransactionHistory() {
 
 function closeTransactionHistory() {
     document.getElementById('txn-history-modal').classList.add('hidden');
-}
-
-    var email = getEmail();
-    if (!email) { showLoginState(); return; }
-
-    showProfileState();
-
-    var namePart = email.split('@')[0];
-    var initials = namePart.substring(0, 2).toUpperCase();
-    document.getElementById('profile-avatar').textContent = initials;
-    document.getElementById('profile-email').textContent = email;
-
-    try {
-        var resp = await fetch(API_BASE + '/api/credits/balance?email=' + encodeURIComponent(email));
-        var data = await resp.json();
-        document.getElementById('profile-credits').textContent = 'Sisa Kredit: ' + (data.credits_balance || 0) + ' Credits';
-        if (data.created_at) {
-            var d = new Date(data.created_at);
-            var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-            document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-        } else {
-            document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
-        }
-    } catch(err) {
-        document.getElementById('profile-credits').textContent = 'Sisa Kredit: — Credits';
-        document.getElementById('profile-created').textContent = 'Akun dibuat pada: —';
-    }
 }
 
 function doLogout() {
