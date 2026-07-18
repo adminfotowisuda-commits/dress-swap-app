@@ -41,7 +41,7 @@
                 <h2 style="font-size:22px;font-weight:800;">Masuk Sesi</h2>
                 <p style="font-size:12px;color:#8B949E;max-width:260px;text-align:center;line-height:1.5;">Masuk dengan email dan password Anda untuk mengakses profil, kredit, dan kreasi.</p>
             </div>
-            <form onsubmit="handleLogin(event)" style="display:flex;flex-direction:column;gap:12px;">
+            <form id="login-form" style="display:flex;flex-direction:column;gap:12px;">
                 <div>
                     <label style="font-size:11px;font-weight:600;color:#8B949E;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">Email</label>
                     <input id="login-email-input" type="email" required placeholder="budi@gmail.com" style="width:100%;background:#0c0e12;border:1px solid #30363D;border-radius:12px;padding:12px 16px;color:#F0F6FC;font-size:14px;box-sizing:border-box;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#00D1FF'" onblur="this.style.borderColor='#30363D'">
@@ -166,6 +166,13 @@
 </div>
 
 <script>
+// ═══ GLOBAL ERROR CATCHER — ensure nothing is ever silent ═══
+window.onerror = function(msg, url, line) {
+    alert('⚠️ JS Error: ' + msg + ' (line ' + line + ')');
+    console.error('GLOBAL ERROR:', msg, url, line);
+};
+console.log('[profile] Script loaded — ' + new Date().toISOString());
+
 var API_BASE = window.location.origin;
 
 function getEmail() { try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; } }
@@ -183,7 +190,9 @@ function showProfileState() {
 }
 
 async function handleLogin(e) {
+    console.log('[profile] handleLogin CALLED — ' + new Date().toISOString());
     e.preventDefault();
+    e.stopPropagation();  // belt-and-suspenders: prevent any parent handler
 
     // ── Safety net: if anything throws before we can show an inline
     //    error, the user still sees an alert so it's never silent.
@@ -473,6 +482,18 @@ async function confirmDeleteAccount() {
 var style = document.createElement('style');
 style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
+
+// ═══ BOOT: bind login form programmatically (more reliable than inline onsubmit) ═══
+(function boot() {
+    console.log('[profile] BOOT — binding login form...');
+    var form = document.getElementById('login-form');
+    if (form) {
+        form.addEventListener('submit', handleLogin);
+        console.log('[profile] Login form bound via addEventListener');
+    } else {
+        console.error('[profile] FATAL — #login-form not found in DOM');
+    }
+})();
 </script>
 </body>
 </html>
