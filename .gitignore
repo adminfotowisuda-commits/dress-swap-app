@@ -17,6 +17,9 @@ public/uploads/references/*
 # Local generation ledger
 database.json
 
+# User accounts, credits, and transactions (runtime data — NEVER commit)
+credits.json
+
 # IDE
 .vscode/
 .idea/
