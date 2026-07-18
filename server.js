@@ -521,8 +521,9 @@ function loadDokuPublicKey() {
 
 /**
  * Create a DOKU SNAP BI signature.
- * - algorithm = 'rsa' → SHA256withRSA using Merchant Private Key
- * - algorithm = 'hmac' → HMAC-SHA512 using Active Secret Key
+ * - algorithm = 'rsa'  → SHA256withRSA using Merchant Private Key
+ * - algorithm = 'hmac' → HMAC-SHA512 using Active Secret Key (SNAP BI Direct)
+ * - algorithm = 'hmac-sha256' → HMAC-SHA256 using Active Secret Key (DOKU Checkout)
  */
 function createDokuSignature(stringToSign, algorithm) {
     if (algorithm === 'rsa') {
@@ -535,6 +536,11 @@ function createDokuSignature(stringToSign, algorithm) {
     }
     if (algorithm === 'hmac') {
         const hmac = crypto.createHmac('sha512', DOKU_ACTIVE_SECRET_KEY);
+        hmac.update(stringToSign);
+        return hmac.digest('base64');
+    }
+    if (algorithm === 'hmac-sha256') {
+        const hmac = crypto.createHmac('sha256', DOKU_ACTIVE_SECRET_KEY);
         hmac.update(stringToSign);
         return hmac.digest('base64');
     }
@@ -655,9 +661,9 @@ async function createDokuPaymentLink(accessToken, orderData) {
     // Build signature and headers based on API type
     let headers, stringToSign;
     if (apiType === 'checkout') {
-        // DOKU Checkout: Client-Id | Request-Id | Request-Timestamp | SHA256(body)
+        // DOKU Checkout: HMAC-SHA256(Client-Id | Request-Id | Request-Timestamp | SHA256(body))
         stringToSign = DOKU_CLIENT_ID + '|' + requestId + '|' + timestamp + '|' + bodyHash;
-        const signature = createDokuSignature(stringToSign, 'hmac');
+        const signature = createDokuSignature(stringToSign, 'hmac-sha256');
         headers = {
             'Content-Type': 'application/json',
             'Client-Id': DOKU_CLIENT_ID,
@@ -695,9 +701,10 @@ async function createDokuPaymentLink(accessToken, orderData) {
     const data = await resp.json();
     console.log(`  [doku] Payment link response: ${JSON.stringify(data)}`);
 
-    // DOKU Checkout nests the URL: response.payment.url
-    // DOKU Direct / older APIs may use flat fields: paymentUrl, redirectUrl
+    // DOKU Checkout may nest the URL at different paths depending on API version:
+    //   response.payment.url, payment.url, or flat paymentUrl / redirectUrl
     const paymentUrl = data.response?.payment?.url
+                    || data.payment?.url
                     || data.paymentUrl
                     || data.redirectUrl
                     || null;
