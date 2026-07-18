@@ -751,6 +751,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'Request-Id': requestId,
             'Request-Timestamp': timestamp,
             'X-TIMESTAMP': timestamp,
+            'Signature': signature,
             'X-SIGNATURE': signature,
             'X-PARTNER-ID': DOKU_CLIENT_ID,
             'CHANNEL-ID': '95221'
