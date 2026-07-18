@@ -3433,29 +3433,52 @@ app.delete('/api/user/delete-account', (req, res) => {
  */
 app.post('/api/auth/login', (req, res) => {
     try {
+        console.log('[LOGIN] ======== INCOMING LOGIN REQUEST ========');
+        console.log('[LOGIN] Body:', JSON.stringify(req.body));
+        console.log('[LOGIN] Content-Type:', req.headers['content-type']);
+
         const { email, password } = req.body;
         if (!email || !password) {
+            console.log('[LOGIN] FAIL — missing email or password');
             return res.status(400).json({ success: false, error: 'Email dan password wajib diisi.' });
         }
         if (password.length < 3) {
+            console.log('[LOGIN] FAIL — password too short');
             return res.status(400).json({ success: false, error: 'Password minimal 3 karakter.' });
         }
 
         const key = email.trim().toLowerCase();
-        const db = readCreditsDB();
+        console.log('[LOGIN] Looking up user:', key);
+
+        let db;
+        try {
+            db = readCreditsDB();
+            console.log('[LOGIN] credits.json loaded — users:', Object.keys(db.users || {}).length, '| transactions:', (db.transactions || []).length);
+        } catch (readErr) {
+            console.error('[LOGIN] CRITICAL — cannot read credits.json:', readErr.message);
+            return res.status(500).json({ success: false, error: 'Database error. Please try again later.' });
+        }
 
         if (db.users[key]) {
             // Existing user — verify password
-            if (db.users[key].password && db.users[key].password !== password) {
+            const storedPassword = db.users[key].password;
+            console.log('[LOGIN] User EXISTS — stored password:', storedPassword ? `"${storedPassword}"` : 'NOT SET');
+            console.log('[LOGIN] Provided password:', `"${password}"`);
+            console.log('[LOGIN] Password match:', storedPassword === password);
+
+            if (storedPassword && storedPassword !== password) {
+                console.log('[LOGIN] FAIL — wrong password for', key);
                 return res.status(401).json({ success: false, error: 'Password salah.' });
             }
             // Set password if not yet set (legacy user)
-            if (!db.users[key].password) {
+            if (!storedPassword) {
                 db.users[key].password = password;
                 writeCreditsDB(db);
+                console.log('[LOGIN] PASSWORD SET for legacy user:', key);
             }
         } else {
             // New user — create account
+            console.log('[LOGIN] User NOT FOUND — creating new account for:', key);
             db.users[key] = {
                 email: key,
                 password: password,
@@ -3463,20 +3486,50 @@ app.post('/api/auth/login', (req, res) => {
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
-            writeCreditsDB(db);
-            console.log(`  [auth] New user registered: ${key}`);
+            try {
+                writeCreditsDB(db);
+                console.log('[LOGIN] New user written to credits.json:', key);
+            } catch (writeErr) {
+                console.error('[LOGIN] CRITICAL — cannot write credits.json:', writeErr.message);
+                return res.status(500).json({ success: false, error: 'Gagal menyimpan data. Silakan coba lagi.' });
+            }
         }
 
-        console.log(`  [auth] Login success: ${key}`);
-        res.json({
+        const responsePayload = {
             success: true,
             email: key,
             credits_balance: db.users[key].credits_balance || 0,
             created_at: db.users[key].created_at || new Date().toISOString()
+        };
+        console.log('[LOGIN] SUCCESS — responding with:', JSON.stringify(responsePayload));
+        res.json(responsePayload);
+    } catch (err) {
+        console.error('[LOGIN] UNCAUGHT ERROR:', err.message, err.stack);
+        res.status(500).json({ success: false, error: 'Gagal memproses login.' });
+    }
+});
+
+/**
+ * GET /api/health
+ * Debug endpoint — verifies the server can read/write credits.json.
+ * Returns user count, package count, and whether bambang@gmail.com exists.
+ */
+app.get('/api/health', (_req, res) => {
+    try {
+        const db = readCreditsDB();
+        const bambang = db.users['bambang@gmail.com'];
+        res.json({
+            status: 'ok',
+            users_count: Object.keys(db.users || {}).length,
+            transactions_count: (db.transactions || []).length,
+            packages_count: (db.packages || []).length,
+            bambang_exists: !!bambang,
+            bambang_credits: bambang ? bambang.credits_balance : null,
+            bambang_has_password: bambang ? !!bambang.password : null,
+            user_emails: Object.keys(db.users || {})
         });
     } catch (err) {
-        console.error('[/api/auth/login] Error:', err);
-        res.status(500).json({ success: false, error: 'Gagal memproses login.' });
+        res.status(500).json({ status: 'error', error: err.message });
     }
 });
 
