@@ -678,16 +678,20 @@ async function createDokuPaymentLink(accessToken, orderData) {
             }
         });
     } else {
-        // SNAP BI Direct API — Virtual Account
+        // DOKU Legacy Core API — flat amount + customer + virtual_account_info
+        const customerName = (email.split('@')[0] || 'customer').replace(/[^a-zA-Z0-9 ]/g, ' ').trim() || 'Customer';
         requestBody = JSON.stringify({
             order: {
                 invoice_number: invoice_number,
-                amount: { value: amount.toFixed(2), currency: 'IDR' }
+                amount: Math.round(Number(amount))
             },
-            virtual_account: {
-                name: email.split('@')[0],
-                email: email,
-                trx_id: invoice_number
+            customer: {
+                name: customerName,
+                email: email
+            },
+            virtual_account_info: {
+                info1: customerName,
+                info2: email
             },
             additional_info: { package_id: package_id }
         });
