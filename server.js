@@ -499,24 +499,37 @@ function loadDokuPrivateKey() {
     try {
         // Support inline PEM key in .env (starts with -----BEGIN)
         if (DOKU_MERCHANT_PRIVATE_KEY_PATH && DOKU_MERCHANT_PRIVATE_KEY_PATH.startsWith('-----BEGIN')) {
-            return DOKU_MERCHANT_PRIVATE_KEY_PATH;
+            return DOKU_MERCHANT_PRIVATE_KEY_PATH.trim();
         }
         // Primary: keys/merchant-private.pem relative to app root
         const primaryPath = path.join(__dirname, 'keys', 'merchant-private.pem');
+        console.log(`  [doku] Looking for private key at: ${primaryPath}`);
         if (fs.existsSync(primaryPath)) {
-            return fs.readFileSync(primaryPath, 'utf8');
+            const key = fs.readFileSync(primaryPath, 'utf8').trim();
+            console.log(`  [doku] Private key loaded from ${primaryPath} (${key.length} chars)`);
+            return key;
         }
         // Fallback: configured path or ./private.key
         const keyPath = path.resolve(DOKU_MERCHANT_PRIVATE_KEY_PATH);
+        console.log(`  [doku] Looking for private key at: ${keyPath}`);
         if (fs.existsSync(keyPath)) {
-            return fs.readFileSync(keyPath, 'utf8');
+            const key = fs.readFileSync(keyPath, 'utf8').trim();
+            console.log(`  [doku] Private key loaded from ${keyPath} (${key.length} chars)`);
+            return key;
         }
         const altPrivateKey = path.join(__dirname, 'private.key');
+        console.log(`  [doku] Looking for private key at: ${altPrivateKey}`);
         if (fs.existsSync(altPrivateKey)) {
-            return fs.readFileSync(altPrivateKey, 'utf8');
+            const key = fs.readFileSync(altPrivateKey, 'utf8').trim();
+            console.log(`  [doku] Private key loaded from ${altPrivateKey} (${key.length} chars)`);
+            return key;
         }
+        console.error('  [doku] No private key file found! Checked paths:', primaryPath, keyPath, altPrivateKey);
         return null;
-    } catch (_) { return null; }
+    } catch (err) {
+        console.error('  [doku] Failed to load private key:', err.message);
+        return null;
+    }
 }
 
 function loadDokuPublicKey() {
@@ -600,6 +613,10 @@ async function requestDokuB2BToken() {
     const signature = createDokuSignature(stringToSign, 'rsa');
 
     console.log(`  [doku] Requesting B2B token…`);
+    console.log(`  [doku] B2B URL: ${DOKU_BASE_URL}${DOKU_B2B_TOKEN_PATH}`);
+    console.log(`  [doku] B2B stringToSign: "${stringToSign}"`);
+    console.log(`  [doku] B2B signature (first 40 chars): ${signature ? signature.slice(0, 40) : 'NULL'}`);
+    console.log(`  [doku] B2B headers — X-CLIENT-KEY: ${DOKU_CLIENT_ID}, X-TIMESTAMP: ${timestamp}`);
 
     const resp = await fetch(`${DOKU_BASE_URL}${DOKU_B2B_TOKEN_PATH}`, {
         method: 'POST',
