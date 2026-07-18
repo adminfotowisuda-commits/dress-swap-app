@@ -81,8 +81,12 @@
                 </div>
             </div>
 
-            <!-- Logout + Delete -->
+            <!-- Riwayat Pembelian + Logout/Delete -->
             <div style="display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid #30363D;">
+                <!-- Riwayat Pembelian Button -->
+                <button onclick="openTransactionHistory()" style="width:100%;padding:12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);color:#fbbf24;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Pembelian
+                </button>
                 <button onclick="doLogout()" style="width:100%;padding:12px;background:rgba(0,209,255,0.06);border:1px solid rgba(0,209,255,0.15);color:#00D1FF;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
                     <i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi
                 </button>
@@ -109,6 +113,54 @@
             <button id="delete-ok-btn" onclick="confirmDeleteAccount()" style="padding:10px 20px;background:#b91c1c;border:none;color:#fff;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#b91c1c'">
                 <i class="fa-solid fa-trash-can text-xs"></i> OK
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TRANSACTION HISTORY MODAL ═══ -->
+<div id="txn-history-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);">
+    <div style="background:#161B22;border:1px solid #30363D;border-radius:20px;padding:28px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;animation:fadeIn 0.3s ease-out;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <h3 style="font-size:18px;font-weight:700;color:#fff;margin:0;display:flex;align-items:center;gap:10px;">
+                <i class="fa-solid fa-clock-rotate-left" style="color:#fbbf24;"></i> Riwayat Pembelian
+            </h3>
+            <button onclick="closeTransactionHistory()" style="background:none;border:none;color:#8B949E;cursor:pointer;font-size:20px;padding:4px 8px;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.color='#F0F6FC';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.color='#8B949E';this.style.background='none'">&times;</button>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="txn-loading" style="text-align:center;padding:32px 0;">
+            <div style="width:32px;height:32px;border:3px solid rgba(251,191,36,0.2);border-top-color:#fbbf24;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px;"></div>
+            <p style="font-size:13px;color:#8B949E;">Memuat riwayat pembelian...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div id="txn-empty" style="display:none;text-align:center;padding:32px 0;">
+            <div style="font-size:48px;margin-bottom:12px;">📭</div>
+            <p style="font-size:14px;font-weight:600;color:#8B949E;">Belum ada riwayat pembelian</p>
+            <p style="font-size:12px;color:#8B949E;margin-top:4px;">Kredit yang Anda beli akan muncul di sini.</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="txn-error" style="display:none;text-align:center;padding:32px 0;">
+            <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+            <p id="txn-error-msg" style="font-size:14px;color:#ffb4ab;">Gagal memuat data.</p>
+            <button onclick="openTransactionHistory()" style="margin-top:12px;padding:8px 20px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);color:#fbbf24;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Coba Lagi</button>
+        </div>
+
+        <!-- Table -->
+        <div id="txn-table-container" style="display:none;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                    <tr style="border-bottom:2px solid #30363D;text-align:left;">
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;">Tanggal</th>
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;">No. Invoice</th>
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;">Paket</th>
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;text-align:right;">Kredit</th>
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;text-align:center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="txn-table-body"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -177,6 +229,108 @@ function showError(msg) {
 }
 
 async function loadProfile() {
+    var email = getEmail();
+    if (!email) { showLoginState(); return; }
+
+    showProfileState();
+
+    var namePart = email.split('@')[0];
+    var initials = namePart.substring(0, 2).toUpperCase();
+    document.getElementById('profile-avatar').textContent = initials;
+    document.getElementById('profile-email').textContent = email;
+
+    try {
+        var resp = await fetch(API_BASE + '/api/credits/balance?email=' + encodeURIComponent(email));
+        var data = await resp.json();
+        document.getElementById('profile-credits').textContent = 'Sisa Kredit: ' + (data.credits_balance || 0) + ' Credits';
+        if (data.created_at) {
+            var d = new Date(data.created_at);
+            var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+        } else {
+            document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+        }
+    } catch(err) {
+        document.getElementById('profile-credits').textContent = 'Sisa Kredit: — Credits';
+        document.getElementById('profile-created').textContent = 'Akun dibuat pada: —';
+    }
+}
+
+async function openTransactionHistory() {
+    var email = getEmail();
+    if (!email) return;
+
+    var modal = document.getElementById('txn-history-modal');
+    var loading = document.getElementById('txn-loading');
+    var empty = document.getElementById('txn-empty');
+    var error = document.getElementById('txn-error');
+    var table = document.getElementById('txn-table-container');
+    var tbody = document.getElementById('txn-table-body');
+
+    // Reset state
+    modal.classList.remove('hidden');
+    loading.style.display = 'block';
+    empty.style.display = 'none';
+    error.style.display = 'none';
+    table.style.display = 'none';
+    tbody.innerHTML = '';
+
+    try {
+        var resp = await fetch(API_BASE + '/api/user/transactions?email=' + encodeURIComponent(email));
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+        var txns = await resp.json();
+        loading.style.display = 'none';
+
+        if (!txns || txns.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+
+        // Build table rows
+        var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        var rows = '';
+        for (var i = 0; i < txns.length; i++) {
+            var t = txns[i];
+            var d = t.date ? new Date(t.date) : null;
+            var dateStr = d ? d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() : '—';
+            var timeStr = d ? ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) : '';
+
+            var statusBadge = '';
+            if (t.status === 'success') {
+                statusBadge = '<span style="background:rgba(34,197,94,0.12);color:#22c55e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Berhasil</span>';
+            } else if (t.status === 'pending') {
+                statusBadge = '<span style="background:rgba(251,191,36,0.12);color:#fbbf24;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Pending</span>';
+            } else if (t.status === 'refund') {
+                statusBadge = '<span style="background:rgba(0,209,255,0.12);color:#00D1FF;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Refund</span>';
+            } else {
+                statusBadge = '<span style="background:rgba(255,180,171,0.12);color:#ffb4ab;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">' + (t.status || '?') + '</span>';
+            }
+
+            var packageLabel = t.package_name || '—';
+            var creditStr = '+' + t.credits;
+
+            rows += '<tr style="border-bottom:1px solid #21262D;">' +
+                '<td style="padding:10px 8px;color:#F0F6FC;white-space:nowrap;">' + dateStr + '<br><span style="font-size:10px;color:#8B949E;">' + timeStr + '</span></td>' +
+                '<td style="padding:10px 8px;color:#8B949E;font-family:monospace;font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (t.invoice_number || '') + '">' + (t.invoice_number || '—') + '</td>' +
+                '<td style="padding:10px 8px;color:#F0F6FC;font-weight:500;">' + packageLabel + '</td>' +
+                '<td style="padding:10px 8px;color:#22c55e;font-weight:700;text-align:right;white-space:nowrap;">' + creditStr + '</td>' +
+                '<td style="padding:10px 8px;text-align:center;">' + statusBadge + '</td>' +
+                '</tr>';
+        }
+        tbody.innerHTML = rows;
+        table.style.display = 'block';
+    } catch (err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        document.getElementById('txn-error-msg').textContent = 'Gagal memuat riwayat: ' + err.message;
+    }
+}
+
+function closeTransactionHistory() {
+    document.getElementById('txn-history-modal').classList.add('hidden');
+}
+
     var email = getEmail();
     if (!email) { showLoginState(); return; }
 

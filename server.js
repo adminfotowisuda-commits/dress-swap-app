@@ -3510,6 +3510,79 @@ app.get('/api/credits/balance', (req, res) => {
 });
 
 /**
+ * GET /api/user/transactions
+ * Returns the full payment/transaction history for a user.
+ * Query: ?email=budi@gmail.com
+ *
+ * Response: array of {
+ *   date, invoice_number, amount, credits, package_name, package_id, status, type
+ * } sorted newest-first.
+ */
+app.get('/api/user/transactions', (req, res) => {
+    try {
+        const email = (req.query.email || '').trim().toLowerCase();
+        if (!email) {
+            return res.status(400).json({ error: 'Email parameter is required.' });
+        }
+
+        const db = readCreditsDB();
+        const packages = getCreditPackages();
+
+        // Filter transactions belonging to this user
+        let userTxns = db.transactions.filter(t => t.email === email);
+
+        // Enrich each transaction with package name & human-readable fields
+        const enriched = userTxns.map(txn => {
+            const pkg = packages.find(p => p.package_id === txn.package_id);
+            const amount = txn.amount || 0;
+
+            // Deduce credits from known amount mappings if not explicitly set
+            // Note: addCredits() stores credits as `amount` (small numbers like 10/20/30).
+            //       Payment handlers store Rupiah as `amount` (10000/11000/12000).
+            let credits = txn.credits || pkg?.credits_given || 0;
+            if (!credits && !txn.package_id) {
+                if (amount === 10000)      { credits = 10; }
+                else if (amount === 11000) { credits = 20; }
+                else if (amount === 12000) { credits = 30; }
+                else if (amount === 5000)  { credits = 10; }
+                else if (amount > 0 && amount <= 100) { credits = amount; } // Already credits value
+            }
+
+            // Deduce package name from amount if no package_id
+            let packageName = pkg ? pkg.name : (txn.package_id || '');
+            if (!packageName && !txn.package_id) {
+                if (amount === 10000)      packageName = 'Paket Basic (10 Kredit)';
+                else if (amount === 11000) packageName = 'Paket Popular (20 Kredit)';
+                else if (amount === 12000) packageName = 'Paket Pro (30 Kredit)';
+                else if (amount === 5000)  packageName = 'Top-Up 5K (10 Kredit)';
+                else if (amount > 0)       packageName = amount + ' Kredit';
+                else                       packageName = '—';
+            }
+
+            return {
+                date: txn.created_at || '',
+                invoice_number: txn.invoice_number || '',
+                amount: amount,
+                credits: credits,
+                package_name: packageName,
+                package_id: txn.package_id || '',
+                status: txn.status || 'pending',
+                type: txn.type || 'top-up'
+            };
+        });
+
+        // Sort newest first
+        enriched.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        console.log(`  [api/user/transactions] ${email} → ${enriched.length} transactions`);
+        res.json(enriched);
+    } catch (err) {
+        console.error('[/api/user/transactions] Error:', err);
+        res.status(500).json({ error: 'Failed to retrieve transaction history.' });
+    }
+});
+
+/**
  * POST /api/payment/request-va
  * Generates a Virtual Account for credit top-up.
  * Tries DOKU first; falls back to realistic mock VA on failure.
@@ -3762,9 +3835,13 @@ app.post('/api/payments/doku-callback', async (req, res) => {
         console.log(`  [doku-callback] Incoming webhook body:`, JSON.stringify(req.body));
         console.log(`  [doku-callback] Incoming webhook headers:`, JSON.stringify(req.headers));
 
-        // Detect payload format: Legacy uses flat TRANSIDMERCHANT/STATUSCODE, SNAP BI uses nested JSON
+        // Detect payload format:
+        //   Legacy: flat TRANSIDMERCHANT/STATUSCODE/AMOUNT
+        //   SNAP BI: nested with order + payment_status
+        //   Nested Direct: order.invoice_number + transaction.status (actual DOKU production payload)
         const isLegacy = req.body.TRANSIDMERCHANT || req.body.ORDERID;
         const isSnapBi = req.body.order && req.body.payment_status;
+        const isNestedDirect = req.body.transaction && req.body.transaction.status && req.body.order;
 
         let invoice_number, userEmail, paymentSuccess;
         let packageId = '';
@@ -3797,9 +3874,31 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             userEmail = (req.body.order || {}).virtual_account?.email || req.body.customer?.email || '';
             packageId = req.body.additional_info?.package_id || '';
             console.log(`  [doku-callback] SNAP BI — invoice: ${invoice_number}, status: ${req.body.payment_status}, email: ${userEmail}`);
+        } else if (isNestedDirect) {
+            // ═══ DOKU Nested Direct Notification (Production) ═══
+            // Payload shape: { order: { invoice_number, amount }, transaction: { status }, additional_info: { package_id } }
+            invoice_number = req.body.order?.invoice_number || '';
+            paymentSuccess = req.body.transaction?.status === 'SUCCESS';
+            const amountRaw = Math.round(parseFloat(req.body.order?.amount || '0'));
+
+            // Priority: explicit package_id from additional_info, then map from amount
+            packageId = req.body.additional_info?.package_id || '';
+            if (!packageId) {
+                if (amountRaw === 10000)      { packageId = 'pkg_trial_10k'; }
+                else if (amountRaw === 11000) { packageId = 'pkg_trial_11k'; }
+                else if (amountRaw === 12000) { packageId = 'pkg_trial_12k'; }
+            }
+
+            // Try to extract email from various nested locations, or fall back to transaction lookup
+            userEmail = req.body.customer?.email
+                     || req.body.order?.customer?.email
+                     || req.body.order?.virtual_account?.email
+                     || '';
+
+            console.log(`  [doku-callback] NESTED DIRECT — invoice: ${invoice_number}, status: ${req.body.transaction?.status}, amount: ${amountRaw}, email: ${userEmail || '(via txn lookup)'}, pkg: ${packageId}`);
         } else {
-            console.warn('  [doku-callback] Unrecognized payload format');
-            return res.status(400).send('CONTINUE'); // Don't block DOKU retries
+            console.warn('  [doku-callback] Unrecognized payload format — body keys:', Object.keys(req.body).join(', '));
+            return res.status(200).send('CONTINUE'); // Return 200 to stop DOKU retries even on unrecognized
         }
 
         if (paymentSuccess) {

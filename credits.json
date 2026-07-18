@@ -62,9 +62,9 @@
     "bambang@gmail.com": {
       "email": "bambang@gmail.com",
       "password": "123",
-      "credits_balance": 26,
+      "credits_balance": 46,
       "created_at": "2026-07-17T14:17:09.020Z",
-      "updated_at": "2026-07-18T16:25:00.138Z"
+      "updated_at": "2026-07-18T16:33:21.954Z"
     }
   },
   "transactions": [
@@ -907,6 +907,14 @@
       "type": "top-up",
       "status": "success",
       "created_at": "2026-07-18T16:25:00.138Z"
+    },
+    {
+      "invoice_number": "INV-TEST-WEBHOOK-1784392401925",
+      "email": "bambang@gmail.com",
+      "amount": 20,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-18T16:33:21.954Z"
     }
   ],
   "packages": [

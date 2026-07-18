@@ -1,28 +1,41 @@
 /**
- * test-webhook.js — Simulate a DOKU Legacy webhook notification locally.
+ * test-webhook.js — Simulate a DOKU Nested Direct webhook notification locally.
  *
  * Usage:  node test-webhook.js
  *
- * Sends a POST to the DOKU webhook endpoint with a flat Legacy payload
- * so we can verify the credits-adding logic works end-to-end.
+ * Sends a POST to the DOKU webhook endpoint with the exact nested JSON
+ * payload that DOKU sends in production.
  */
 
 const PORT = process.env.PORT || 3000;
 const WEBHOOK_PATH = '/api/payments/doku-callback';
 const WEBHOOK_URL = `http://localhost:${PORT}${WEBHOOK_PATH}`;
 
-// ── Test payload: DOKU Legacy flat format ──────────────────────────
-// STATUSCODE '0000' = success
-// AMOUNT 10000 → maps to pkg_trial_10k → 10 credits
+// ── Test payload: DOKU Nested Direct (production format) ──────────
+// This matches the exact structure DOKU sends:
+//   { order: { invoice_number, amount }, transaction: { status }, additional_info: { package_id } }
+// NOTE: DOKU may NOT include customer.email in production webhooks.
+// In that case the server falls back to looking up the transaction by invoice_number
+// in credits.json (created when the user initiated payment). For standalone testing,
+// we include customer.email so the test works without a pre-existing transaction.
 const testPayload = {
-  TRANSIDMERCHANT: 'INV-TEST-WEBHOOK-' + Date.now(),
-  STATUSCODE: '0000',
-  AMOUNT: '10000.00',
-  EMAIL: 'bambang@gmail.com'
+  order: {
+    invoice_number: 'INV-TEST-WEBHOOK-' + Date.now(),
+    amount: 11000
+  },
+  transaction: {
+    status: 'SUCCESS'
+  },
+  additional_info: {
+    package_id: 'pkg_trial_11k'
+  },
+  customer: {
+    email: 'bambang@gmail.com'
+  }
 };
 
 console.log('╔══════════════════════════════════════════════════════╗');
-console.log('║  🧪 DOKU Webhook Local Test                         ║');
+console.log('║  🧪 DOKU Webhook Local Test (Nested Direct)         ║');
 console.log('╠══════════════════════════════════════════════════════╣');
 console.log(`║  Target: ${WEBHOOK_URL}`);
 console.log(`║  Payload: ${JSON.stringify(testPayload)}`);
@@ -51,22 +64,22 @@ console.log('');
     // ── Verify credits were added ──────────────────────────────────
     console.log('');
     console.log('── Verifying credits.json ──');
+    // Use fresh require — flush Node's module cache to see latest write
+    delete require.cache[require.resolve('./credits.json')];
     const credits = require('./credits.json');
-    const user = credits.users['bambang@gmail.com'];
-    if (user) {
-      console.log(`  User:  ${user.email}`);
-      console.log(`  Balance: ${user.credits_balance} credits`);
-    } else {
-      console.log('  User bambang@gmail.com not found in credits.json');
-    }
 
-    // Check if transaction was recorded
-    const txn = credits.transactions.find(t => t.invoice_number === testPayload.TRANSIDMERCHANT);
+    // Find the transaction by invoice
+    const txn = credits.transactions.find(t => t.invoice_number === testPayload.order.invoice_number);
     if (txn) {
       console.log(`  Transaction found: ${txn.invoice_number} | status=${txn.status} | +${txn.amount} credits`);
+      const user = credits.users[txn.email];
+      if (user) {
+        console.log(`  User:  ${user.email}`);
+        console.log(`  Balance: ${user.credits_balance} credits`);
+      }
       console.log('✅ Credits successfully added!');
     } else {
-      console.log(`  ⚠️  No transaction recorded for invoice ${testPayload.TRANSIDMERCHANT}`);
+      console.log(`  ⚠️  No transaction recorded for invoice ${testPayload.order.invoice_number}`);
       console.log('     (this is expected if the server is not running)');
     }
   } catch (err) {
