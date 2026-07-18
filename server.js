@@ -656,25 +656,41 @@ async function createDokuPaymentLink(accessToken, orderData) {
         });
     }
 
-    const bodyHash = crypto.createHash('sha256').update(requestBody).digest('hex').toLowerCase();
-
     // Build signature and headers based on API type
-    let headers, stringToSign;
+    let headers;
     if (apiType === 'checkout') {
-        // DOKU Checkout: HMAC-SHA256(Client-Id | Request-Id | Request-Timestamp | SHA256(body))
-        stringToSign = DOKU_CLIENT_ID + '|' + requestId + '|' + timestamp + '|' + bodyHash;
-        const signature = createDokuSignature(stringToSign, 'hmac-sha256');
+        // ═══ DOKU Checkout: HMAC-SHA256 per official spec ═══
+        // String to sign is newline-separated Key:Value pairs:
+        //   Client-Id:{value}\nRequest-Id:{value}\nRequest-Timestamp:{value}\nRequest-Target:{value}\nDigest:{value}
+        // Digest is SHA256(body) in base64 (not hex).
+        // Timestamp is ISO 8601 UTC with Z suffix.
+        // Signature header value = "HMACSHA256=" + base64(HMAC-SHA256(stringToSign)).
+        const checkoutTimestamp = new Date().toISOString(); // 2026-07-18T10:30:00.000Z
+        const digestBase64 = crypto.createHash('sha256').update(requestBody).digest('base64');
+        const checkoutStringToSign =
+            'Client-Id:' + DOKU_CLIENT_ID + '\n' +
+            'Request-Id:' + requestId + '\n' +
+            'Request-Timestamp:' + checkoutTimestamp + '\n' +
+            'Request-Target:' + endpointPath + '\n' +
+            'Digest:' + digestBase64;
+        const checkoutHmac = crypto.createHmac('sha256', DOKU_ACTIVE_SECRET_KEY);
+        checkoutHmac.update(checkoutStringToSign);
+        const signatureValue = 'HMACSHA256=' + checkoutHmac.digest('base64');
+
+        console.log(`  [doku] Checkout stringToSign:\n${checkoutStringToSign}`);
+
         headers = {
             'Content-Type': 'application/json',
             'Client-Id': DOKU_CLIENT_ID,
             'Request-Id': requestId,
-            'Request-Timestamp': timestamp,
-            'Signature': signature
+            'Request-Timestamp': checkoutTimestamp,
+            'Signature': signatureValue
         };
     } else {
-        // SNAP BI Direct: HTTPMethod:EndpointPath:AccessToken:SHA256(body):Timestamp
-        stringToSign = 'POST' + ':' + endpointPath + ':' + accessToken + ':' + bodyHash + ':' + timestamp;
-        const signature = createDokuSignature(stringToSign, 'hmac');
+        // ═══ SNAP BI Direct: HMAC-SHA512 ═══
+        const bodyHash = crypto.createHash('sha256').update(requestBody).digest('hex').toLowerCase();
+        const snapStringToSign = 'POST' + ':' + endpointPath + ':' + accessToken + ':' + bodyHash + ':' + timestamp;
+        const signature = createDokuSignature(snapStringToSign, 'hmac');
         headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + accessToken,
