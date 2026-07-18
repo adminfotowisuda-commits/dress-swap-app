@@ -501,9 +501,13 @@ function loadDokuPrivateKey() {
         if (DOKU_MERCHANT_PRIVATE_KEY_PATH && DOKU_MERCHANT_PRIVATE_KEY_PATH.startsWith('-----BEGIN')) {
             return DOKU_MERCHANT_PRIVATE_KEY_PATH;
         }
+        // Try configured path first, then fall back to ./private.key
         const keyPath = path.resolve(DOKU_MERCHANT_PRIVATE_KEY_PATH);
-        if (!fs.existsSync(keyPath)) return null;
-        return fs.readFileSync(keyPath, 'utf8');
+        const privateKeyPath = fs.existsSync(keyPath) ? keyPath : path.join(__dirname, 'private.key');
+        if (fs.existsSync(privateKeyPath)) {
+            return fs.readFileSync(privateKeyPath, 'utf8');
+        }
+        return null;
     } catch (_) { return null; }
 }
 
