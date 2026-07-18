@@ -3753,29 +3753,67 @@ app.all('/api/payments/doku-callback', async (req, res) => {
             return res.status(200).json({ success: true, message: 'Sandbox payment simulated successfully.', credits_added: credits });
         }
 
-        // --- Production webhook verification ---
-        const rawBody = JSON.stringify(req.body);
-        const isValid = verifyDokuSignature(req.headers, rawBody);
+        // --- Production webhook — supports DOKU Legacy flat payload + SNAP BI nested payload ---
+        console.log(`  [doku-callback] Incoming webhook body:`, JSON.stringify(req.body));
+        console.log(`  [doku-callback] Incoming webhook headers:`, JSON.stringify(req.headers));
 
-        if (!isValid) {
-            console.warn('  [doku-callback] Invalid signature — request rejected');
-            return res.status(401).json({ error: 'Invalid signature.' });
+        // Detect payload format: Legacy uses flat TRANSIDMERCHANT/STATUSCODE, SNAP BI uses nested JSON
+        const isLegacy = req.body.TRANSIDMERCHANT || req.body.ORDERID;
+        const isSnapBi = req.body.order && req.body.payment_status;
+
+        let invoice_number, userEmail, paymentSuccess;
+        let packageId = '';
+
+        if (isLegacy) {
+            // ═══ DOKU Legacy Notification ═══
+            invoice_number = req.body.TRANSIDMERCHANT || req.body.ORDERID || '';
+            const statusCode = req.body.STATUSCODE || req.body.RESULTCODE || '';
+            paymentSuccess = statusCode === '0000' || statusCode === '00';
+            userEmail = req.body.EMAIL || req.body.CUSTEMAIL || '';
+            const amountRaw = Math.round(parseFloat(req.body.AMOUNT || '0'));
+
+            // Map amount to credits and package
+            if (amountRaw === 10000) { packageId = 'pkg_trial_10k'; }
+            else if (amountRaw === 11000) { packageId = 'pkg_trial_11k'; }
+            else if (amountRaw === 12000) { packageId = 'pkg_trial_12k'; }
+            else { packageId = ''; }
+
+            console.log(`  [doku-callback] LEGACY — invoice: ${invoice_number}, status: ${statusCode}, amount: ${amountRaw}, email: ${userEmail}, pkg: ${packageId}`);
+        } else if (isSnapBi) {
+            // ═══ DOKU SNAP BI Notification ═══
+            const rawBody = JSON.stringify(req.body);
+            const isValid = verifyDokuSignature(req.headers, rawBody);
+            if (!isValid) {
+                console.warn('  [doku-callback] Invalid SNAP BI signature — request rejected');
+                return res.status(401).json({ error: 'Invalid signature.' });
+            }
+            invoice_number = req.body.invoice_number || '';
+            paymentSuccess = req.body.payment_status === 'SUCCESS';
+            userEmail = (req.body.order || {}).virtual_account?.email || req.body.customer?.email || '';
+            packageId = req.body.additional_info?.package_id || '';
+            console.log(`  [doku-callback] SNAP BI — invoice: ${invoice_number}, status: ${req.body.payment_status}, email: ${userEmail}`);
+        } else {
+            console.warn('  [doku-callback] Unrecognized payload format');
+            return res.status(400).send('CONTINUE'); // Don't block DOKU retries
         }
 
-        const { invoice_number, payment_status, order } = req.body;
-        const packageId = req.body.additional_info?.package_id || '';
-        const userEmail = (order || {}).virtual_account?.email || req.body.customer?.email || '';
-
-        if (payment_status === 'SUCCESS') {
+        if (paymentSuccess) {
             const packages = getCreditPackages();
             const pkg = packages.find(p => p.package_id === packageId);
             const credits = pkg ? pkg.credits_given : 0;
+
+            // If Legacy and no email found, try to match via transaction record
+            if (!userEmail) {
+                const db = readCreditsDB();
+                const txn = db.transactions.find(t => t.invoice_number === invoice_number);
+                if (txn) userEmail = txn.email;
+            }
 
             if (credits > 0 && userEmail) {
                 addCredits(userEmail, credits, invoice_number);
             }
 
-            // Update transaction
+            // Update transaction status
             const db = readCreditsDB();
             const txn = db.transactions.find(t => t.invoice_number === invoice_number);
             if (txn) txn.status = 'success';
@@ -3784,6 +3822,10 @@ app.all('/api/payments/doku-callback', async (req, res) => {
             console.log(`  [doku-callback] PAYMENT SUCCESS — ${userEmail} received ${credits} credits (invoice: ${invoice_number})`);
         }
 
+        // Return "CONTINUE" for Legacy, JSON for SNAP BI — DOKU expects 200 to stop retrying
+        if (isLegacy) {
+            return res.status(200).send('CONTINUE');
+        }
         res.status(200).json({ message: 'Notification received.' });
     } catch (err) {
         console.error('[/api/payments/doku-callback] Error:', err);
