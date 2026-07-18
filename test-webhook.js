@@ -18,7 +18,7 @@ const testPayload = {
   TRANSIDMERCHANT: 'INV-TEST-WEBHOOK-' + Date.now(),
   STATUSCODE: '0000',
   AMOUNT: '10000.00',
-  EMAIL: 'moci@gmail.com'
+  EMAIL: 'bambang@gmail.com'
 };
 
 console.log('╔══════════════════════════════════════════════════════╗');
@@ -52,12 +52,12 @@ console.log('');
     console.log('');
     console.log('── Verifying credits.json ──');
     const credits = require('./credits.json');
-    const user = credits.users['moci@gmail.com'];
+    const user = credits.users['bambang@gmail.com'];
     if (user) {
       console.log(`  User:  ${user.email}`);
       console.log(`  Balance: ${user.credits_balance} credits`);
     } else {
-      console.log('  User moci@gmail.com not found in credits.json');
+      console.log('  User bambang@gmail.com not found in credits.json');
     }
 
     // Check if transaction was recorded
