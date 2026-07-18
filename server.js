@@ -3515,6 +3515,11 @@ app.post('/api/payment/request-va', async (req, res) => {
         ];
 
         console.log(`  [payment] Invoice ${invoiceNumber} — ${email} → ${pkg.name} (Rp ${pkg.price})`);
+        console.log(`  [payment] >>> RESPONSE PAYLOAD:`, JSON.stringify({
+            payment_url: paymentUrl,
+            va_number: vaNumber,
+            invoice_number: invoiceNumber
+        }));
         res.json({
             success: true,
             invoice_number: invoiceNumber,
