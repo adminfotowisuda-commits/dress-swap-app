@@ -67,7 +67,7 @@ const CREDITS_DB_PATH   = path.join(__dirname, 'credits.json');
 // DOKU configuration — read from environment
 const DOKU_CLIENT_ID            = process.env.DOKU_CLIENT_ID || '';
 const DOKU_API_KEY              = process.env.DOKU_API_KEY || '';
-const DOKU_ACTIVE_SECRET_KEY    = process.env.DOKU_ACTIVE_SECRET_KEY || '';
+const DOKU_SECRET_KEY           = process.env.DOKU_SECRET_KEY || process.env.DOKU_ACTIVE_SECRET_KEY || '';
 const DOKU_MERCHANT_PRIVATE_KEY_PATH = process.env.DOKU_MERCHANT_PRIVATE_KEY_PATH || './keys/merchant-private.pem';
 const DOKU_PUBLIC_KEY_PATH      = process.env.DOKU_PUBLIC_KEY_PATH || './keys/doku-public.pem';
 const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api-sandbox.doku.com';
@@ -501,11 +501,19 @@ function loadDokuPrivateKey() {
         if (DOKU_MERCHANT_PRIVATE_KEY_PATH && DOKU_MERCHANT_PRIVATE_KEY_PATH.startsWith('-----BEGIN')) {
             return DOKU_MERCHANT_PRIVATE_KEY_PATH;
         }
-        // Try configured path first, then fall back to ./private.key
+        // Primary: keys/merchant-private.pem relative to app root
+        const primaryPath = path.join(__dirname, 'keys', 'merchant-private.pem');
+        if (fs.existsSync(primaryPath)) {
+            return fs.readFileSync(primaryPath, 'utf8');
+        }
+        // Fallback: configured path or ./private.key
         const keyPath = path.resolve(DOKU_MERCHANT_PRIVATE_KEY_PATH);
-        const privateKeyPath = fs.existsSync(keyPath) ? keyPath : path.join(__dirname, 'private.key');
-        if (fs.existsSync(privateKeyPath)) {
-            return fs.readFileSync(privateKeyPath, 'utf8');
+        if (fs.existsSync(keyPath)) {
+            return fs.readFileSync(keyPath, 'utf8');
+        }
+        const altPrivateKey = path.join(__dirname, 'private.key');
+        if (fs.existsSync(altPrivateKey)) {
+            return fs.readFileSync(altPrivateKey, 'utf8');
         }
         return null;
     } catch (_) { return null; }
@@ -539,12 +547,12 @@ function createDokuSignature(stringToSign, algorithm) {
         return sign.sign(privateKey, 'base64');
     }
     if (algorithm === 'hmac') {
-        const hmac = crypto.createHmac('sha512', DOKU_ACTIVE_SECRET_KEY);
+        const hmac = crypto.createHmac('sha512', DOKU_SECRET_KEY);
         hmac.update(stringToSign);
         return hmac.digest('base64');
     }
     if (algorithm === 'hmac-sha256') {
-        const hmac = crypto.createHmac('sha256', DOKU_ACTIVE_SECRET_KEY);
+        const hmac = crypto.createHmac('sha256', DOKU_SECRET_KEY);
         hmac.update(stringToSign);
         return hmac.digest('base64');
     }
@@ -685,7 +693,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'Request-Timestamp:' + checkoutTimestamp + '\n' +
             'Request-Target:' + endpointPath + '\n' +
             'Digest:' + digestBase64;
-        const checkoutHmac = crypto.createHmac('sha256', DOKU_ACTIVE_SECRET_KEY);
+        const checkoutHmac = crypto.createHmac('sha256', DOKU_SECRET_KEY);
         checkoutHmac.update(checkoutStringToSign);
         const signatureValue = 'HMACSHA256=' + checkoutHmac.digest('base64');
 
