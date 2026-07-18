@@ -638,7 +638,11 @@ async function createDokuPaymentLink(accessToken, orderData) {
                 line_items: [{ name: 'Credit Top-Up', price: amount, quantity: 1 }]
             },
             payment: { payment_due_date: 60 },
-            customer: { name: email.split('@')[0], email: email }
+            customer: {
+                name: (email.split('@')[0] || 'customer').replace(/[^a-zA-Z0-9 ]/g, ' ').trim() || 'Customer',
+                email: email,
+                phone: '081234567890'
+            }
         });
     } else {
         // SNAP BI Direct API — Virtual Account
@@ -702,6 +706,8 @@ async function createDokuPaymentLink(accessToken, orderData) {
     }
 
     console.log(`  [doku] Creating payment link for ${email} (${invoice_number}) [${apiType}]…`);
+    console.log(`  [doku] Request body:`, requestBody);
+    console.log(`  [doku] Request headers:`, JSON.stringify(headers, null, 2));
 
     const resp = await fetch(`${DOKU_BASE_URL}${endpointPath}`, {
         method: 'POST',
