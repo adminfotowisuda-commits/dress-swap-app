@@ -774,19 +774,20 @@ async function createDokuPaymentLink(accessToken, orderData) {
     const data = await resp.json();
     console.log(`  [doku] Payment link response: ${JSON.stringify(data)}`);
 
-    // DOKU Checkout may nest the URL at different paths depending on API version:
-    //   response.payment.url, payment.url, or flat paymentUrl / redirectUrl
+    // DOKU response parsing — covers Checkout, SNAP BI, and Legacy formats
     const paymentUrl = data.response?.payment?.url
                     || data.payment?.url
                     || data.paymentUrl
                     || data.redirectUrl
+                    || data.virtual_account_info?.how_to_pay_page
                     || null;
     const vaNumber = data.virtualAccountNo
                   || data.va_number
                   || data.response?.virtual_account?.number
+                  || data.virtual_account_info?.virtual_account_number
                   || null;
 
-    console.log(`  [doku] Payment link created — invoice: ${invoice_number} | url: ${paymentUrl || 'N/A'} | va: ${vaNumber || 'N/A'}`);
+    console.log(`  [doku] VA created — invoice: ${invoice_number} | va: ${vaNumber || 'N/A'} | url: ${paymentUrl || 'N/A'}`);
     return {
         invoice_number: invoice_number,
         payment_url: paymentUrl,
