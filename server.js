@@ -731,8 +731,8 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'POST',
             '/doku-virtual-account/v2/payment-code',
             cleanToken,
-            bodyHash,
-            timestamp
+            timestamp,
+            bodyHash
         ].join('\n');
 
         const snapHmac = crypto.createHmac('sha256', DOKU_SECRET_KEY);
