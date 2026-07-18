@@ -691,7 +691,8 @@ async function createDokuPaymentLink(accessToken, orderData) {
             },
             virtual_account_info: {
                 info1: customerName,
-                info2: email
+                info2: email,
+                reusable_status: false
             },
             additional_info: { package_id: package_id }
         });
