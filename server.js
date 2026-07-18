@@ -3475,7 +3475,6 @@ app.post('/api/payment/request-va', async (req, res) => {
         // DOKU Checkout uses Client-Id + HMAC directly (no B2B token needed).
         // DOKU Direct (SNAP BI) requires a B2B access token first.
         const apiType = process.env.DOKU_PAYMENT_API_TYPE || 'direct';
-        let dokuError = null;
         try {
             const token = apiType === 'direct' ? await requestDokuB2BToken() : null;
             const dokuResult = await createDokuPaymentLink(token, {
@@ -3487,22 +3486,24 @@ app.post('/api/payment/request-va', async (req, res) => {
             paymentUrl = dokuResult.payment_url || null;
             console.log(`  [payment] DOKU ${apiType} — VA: ${vaNumber || 'N/A'} | paymentUrl: ${paymentUrl || 'N/A'}`);
         } catch (dokuErr) {
-            dokuError = dokuErr.message;
             console.error('  [payment] DOKU API call FAILED:', dokuErr.message);
+            return res.status(503).json({
+                success: false,
+                error: 'Layanan pembayaran sedang tidak tersedia',
+                message: 'Gagal menghubungi DOKU: ' + dokuErr.message
+            });
         }
 
-        // --- Fallback: generate mock VA or simulated payment URL ---
+        // If DOKU returned neither a payment URL nor a VA number, the response
+        // format may have changed — log and fail explicitly instead of silently
+        // falling back to mock data.
         if (!vaNumber && !paymentUrl) {
-            if (process.env.DOKU_SANDBOX_MODE === 'true') {
-                // Sandbox mode — generate a simulated payment URL that goes through doku-callback
-                paymentUrl = `https://fotowisuda.ai/api/payments/doku-callback?simulate=1&invoice=${encodeURIComponent(invoiceNumber)}&email=${encodeURIComponent(email)}&package=${encodeURIComponent(package_id)}`;
-                console.log(`  [payment] Sandbox simulated payment URL generated — no real VA created`);
-            } else {
-                // Production with DOKU down — generate mock VA as last resort
-                const mockDigits = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)).join('');
-                vaNumber = '8856' + mockDigits;
-                console.log(`  [payment] Mock VA generated (DOKU unavailable): ${vaNumber} | Error: ${dokuError || 'unknown'}`);
-            }
+            console.error('  [payment] DOKU returned 200 but no payment_url or va_number — response format mismatch');
+            return res.status(502).json({
+                success: false,
+                error: 'Respon DOKU tidak dikenali',
+                message: 'Gateway pembayaran mengembalikan format yang tidak diharapkan. Silakan coba lagi.'
+            });
         }
 
         const instructions = [
