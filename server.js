@@ -744,15 +744,10 @@ async function createDokuPaymentLink(accessToken, orderData) {
 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + accessToken,
             'Client-Id': DOKU_CLIENT_ID,
             'Request-Id': requestId,
             'Request-Timestamp': timestamp,
-            'X-TIMESTAMP': timestamp,
-            'Signature': signature,
-            'X-SIGNATURE': signature,
-            'X-PARTNER-ID': DOKU_CLIENT_ID,
-            'CHANNEL-ID': '95221'
+            'Signature': signature
         };
     }
 
@@ -3549,7 +3544,7 @@ app.post('/api/payment/request-va', async (req, res) => {
         // DOKU Direct (SNAP BI) requires a B2B access token first.
         const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
         try {
-            const token = apiType === 'direct' ? await requestDokuB2BToken() : null;
+            const token = null; // Legacy Non-SNAP — no B2B token needed
             const dokuResult = await createDokuPaymentLink(token, {
                 email, package_id,
                 invoice_number: invoiceNumber,
@@ -3650,7 +3645,7 @@ app.post('/api/credits/top-up', async (req, res) => {
         const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
         let paymentResult = null;
         try {
-            const token = apiType === 'direct' ? await requestDokuB2BToken() : null;
+            const token = null; // Legacy Non-SNAP — no B2B token needed
             paymentResult = await createDokuPaymentLink(token, {
                 email: email,
                 package_id: package_id,
