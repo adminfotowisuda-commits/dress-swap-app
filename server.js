@@ -724,18 +724,17 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'Signature': signatureValue
         };
     } else {
-        // ═══ SNAP BI Direct: HMAC-SHA256 ═══
-        // requestBody is the exact JSON.stringify output sent to DOKU — same string
-        // is used for bodyHash and for the fetch body, guaranteeing no mismatch.
-        const bodyHash = crypto.createHash('sha256').update(requestBody).digest('base64');
+        // ═══ SNAP BI Direct: HMAC-SHA256 (Hybrid SK- key) ═══
+        // Colon-separated per DOKU Hybrid spec
+        const bodyHash = crypto.createHash('sha256').update(requestBody).digest('hex').toLowerCase();
         const cleanToken = accessToken.replace(/^Bearer\s+/i, '');
         const snapStringToSign = [
             'POST',
             '/doku-virtual-account/v2/payment-code',
             cleanToken,
-            timestamp,
-            bodyHash
-        ].join('\n') + '\n';
+            bodyHash,
+            timestamp
+        ].join(':');
 
         const snapHmac = crypto.createHmac('sha256', DOKU_SECRET_KEY);
         snapHmac.update(snapStringToSign);
