@@ -724,24 +724,23 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'Signature': signatureValue
         };
     } else {
-        // ═══ DOKU SNAP BI: HMAC-SHA512, 4-component colon-separated, base64 ═══
-        const bodyHash = crypto.createHash('sha256').update(requestBody).digest('hex').toLowerCase();
-        const snapStringToSign = [
-            'POST',
-            '/doku-virtual-account/v2/payment-code',
-            bodyHash,
-            timestamp
-        ].join(':');
-
-        const snapHmac = crypto.createHmac('sha512', DOKU_SECRET_KEY);
-        snapHmac.update(snapStringToSign);
-        const signature = snapHmac.digest('base64');
+        // ═══ DOKU Non-SNAP Legacy: HMAC-SHA256, newline Key:Value, HMACSHA256= prefix ═══
+        const digest = crypto.createHash('sha256').update(requestBody).digest('base64');
+        const stringToSign = [
+            `Client-Id:${DOKU_CLIENT_ID}`,
+            `Request-Id:${requestId}`,
+            `Request-Timestamp:${timestamp}`,
+            `Request-Target:/doku-virtual-account/v2/payment-code`,
+            `Digest:${digest}`
+        ].join('\n');
+        const hmacBase64 = crypto.createHmac('sha256', DOKU_SECRET_KEY).update(stringToSign).digest('base64');
+        const signature = `HMACSHA256=${hmacBase64}`;
 
         console.log(`  [doku] DOKU_SECRET_KEY loaded: ${DOKU_SECRET_KEY ? 'YES (len=' + DOKU_SECRET_KEY.length + ' prefix=' + DOKU_SECRET_KEY.slice(0, 4) + '...)' : 'NO — EMPTY!'}`);
-        console.log(`  [doku] SNAP BI requestBody (first 200): ${requestBody.slice(0, 200)}`);
-        console.log(`  [doku] SNAP BI stringToSign:\n---\n${snapStringToSign}\n---`);
-        console.log(`  [doku] SNAP BI bodyHash: ${bodyHash}`);
-        console.log(`  [doku] SNAP BI signature: ${signature ? signature.slice(0, 40) + '...' : 'NULL'} `);
+        console.log(`  [doku] Non-SNAP requestBody (first 200): ${requestBody.slice(0, 200)}`);
+        console.log(`  [doku] Non-SNAP stringToSign:\n---\n${stringToSign}\n---`);
+        console.log(`  [doku] Non-SNAP digest: ${digest}`);
+        console.log(`  [doku] Non-SNAP signature: ${signature ? signature.slice(0, 50) + '...' : 'NULL'} `);
 
         headers = {
             'Content-Type': 'application/json',
