@@ -632,7 +632,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
         requestBody = JSON.stringify({
             order: {
                 invoice_number: invoice_number,
-                amount: { value: amount.toFixed(2), currency: 'IDR' },
+                amount: Number(amount),
                 callback_url: 'https://fotowisuda.ai/api/payments/doku-callback',
                 line_items: [{ name: 'Credit Top-Up', price: amount, quantity: 1 }]
             },
