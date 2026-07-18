@@ -61,6 +61,14 @@ function getGeminiClient() {
 const UPLOADS_DIR       = path.join(__dirname, 'public', 'uploads');
 const THUMBNAILS_DIR    = path.join(UPLOADS_DIR, 'thumbnails');
 const REFERENCES_DIR    = path.join(UPLOADS_DIR, 'references');
+// ═══ TWO DATABASES — DO NOT CONFUSE THEM ═══════════════════════════
+// database.json  → image generation records (array of {generation_id, …})
+//                   managed by readDatabase() / writeDatabase()
+// credits.json   → user accounts, passwords, credit balances, packages,
+//                   and top-up transactions
+//                   managed by readCreditsDB() / writeCreditsDB()
+// Both are git-ignored — they are RUNTIME data, never deployed.
+// ═══════════════════════════════════════════════════════════════════
 const DATABASE_PATH     = path.join(__dirname, 'database.json');
 const CREDITS_DB_PATH   = path.join(__dirname, 'credits.json');
 

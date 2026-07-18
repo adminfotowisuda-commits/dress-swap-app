@@ -184,12 +184,19 @@ function showProfileState() {
 
 async function handleLogin(e) {
     e.preventDefault();
+
+    // ── Safety net: if anything throws before we can show an inline
+    //    error, the user still sees an alert so it's never silent.
+    window._loginSafetyTimer = setTimeout(function() {
+        alert('⚠️ Login sedang diproses. Jika halaman tidak merespon, muat ulang dan coba lagi.');
+    }, 8000);
+
     var email = document.getElementById('login-email-input').value.trim();
     var password = document.getElementById('login-password-input').value;
     var errorEl = document.getElementById('login-error');
 
-    if (!email || email.indexOf('@') === -1) { showError('Masukkan alamat email yang valid.'); return; }
-    if (!password || password.length < 3) { showError('Password minimal 3 karakter.'); return; }
+    if (!email || email.indexOf('@') === -1) { showError('Masukkan alamat email yang valid.'); clearTimeout(window._loginSafetyTimer); return; }
+    if (!password || password.length < 3) { showError('Password minimal 3 karakter.'); clearTimeout(window._loginSafetyTimer); return; }
 
     var btn = document.getElementById('login-submit-btn');
     btn.disabled = true;
@@ -202,10 +209,29 @@ async function handleLogin(e) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: password })
         });
-        var data = await resp.json();
 
-        if (!data.success) { showError(data.error || 'Login gagal.'); btn.disabled = false; btn.textContent = 'Masuk'; return; }
+        // ── Try to parse JSON; if the server returned HTML (crash/error page),
+        //    resp.json() will throw and we fall into the catch block.
+        var contentType = resp.headers.get('content-type') || '';
+        var data;
+        if (contentType.indexOf('application/json') !== -1) {
+            data = await resp.json();
+        } else {
+            // Server returned non-JSON (probably an error page or crash)
+            var text = await resp.text();
+            console.error('[LOGIN] Server returned non-JSON:', text.slice(0, 300));
+            throw new Error('Server returned HTTP ' + resp.status + ' (' + contentType + ')');
+        }
 
+        if (!data.success) {
+            showError(data.error || 'Login gagal. Periksa email dan password Anda.');
+            btn.disabled = false;
+            btn.textContent = 'Masuk';
+            clearTimeout(window._loginSafetyTimer);
+            return;
+        }
+
+        clearTimeout(window._loginSafetyTimer);
         setEmail(email);
 
         // Update sidebar dynamically
@@ -217,15 +243,34 @@ async function handleLogin(e) {
         btn.disabled = false;
         btn.textContent = 'Masuk';
     } catch(err) {
-        showError('Gagal terhubung ke server.');
+        clearTimeout(window._loginSafetyTimer);
+        console.error('[LOGIN] Catch block —', err.message);
+        showError('Gagal terhubung ke server. (' + err.message + ')');
         btn.disabled = false;
         btn.textContent = 'Masuk';
+
+        // Fallback: if the inline error element is somehow unreachable,
+        // show an alert so the user is never left wondering.
+        if (errorEl.style.display === 'none' || !errorEl.textContent) {
+            alert('❌ Gagal login: ' + err.message + '\n\nSilakan muat ulang halaman dan coba lagi.');
+        }
     }
 }
 
 function showError(msg) {
     var el = document.getElementById('login-error');
-    if (el) { el.textContent = msg; el.style.display = 'block'; }
+    if (el) {
+        el.textContent = msg;
+        el.style.display = 'block';
+        // Auto-hide after 10 seconds
+        clearTimeout(window._loginErrorTimer);
+        window._loginErrorTimer = setTimeout(function() {
+            el.style.display = 'none';
+        }, 10000);
+    } else {
+        // Ultimate fallback
+        alert('❌ ' + msg);
+    }
 }
 
 async function loadProfile() {
