@@ -55,9 +55,9 @@
     "moci@gmail.com": {
       "email": "moci@gmail.com",
       "password": "123",
-      "credits_balance": 20,
+      "credits_balance": 30,
       "created_at": "2026-07-17T13:37:01.810Z",
-      "updated_at": "2026-07-17T13:37:27.511Z"
+      "updated_at": "2026-07-18T15:52:46.952Z"
     },
     "bambang@gmail.com": {
       "email": "bambang@gmail.com",
@@ -891,25 +891,33 @@
       "type": "top-up",
       "status": "success",
       "created_at": "2026-07-17T14:38:37.364Z"
+    },
+    {
+      "invoice_number": "INV-TEST-WEBHOOK-1784389966864",
+      "email": "moci@gmail.com",
+      "amount": 10,
+      "type": "top-up",
+      "status": "success",
+      "created_at": "2026-07-18T15:52:46.952Z"
     }
   ],
   "packages": [
     {
-      "package_id": "pkg_trial_5k",
-      "name": "Paket Trial Pemula",
-      "price": 5000,
+      "package_id": "pkg_trial_10k",
+      "name": "Paket Basic",
+      "price": 10000,
       "credits_given": 10
     },
     {
-      "package_id": "pkg_trial_6k",
-      "name": "Paket Trial Menengah",
-      "price": 6000,
+      "package_id": "pkg_trial_11k",
+      "name": "Paket Popular",
+      "price": 11000,
       "credits_given": 20
     },
     {
-      "package_id": "pkg_trial_7k",
-      "name": "Paket Trial Pro",
-      "price": 7000,
+      "package_id": "pkg_trial_12k",
+      "name": "Paket Pro",
+      "price": 12000,
       "credits_given": 30
     }
   ]
