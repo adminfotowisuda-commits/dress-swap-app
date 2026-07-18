@@ -732,6 +732,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + accessToken,
             'Client-Id': DOKU_CLIENT_ID,
+            'Request-Id': requestId,
             'X-TIMESTAMP': timestamp,
             'X-SIGNATURE': signature,
             'X-PARTNER-ID': DOKU_CLIENT_ID,
