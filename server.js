@@ -693,11 +693,24 @@ async function createDokuPaymentLink(accessToken, orderData) {
     }
 
     const data = await resp.json();
-    console.log(`  [doku] Payment link created — invoice: ${invoice_number}`);
+    console.log(`  [doku] Payment link response: ${JSON.stringify(data)}`);
+
+    // DOKU Checkout nests the URL: response.payment.url
+    // DOKU Direct / older APIs may use flat fields: paymentUrl, redirectUrl
+    const paymentUrl = data.response?.payment?.url
+                    || data.paymentUrl
+                    || data.redirectUrl
+                    || null;
+    const vaNumber = data.virtualAccountNo
+                  || data.va_number
+                  || data.response?.virtual_account?.number
+                  || null;
+
+    console.log(`  [doku] Payment link created — invoice: ${invoice_number} | url: ${paymentUrl || 'N/A'} | va: ${vaNumber || 'N/A'}`);
     return {
         invoice_number: invoice_number,
-        payment_url: data.paymentUrl || data.redirectUrl || null,
-        virtual_account_number: data.virtualAccountNo || data.va_number || null,
+        payment_url: paymentUrl,
+        virtual_account_number: vaNumber,
         raw: data
     };
 }
@@ -3452,8 +3465,11 @@ app.post('/api/payment/request-va', async (req, res) => {
         let paymentUrl = null;
 
         // --- Attempt DOKU payment link creation ---
+        // DOKU Checkout uses Client-Id + HMAC directly (no B2B token needed).
+        // DOKU Direct (SNAP BI) requires a B2B access token first.
+        const apiType = process.env.DOKU_PAYMENT_API_TYPE || 'direct';
         try {
-            const token = await requestDokuB2BToken();
+            const token = apiType === 'direct' ? await requestDokuB2BToken() : null;
             const dokuResult = await createDokuPaymentLink(token, {
                 email, package_id,
                 invoice_number: invoiceNumber,
@@ -3461,7 +3477,7 @@ app.post('/api/payment/request-va', async (req, res) => {
             });
             vaNumber = dokuResult.virtual_account_number || null;
             paymentUrl = dokuResult.payment_url || null;
-            console.log(`  [payment] DOKU VA created — ${vaNumber || 'checkout URL'}`);
+            console.log(`  [payment] DOKU ${apiType} — VA: ${vaNumber || 'N/A'} | paymentUrl: ${paymentUrl || 'N/A'}`);
         } catch (dokuErr) {
             console.warn('  [payment] DOKU unavailable, generating mock VA:', dokuErr.message);
         }
