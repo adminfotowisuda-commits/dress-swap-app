@@ -621,7 +621,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
     const { email, package_id, invoice_number, amount } = orderData;
 
     // Build request body based on API type
-    const apiType = process.env.DOKU_PAYMENT_API_TYPE || 'direct'; // 'direct' or 'checkout'
+    const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
 
     // Auto-select endpoint: SNAP BI Direct always uses /v1.0/transfer-va/create-va.
     // DOKU Checkout uses the env var (defaults to /checkout/v1/payment).
@@ -3500,7 +3500,7 @@ app.post('/api/payment/request-va', async (req, res) => {
         // --- Attempt DOKU payment link creation ---
         // DOKU Checkout uses Client-Id + HMAC directly (no B2B token needed).
         // DOKU Direct (SNAP BI) requires a B2B access token first.
-        const apiType = process.env.DOKU_PAYMENT_API_TYPE || 'direct';
+        const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
         try {
             const token = apiType === 'direct' ? await requestDokuB2BToken() : null;
             const dokuResult = await createDokuPaymentLink(token, {
@@ -3600,7 +3600,7 @@ app.post('/api/credits/top-up', async (req, res) => {
         writeCreditsDB(db);
 
         // --- Attempt DOKU payment link creation ---
-        const apiType = process.env.DOKU_PAYMENT_API_TYPE || 'direct';
+        const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
         let paymentResult = null;
         try {
             const token = apiType === 'direct' ? await requestDokuB2BToken() : null;
