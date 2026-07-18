@@ -724,13 +724,12 @@ async function createDokuPaymentLink(accessToken, orderData) {
             'Signature': signatureValue
         };
     } else {
-        // ═══ DOKU SNAP BI: HMAC-SHA512, colon-separated ═══
+        // ═══ DOKU SNAP BI: HMAC-SHA512, 4-component colon-separated ═══
+        // Per DOKU spec: no accessToken in the symmetric stringToSign
         const bodyHash = crypto.createHash('sha256').update(requestBody).digest('hex').toLowerCase();
-        const cleanToken = accessToken.replace(/^Bearer\s+/i, '');
         const snapStringToSign = [
             'POST',
             '/doku-virtual-account/v2/payment-code',
-            cleanToken,
             bodyHash,
             timestamp
         ].join(':');
