@@ -1,17 +1,19 @@
 /**
- * restore-user.js — Re-insert a user into credits.json on the production server.
+ * restore-user.js — Re-insert a user into database.json on the production server.
  *
- * Run this ONCE on Hostinger after a deploy overwrote credits.json:
+ * Run this ONCE on Hostinger after a deploy:
  *   node restore-user.js
  *
  * Safe to run multiple times — it only inserts if the user is missing or
  * updates if they exist (won't reduce credits below what you specify).
+ * Works with the UNIFIED database.json format:
+ *   { users: {}, transactions: [], packages: [], generations: [] }
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const CREDITS_PATH = path.join(__dirname, 'credits.json');
+const DB_PATH = path.join(__dirname, 'database.json');
 
 // ── CONFIGURE THE USER TO RESTORE ──────────────────────────────────
 const USER_TO_RESTORE = {
@@ -24,14 +26,23 @@ const USER_TO_RESTORE = {
 
 function readDB() {
   try {
-    return JSON.parse(fs.readFileSync(CREDITS_PATH, 'utf8'));
+    const parsed = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    if (Array.isArray(parsed)) {
+      // Legacy array format — wrap into unified object
+      return { users: {}, transactions: [], packages: [], generations: parsed };
+    }
+    parsed.users = parsed.users || {};
+    parsed.transactions = parsed.transactions || [];
+    parsed.packages = parsed.packages || [];
+    parsed.generations = parsed.generations || [];
+    return parsed;
   } catch (err) {
-    return { users: {}, transactions: [], packages: [] };
+    return { users: {}, transactions: [], packages: [], generations: [] };
   }
 }
 
 function writeDB(data) {
-  fs.writeFileSync(CREDITS_PATH, JSON.stringify(data, null, 2), 'utf8');
+  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
 }
 
 // ── Main ───────────────────────────────────────────────────────────

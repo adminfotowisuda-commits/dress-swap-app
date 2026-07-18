@@ -14,11 +14,8 @@ public/uploads/references/*
 !public/uploads/thumbnails/.gitkeep
 !public/uploads/references/.gitkeep
 
-# Local generation ledger
+# Unified runtime database (users, credits, transactions, generations — NEVER commit)
 database.json
-
-# User accounts, credits, and transactions (runtime data — NEVER commit)
-credits.json
 
 # IDE
 .vscode/

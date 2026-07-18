@@ -63,16 +63,20 @@ console.log('');
 
     // ── Verify credits were added ──────────────────────────────────
     console.log('');
-    console.log('── Verifying credits.json ──');
+    console.log('── Verifying database.json ──');
     // Use fresh require — flush Node's module cache to see latest write
-    delete require.cache[require.resolve('./credits.json')];
-    const credits = require('./credits.json');
+    delete require.cache[require.resolve('./database.json')];
+    const db = require('./database.json');
+
+    // Handle both unified format and legacy formats
+    const transactions = db.transactions || [];
+    const users = db.users || {};
 
     // Find the transaction by invoice
-    const txn = credits.transactions.find(t => t.invoice_number === testPayload.order.invoice_number);
+    const txn = transactions.find(t => t.invoice_number === testPayload.order.invoice_number);
     if (txn) {
       console.log(`  Transaction found: ${txn.invoice_number} | status=${txn.status} | +${txn.amount} credits`);
-      const user = credits.users[txn.email];
+      const user = users[txn.email];
       if (user) {
         console.log(`  User:  ${user.email}`);
         console.log(`  Balance: ${user.credits_balance} credits`);

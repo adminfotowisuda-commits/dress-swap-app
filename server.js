@@ -61,16 +61,16 @@ function getGeminiClient() {
 const UPLOADS_DIR       = path.join(__dirname, 'public', 'uploads');
 const THUMBNAILS_DIR    = path.join(UPLOADS_DIR, 'thumbnails');
 const REFERENCES_DIR    = path.join(UPLOADS_DIR, 'references');
-// ═══ TWO DATABASES — DO NOT CONFUSE THEM ═══════════════════════════
-// database.json  → image generation records (array of {generation_id, …})
-//                   managed by readDatabase() / writeDatabase()
-// credits.json   → user accounts, passwords, credit balances, packages,
-//                   and top-up transactions
-//                   managed by readCreditsDB() / writeCreditsDB()
-// Both are git-ignored — they are RUNTIME data, never deployed.
+// ═══ UNIFIED DATABASE — ONE FILE TO RULE THEM ALL ══════════════════
+// database.json  → { users, transactions, packages, generations }
+//   users         → { "email": { password, credits_balance, … } }
+//   transactions  → [ { invoice_number, email, amount, … } ]
+//   packages      → [ { package_id, name, price, credits_given } ]
+//   generations   → [ { generation_id, status, … } ]
+// Git-ignored — RUNTIME data, NEVER deployed.
 // ═══════════════════════════════════════════════════════════════════
 const DATABASE_PATH     = path.join(__dirname, 'database.json');
-const CREDITS_DB_PATH   = path.join(__dirname, 'credits.json');
+const CREDITS_DB_PATH   = DATABASE_PATH;  // unified — same file
 
 // DOKU configuration — read from environment
 const DOKU_CLIENT_ID            = process.env.DOKU_CLIENT_ID || '';
@@ -125,8 +125,38 @@ function ensureDirectories() {
 
 function ensureDatabase() {
     if (!fs.existsSync(DATABASE_PATH)) {
-        fs.writeFileSync(DATABASE_PATH, '[]', 'utf8');
-        console.log('  [init] Created empty database.json');
+        const defaultPackages = [
+            { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
+            { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
+            { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+        ];
+        const unified = { users: {}, transactions: [], packages: defaultPackages, generations: [] };
+        fs.writeFileSync(DATABASE_PATH, JSON.stringify(unified, null, 2), 'utf8');
+        console.log('  [init] Created database.json (unified: users + credits + generations)');
+    } else {
+        // Auto-migrate: if database.json exists as old array format, wrap it
+        try {
+            const raw = fs.readFileSync(DATABASE_PATH, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                const defaultPackages = [
+                    { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
+                    { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
+                    { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+                ];
+                const unified = { users: {}, transactions: [], packages: defaultPackages, generations: parsed };
+                fs.writeFileSync(DATABASE_PATH, JSON.stringify(unified, null, 2), 'utf8');
+                console.log('  [init] Migrated database.json from array → unified object');
+            } else if (!parsed.generations) {
+                // Object without generations key — add it
+                parsed.generations = parsed.generations || [];
+                parsed.users = parsed.users || {};
+                parsed.transactions = parsed.transactions || [];
+                parsed.packages = parsed.packages || [];
+                fs.writeFileSync(DATABASE_PATH, JSON.stringify(parsed, null, 2), 'utf8');
+                console.log('  [init] Normalized database.json to unified format');
+            }
+        } catch (_) { /* leave as-is */ }
     }
 }
 
@@ -177,13 +207,16 @@ function cleanupStaleProcessingRecords() {
 // ------------------------------------------------------------------
 
 /**
- * Read all records from database.json.
+ * Read all generation records from database.json.
+ * Handles both old array format and new unified object format.
  * @returns {Array<object>}
  */
 function readDatabase() {
     try {
         const raw = fs.readFileSync(DATABASE_PATH, 'utf8');
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;           // legacy array format
+        return parsed.generations || [];                     // unified object format
     } catch (_err) {
         console.error('  [db] Failed to read database.json — returning empty array');
         return [];
@@ -191,11 +224,44 @@ function readDatabase() {
 }
 
 /**
- * Overwrite the entire database.json file.
+ * Overwrite the generations array inside database.json.
+ * Preserves users, transactions, and packages.
  * @param {Array<object>} records
  */
 function writeDatabase(records) {
-    fs.writeFileSync(DATABASE_PATH, JSON.stringify(records, null, 2), 'utf8');
+    const db = readUnifiedDB();
+    db.generations = records;
+    writeUnifiedDB(db);
+}
+
+/**
+ * Read the entire unified database.json object.
+ * @returns {{ users:object, transactions:array, packages:array, generations:array }}
+ */
+function readUnifiedDB() {
+    try {
+        const raw = fs.readFileSync(DATABASE_PATH, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+            // Legacy array — auto-wrap
+            return { users: {}, transactions: [], packages: [], generations: parsed };
+        }
+        parsed.users = parsed.users || {};
+        parsed.transactions = parsed.transactions || [];
+        parsed.packages = parsed.packages || [];
+        parsed.generations = parsed.generations || [];
+        return parsed;
+    } catch (_err) {
+        return { users: {}, transactions: [], packages: [], generations: [] };
+    }
+}
+
+/**
+ * Overwrite the entire unified database.json file.
+ * @param {object} db — { users, transactions, packages, generations }
+ */
+function writeUnifiedDB(db) {
+    fs.writeFileSync(DATABASE_PATH, JSON.stringify(db, null, 2), 'utf8');
 }
 
 /**
@@ -378,20 +444,15 @@ const upload = multer({
 
 // ------------------------------------------------------------------
 // Credits database helpers — user balances, transactions, packages
+// All read/write the UNIFIED database.json (via readUnifiedDB / writeUnifiedDB)
 // ------------------------------------------------------------------
 
 function readCreditsDB() {
-    try {
-        const raw = fs.readFileSync(CREDITS_DB_PATH, 'utf8');
-        return JSON.parse(raw);
-    } catch (_err) {
-        console.error('  [credits] Failed to read credits.json — returning empty store');
-        return { users: {}, transactions: [], packages: [] };
-    }
+    return readUnifiedDB();
 }
 
 function writeCreditsDB(data) {
-    fs.writeFileSync(CREDITS_DB_PATH, JSON.stringify(data, null, 2), 'utf8');
+    writeUnifiedDB(data);
 }
 
 function getUserCredits(email) {
@@ -487,16 +548,10 @@ function ensureCreditsDatabase() {
         { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
     ];
 
-    if (!fs.existsSync(CREDITS_DB_PATH)) {
-        writeCreditsDB({ users: {}, transactions: [], packages: defaultPackages });
-        console.log('  [init] Created credits.json with packages:', defaultPackages.map(p => p.package_id).join(', '));
-    } else {
-        // Always sync packages to latest pricing on server restart
-        const db = readCreditsDB();
-        db.packages = defaultPackages;
-        writeCreditsDB(db);
-        console.log('  [init] Synced credits.json packages to:', defaultPackages.map(p => p.package_id).join(', '));
-    }
+    const db = readUnifiedDB();
+    db.packages = defaultPackages;  // Always sync to latest pricing
+    writeUnifiedDB(db);
+    console.log('  [init] Synced database.json packages to:', defaultPackages.map(p => p.package_id).join(', '));
 }
 
 // ------------------------------------------------------------------
@@ -4047,11 +4102,11 @@ ensureCreditsDatabase();
 cleanupStaleProcessingRecords();
 
 // ═══ ONE-TIME USER RESTORE (deploy bootstrap) ═══════════════════════
-// This ensures bambang@gmail.com exists after a deploy overwrites credits.json.
+// Ensures bambang@gmail.com exists in database.json after a fresh deploy.
 // Remove this block after the first successful deploy & login.
 (function() {
     try {
-        const db = readCreditsDB();
+        const db = readUnifiedDB();
         const email = 'bambang@gmail.com';
         const existing = db.users[email];
         const minCredits = 20;
