@@ -628,7 +628,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
                 invoice_number: invoice_number,
                 amount: amount,
                 currency: 'IDR',
-                callback_url: `http://localhost:${PORT}/api/payments/doku-callback`,
+                callback_url: 'https://fotowisuda.ai/api/payments/doku-callback',
                 line_items: [{ name: 'Credit Top-Up', price: amount, quantity: 1 }]
             },
             payment: { payment_due_date: 60 },
@@ -3553,7 +3553,7 @@ app.post('/api/credits/top-up', async (req, res) => {
                 console.warn('  [credits] DOKU_SANDBOX_MODE=true — using simulated payment URL');
                 paymentResult = {
                     invoice_number: invoiceNumber,
-                    payment_url: `http://localhost:3000/api/payments/doku-callback?invoice=${invoiceNumber}&email=${encodeURIComponent(email)}&package=${package_id}&simulate=1`,
+                    payment_url: `https://fotowisuda.ai/api/payments/doku-callback?invoice=${invoiceNumber}&email=${encodeURIComponent(email)}&package=${package_id}&simulate=1`,
                     virtual_account_number: null
                 };
             } else {
