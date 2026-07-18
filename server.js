@@ -620,12 +620,17 @@ async function requestDokuB2BToken() {
 async function createDokuPaymentLink(accessToken, orderData) {
     const { email, package_id, invoice_number, amount } = orderData;
 
-    const endpointPath = DOKU_CREATE_VA_PATH;
-    const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00');
-    const requestId = 'REQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-
     // Build request body based on API type
     const apiType = process.env.DOKU_PAYMENT_API_TYPE || 'direct'; // 'direct' or 'checkout'
+
+    // Auto-select endpoint: SNAP BI Direct always uses /v1.0/transfer-va/create-va.
+    // DOKU Checkout uses the env var (defaults to /checkout/v1/payment).
+    const endpointPath = apiType === 'checkout'
+        ? DOKU_CREATE_VA_PATH
+        : '/v1.0/transfer-va/create-va';
+
+    const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00');
+    const requestId = 'REQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
     let requestBody;
 
     if (apiType === 'checkout') {
