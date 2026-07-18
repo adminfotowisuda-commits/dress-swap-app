@@ -733,7 +733,7 @@ async function createDokuPaymentLink(accessToken, orderData) {
             cleanToken,
             timestamp,
             bodyHash
-        ].join('\n');
+        ].join('\n') + '\n';
 
         const snapHmac = crypto.createHmac('sha256', DOKU_SECRET_KEY);
         snapHmac.update(snapStringToSign);
