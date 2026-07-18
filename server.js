@@ -478,9 +478,9 @@ function ensureCreditsDatabase() {
             users: {},
             transactions: [],
             packages: [
-                { package_id: 'pkg_trial_5k',  name: 'Paket Trial Pemula',    price: 5000, credits_given: 10 },
-                { package_id: 'pkg_trial_6k',  name: 'Paket Trial Menengah',  price: 6000, credits_given: 20 },
-                { package_id: 'pkg_trial_7k',  name: 'Paket Trial Pro',       price: 7000, credits_given: 30 }
+                { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
+                { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
+                { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
             ]
         };
         writeCreditsDB(initial);
