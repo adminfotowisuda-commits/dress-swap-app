@@ -37,6 +37,27 @@ const sharp    = require('sharp');
 const { GoogleGenAI } = require('@google/genai');
 require('dotenv').config();
 
+// ═══ CRASH PREVENTION — keep the server alive no matter what ═══
+process.on('uncaughtException', (err) => {
+    console.error('');
+    console.error('╔══════════════════════════════════════════════════════╗');
+    console.error('║  [FATAL] UNCAUGHT EXCEPTION — would have crashed!   ║');
+    console.error('╚══════════════════════════════════════════════════════╝');
+    console.error('[FATAL] Message:', err.message);
+    console.error('[FATAL] Stack:', err.stack);
+    console.error('');
+    // DO NOT process.exit() — keep the server alive
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('');
+    console.error('╔══════════════════════════════════════════════════════╗');
+    console.error('║  [FATAL] UNHANDLED REJECTION — would have crashed!   ║');
+    console.error('╚══════════════════════════════════════════════════════╝');
+    console.error('[FATAL] Reason:', reason);
+    if (reason && reason.stack) console.error('[FATAL] Stack:', reason.stack);
+    console.error('');
+});
+
 // ------------------------------------------------------------------
 // Configuration
 // ------------------------------------------------------------------
@@ -3495,18 +3516,31 @@ app.delete('/api/user/delete-account', (req, res) => {
  * Body: { email, password }
  */
 app.post('/api/auth/login', (req, res) => {
+    // ── STEP 0: Log the attempt BEFORE touching anything ──────────
+    const attemptEmail = (req.body && req.body.email) ? req.body.email : '(no email in body)';
+    console.log('[LOGIN ATTEMPT] Email:', attemptEmail);
+    console.log('[LOGIN ATTEMPT] Has body:', !!req.body);
+    console.log('[LOGIN ATTEMPT] Body keys:', req.body ? Object.keys(req.body).join(', ') : 'NONE');
+
+    // ── Outer crash barrier — if ANYTHING throws, we catch it ─────
     try {
         console.log('[LOGIN] ======== INCOMING LOGIN REQUEST ========');
         console.log('[LOGIN] Body:', JSON.stringify(req.body));
         console.log('[LOGIN] Content-Type:', req.headers['content-type']);
 
+        // Guard: req.body might be undefined if JSON parse failed
+        if (!req.body || typeof req.body !== 'object') {
+            console.log('[LOGIN] FAIL — req.body is not an object');
+            return res.status(400).json({ success: false, error: 'Invalid request body. Expected JSON.' });
+        }
+
         const { email, password } = req.body;
-        if (!email || !password) {
-            console.log('[LOGIN] FAIL — missing email or password');
+        if (!email || typeof email !== 'string') {
+            console.log('[LOGIN] FAIL — missing or invalid email');
             return res.status(400).json({ success: false, error: 'Email dan password wajib diisi.' });
         }
-        if (password.length < 3) {
-            console.log('[LOGIN] FAIL — password too short');
+        if (!password || typeof password !== 'string' || password.length < 3) {
+            console.log('[LOGIN] FAIL — password too short or invalid');
             return res.status(400).json({ success: false, error: 'Password minimal 3 karakter.' });
         }
 
@@ -3516,10 +3550,17 @@ app.post('/api/auth/login', (req, res) => {
         let db;
         try {
             db = readCreditsDB();
-            console.log('[LOGIN] credits.json loaded — users:', Object.keys(db.users || {}).length, '| transactions:', (db.transactions || []).length);
+            console.log('[LOGIN] database.json loaded — users:', Object.keys(db.users || {}).length, '| transactions:', (db.transactions || []).length);
         } catch (readErr) {
-            console.error('[LOGIN] CRITICAL — cannot read credits.json:', readErr.message);
+            console.error('[LOGIN] CRITICAL — cannot read database.json:', readErr.message);
+            console.error('[LOGIN] CRITICAL — stack:', readErr.stack);
             return res.status(500).json({ success: false, error: 'Database error. Please try again later.' });
+        }
+
+        // Guard: ensure db.users is an object
+        if (!db.users || typeof db.users !== 'object') {
+            console.error('[LOGIN] CRITICAL — db.users is not an object, fixing...');
+            db.users = {};
         }
 
         if (db.users[key]) {
@@ -3551,9 +3592,10 @@ app.post('/api/auth/login', (req, res) => {
             };
             try {
                 writeCreditsDB(db);
-                console.log('[LOGIN] New user written to credits.json:', key);
+                console.log('[LOGIN] New user written to database.json:', key);
             } catch (writeErr) {
-                console.error('[LOGIN] CRITICAL — cannot write credits.json:', writeErr.message);
+                console.error('[LOGIN] CRITICAL — cannot write database.json:', writeErr.message);
+                console.error('[LOGIN] CRITICAL — stack:', writeErr.stack);
                 return res.status(500).json({ success: false, error: 'Gagal menyimpan data. Silakan coba lagi.' });
             }
         }
@@ -3565,10 +3607,23 @@ app.post('/api/auth/login', (req, res) => {
             created_at: db.users[key].created_at || new Date().toISOString()
         };
         console.log('[LOGIN] SUCCESS — responding with:', JSON.stringify(responsePayload));
-        res.json(responsePayload);
+        return res.json(responsePayload);
     } catch (err) {
-        console.error('[LOGIN] UNCAUGHT ERROR:', err.message, err.stack);
-        res.status(500).json({ success: false, error: 'Gagal memproses login.' });
+        console.error('');
+        console.error('╔══════════════════════════════════════════════════════╗');
+        console.error('║  [LOGIN CRASH DETECTED]                              ║');
+        console.error('╚══════════════════════════════════════════════════════╝');
+        console.error('[LOGIN CRASH DETECTED] Message:', err.message);
+        console.error('[LOGIN CRASH DETECTED] Stack:', err.stack);
+        console.error('[LOGIN CRASH DETECTED] Type:', typeof err);
+        console.error('[LOGIN CRASH DETECTED] req.body exists:', !!req.body);
+        console.error('');
+        // ALWAYS return a response — keep the server alive
+        return res.status(500).json({
+            success: false,
+            error: 'Server crashed during login.',
+            details: err.message || 'Unknown error'
+        });
     }
 });
 
