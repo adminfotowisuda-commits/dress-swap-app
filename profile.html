@@ -42,33 +42,14 @@
 
         <!-- ═══ LOGIN STATE (shown when NOT logged in) ═══ -->
         <div id="login-state">
-            <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px;">
-                <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(0,209,255,0.12),rgba(157,91,255,0.12));border:2px solid rgba(0,209,255,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;color:#00D1FF;margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
+            <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:28px;">
+                <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(0,209,255,0.12),rgba(157,91,255,0.12));border:2px solid rgba(0,209,255,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;color:#00D1FF;margin-bottom:16px;"><i class="fa-brands fa-google"></i></div>
                 <h2 style="font-size:22px;font-weight:800;">Masuk Sesi</h2>
-                <p style="font-size:12px;color:#8B949E;max-width:260px;text-align:center;line-height:1.5;">Masuk dengan email dan password Anda untuk mengakses profil, kredit, dan kreasi.</p>
+                <p style="font-size:12px;color:#8B949E;max-width:280px;text-align:center;line-height:1.5;">Masuk dengan akun Google Anda untuk mengakses profil, kredit, dan kreasi.</p>
             </div>
-            <form id="login-form" style="display:flex;flex-direction:column;gap:12px;">
-                <div>
-                    <label style="font-size:11px;font-weight:600;color:#8B949E;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">Email</label>
-                    <input id="login-email-input" type="email" required placeholder="budi@gmail.com" style="width:100%;background:#0c0e12;border:1px solid #30363D;border-radius:12px;padding:12px 16px;color:#F0F6FC;font-size:14px;box-sizing:border-box;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#00D1FF'" onblur="this.style.borderColor='#30363D'">
-                </div>
-                <div>
-                    <label style="font-size:11px;font-weight:600;color:#8B949E;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">Password</label>
-                    <input id="login-password-input" type="password" required placeholder="••••••••" style="width:100%;background:#0c0e12;border:1px solid #30363D;border-radius:12px;padding:12px 16px;color:#F0F6FC;font-size:14px;box-sizing:border-box;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#9D5BFF'" onblur="this.style.borderColor='#30363D'">
-                </div>
-                <p id="login-error" style="font-size:11px;color:#ffb4ab;display:none;text-align:center;"></p>
-                <button type="submit" id="login-submit-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,#00D1FF,#9D5BFF);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,209,255,0.2);" onmouseover="this.style.boxShadow='0 6px 24px rgba(157,91,255,0.3)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 16px rgba(0,209,255,0.2)';this.style.transform='translateY(0)'">Masuk</button>
-            </form>
 
-            <!-- Google Sign-In divider + button -->
-            <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-                <div style="flex:1;height:1px;background:#30363D;"></div>
-                <span style="font-size:10px;color:#5c6370;font-weight:600;text-transform:uppercase;white-space:nowrap;">atau lanjutkan dengan</span>
-                <div style="flex:1;height:1px;background:#30363D;"></div>
-            </div>
-            <div id="g_id_signin_wrapper" style="display:flex;justify-content:center;margin-top:12px;min-height:40px;"></div>
-
-            <p style="font-size:10px;color:#8B949E;text-align:center;margin-top:16px;">Belum punya akun? Masukkan email dan password baru untuk mendaftar otomatis.</p>
+            <!-- Google Sign-In Button -->
+            <div id="g_id_signin_wrapper" style="display:flex;justify-content:center;min-height:44px;"></div>
         </div>
 
         <!-- ═══ PROFILE STATE (shown when logged in) ═══ -->
@@ -351,107 +332,6 @@ function showProfileState() {
     document.getElementById('profile-state').style.display = 'block';
 }
 
-async function handleLogin(e) {
-    console.log('[profile] handleLogin CALLED — ' + new Date().toISOString());
-    e.preventDefault();
-    e.stopPropagation();  // belt-and-suspenders: prevent any parent handler
-
-    // ── Safety net: if anything throws before we can show an inline
-    //    error, the user still sees an alert so it's never silent.
-    window._loginSafetyTimer = setTimeout(function() {
-        showToast('Login sedang diproses. Jika halaman tidak merespon, muat ulang dan coba lagi.', 'warning');
-        dismissToast(5000);
-    }, 8000);
-
-    var email = document.getElementById('login-email-input').value.trim();
-    var password = document.getElementById('login-password-input').value;
-    var errorEl = document.getElementById('login-error');
-
-    if (!email || email.indexOf('@') === -1) { showError('Masukkan alamat email yang valid.'); clearTimeout(window._loginSafetyTimer); return; }
-    if (!password || password.length < 3) { showError('Password minimal 3 karakter.'); clearTimeout(window._loginSafetyTimer); return; }
-
-    var btn = document.getElementById('login-submit-btn');
-    btn.disabled = true;
-    btn.textContent = 'Memproses...';
-    errorEl.style.display = 'none';
-
-    try {
-        var resp = await fetch(API_BASE + '/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, password: password })
-        });
-
-        // ── Try to parse JSON; if the server returned HTML (crash/error page),
-        //    resp.json() will throw and we fall into the catch block.
-        var contentType = resp.headers.get('content-type') || '';
-        var data;
-        if (contentType.indexOf('application/json') !== -1) {
-            data = await resp.json();
-        } else {
-            // Server returned non-JSON (probably an error page or crash)
-            var text = await resp.text();
-            console.error('[LOGIN] Server returned non-JSON:', text.slice(0, 300));
-            throw new Error('Server returned HTTP ' + resp.status + ' (' + contentType + ')');
-        }
-
-        if (!data.success) {
-            var errMsg = data.error || 'Login gagal. Periksa email dan password Anda.';
-            showError(errMsg);
-            showToast('Gagal masuk: ' + errMsg, 'error');
-            dismissToast(3500);
-            btn.disabled = false;
-            btn.textContent = 'Masuk';
-            clearTimeout(window._loginSafetyTimer);
-            return;
-        }
-
-        clearTimeout(window._loginSafetyTimer);
-        setEmail(email);
-
-        // Update sidebar dynamically
-        if (window._refreshCredits) window._refreshCredits();
-        if (window._renderUserProfile) window._renderUserProfile();
-
-        // Transition to profile view
-        loadProfile();
-        btn.disabled = false;
-        btn.textContent = 'Masuk';
-
-        // Show success toast then redirect to home
-        showToast('Login Berhasil! Mengalihkan...', 'success');
-        dismissToast(1500, function() {
-            window.location.href = '/';
-        });
-    } catch(err) {
-        clearTimeout(window._loginSafetyTimer);
-        console.error('[LOGIN] Catch block —', err.message);
-        var netErrMsg = 'Kesalahan jaringan: ' + err.message;
-        showError(netErrMsg);
-        showToast(netErrMsg, 'error');
-        dismissToast(4000);
-        btn.disabled = false;
-        btn.textContent = 'Masuk';
-    }
-}
-
-function showError(msg) {
-    var el = document.getElementById('login-error');
-    if (el) {
-        el.textContent = msg;
-        el.style.display = 'block';
-        // Auto-hide after 10 seconds
-        clearTimeout(window._loginErrorTimer);
-        window._loginErrorTimer = setTimeout(function() {
-            el.style.display = 'none';
-        }, 10000);
-    } else {
-        // Ultimate fallback
-        showToast(msg, 'error');
-        dismissToast(3500);
-    }
-}
-
 async function loadProfile() {
     var email = getEmail();
     if (!email) { showLoginState(); return; }
@@ -690,18 +570,9 @@ var style = document.createElement('style');
 style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
 
-// ═══ BOOT: bind login form programmatically (more reliable than inline onsubmit) ═══
+// ═══ BOOT: initialize Google Sign-In ═══
 (function boot() {
-    console.log('[profile] BOOT — binding login form...');
-    var form = document.getElementById('login-form');
-    if (form) {
-        form.addEventListener('submit', handleLogin);
-        console.log('[profile] Login form bound via addEventListener');
-    } else {
-        console.error('[profile] FATAL — #login-form not found in DOM');
-    }
-
-    // Initialize Google Sign-In
+    console.log('[profile] BOOT — initializing Google Sign-In...');
     initGoogleSignIn();
 })();
 </script>
