@@ -24,7 +24,7 @@
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:24px}
   @media(min-width:768px){.grid{grid-template-columns:repeat(3,1fr)}}
   @media(min-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
-  .card{background:#161B22;border:1px solid #30363D;border-radius:16px;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s}
+  .card{background:#161B22;border:1px solid #30363D;border-radius:0;overflow:hidden;cursor:pointer;transition:box-shadow 0.2s}
   .card:hover{box-shadow:0 4px 20px rgba(0,209,255,0.15)}
   .card-img-wrap{position:relative;width:100%;padding-bottom:133.33%;background:#0a0c10}
   .card-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -81,7 +81,7 @@
   .processing-card{
     background:#161B22;
     border:1px solid #30363D;
-    border-radius:16px;
+    border-radius:0;
     overflow:hidden;
     animation:processingPulse 2.5s ease-in-out infinite;
     pointer-events:none;
@@ -810,7 +810,7 @@ function openPreview(idx) {
 
     img.style.transformOrigin = 'center center';
     img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + sX + ', ' + sY + ')';
-    img.style.borderRadius = '8px';
+    img.style.borderRadius = '0px';
     img.style.willChange = 'transform, border-radius';
 
     // Force layout
@@ -881,7 +881,7 @@ function closePreview() {
                          + ', border-radius ' + (DURATION_CLOSE / 1000) + 's ease';
     img.style.transformOrigin = 'center center';
     img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + sX + ', ' + sY + ')';
-    img.style.borderRadius = '8px';
+    img.style.borderRadius = '0px';
     img.style.willChange = 'transform, border-radius';
 
     var onDone = function() {
