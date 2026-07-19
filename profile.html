@@ -81,11 +81,15 @@
                 </div>
             </div>
 
-            <!-- Riwayat Pembelian + Logout/Delete -->
+            <!-- Riwayat Pembelian + Riwayat Penggunaan + Logout/Delete -->
             <div style="display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid #30363D;">
                 <!-- Riwayat Pembelian Button -->
                 <button onclick="openTransactionHistory()" style="width:100%;padding:12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);color:#fbbf24;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
                     <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Pembelian
+                </button>
+                <!-- Riwayat Penggunaan Button -->
+                <button onclick="openUsageHistory()" style="width:100%;padding:12px;background:rgba(0,209,255,0.06);border:1px solid rgba(0,209,255,0.15);color:#00D1FF;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <i class="fa-solid fa-list-check"></i> Riwayat Penggunaan
                 </button>
                 <button onclick="doLogout()" style="width:100%;padding:12px;background:rgba(0,209,255,0.06);border:1px solid rgba(0,209,255,0.15);color:#00D1FF;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
                     <i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi
@@ -160,6 +164,52 @@
                     </tr>
                 </thead>
                 <tbody id="txn-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ CREDIT USAGE HISTORY MODAL ═══ -->
+<div id="usage-history-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);">
+    <div style="background:#161B22;border:1px solid #30363D;border-radius:20px;padding:28px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;animation:fadeIn 0.3s ease-out;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <h3 style="font-size:18px;font-weight:700;color:#fff;margin:0;display:flex;align-items:center;gap:10px;">
+                <i class="fa-solid fa-list-check" style="color:#00D1FF;"></i> Riwayat Penggunaan Kredit
+            </h3>
+            <button onclick="closeUsageHistory()" style="background:none;border:none;color:#8B949E;cursor:pointer;font-size:20px;padding:4px 8px;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.color='#F0F6FC';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.color='#8B949E';this.style.background='none'">&times;</button>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="usage-loading" style="text-align:center;padding:32px 0;">
+            <div style="width:32px;height:32px;border:3px solid rgba(0,209,255,0.2);border-top-color:#00D1FF;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px;"></div>
+            <p style="font-size:13px;color:#8B949E;">Memuat riwayat penggunaan...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div id="usage-empty" style="display:none;text-align:center;padding:32px 0;">
+            <div style="font-size:48px;margin-bottom:12px;">📋</div>
+            <p style="font-size:14px;font-weight:600;color:#8B949E;">Belum ada riwayat penggunaan</p>
+            <p style="font-size:12px;color:#8B949E;margin-top:4px;">Setiap kali Anda menggunakan kredit untuk membuat gambar, akan muncul di sini.</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="usage-error" style="display:none;text-align:center;padding:32px 0;">
+            <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+            <p id="usage-error-msg" style="font-size:14px;color:#ffb4ab;">Gagal memuat data.</p>
+            <button onclick="openUsageHistory()" style="margin-top:12px;padding:8px 20px;background:rgba(0,209,255,0.1);border:1px solid rgba(0,209,255,0.2);color:#00D1FF;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">Coba Lagi</button>
+        </div>
+
+        <!-- Table -->
+        <div id="usage-table-container" style="display:none;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                    <tr style="border-bottom:2px solid #30363D;text-align:left;">
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;">Tanggal</th>
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;">Fitur / Aksi</th>
+                        <th style="padding:10px 8px;color:#8B949E;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;font-size:10px;text-align:right;">Kredit Terpakai</th>
+                    </tr>
+                </thead>
+                <tbody id="usage-table-body"></tbody>
             </table>
         </div>
     </div>
@@ -382,6 +432,68 @@ async function openTransactionHistory() {
 
 function closeTransactionHistory() {
     document.getElementById('txn-history-modal').classList.add('hidden');
+}
+
+async function openUsageHistory() {
+    var email = getEmail();
+    if (!email) return;
+
+    var modal = document.getElementById('usage-history-modal');
+    var loading = document.getElementById('usage-loading');
+    var empty = document.getElementById('usage-empty');
+    var error = document.getElementById('usage-error');
+    var table = document.getElementById('usage-table-container');
+    var tbody = document.getElementById('usage-table-body');
+
+    // Reset state
+    modal.classList.remove('hidden');
+    loading.style.display = 'block';
+    empty.style.display = 'none';
+    error.style.display = 'none';
+    table.style.display = 'none';
+    tbody.innerHTML = '';
+
+    try {
+        var resp = await fetch(API_BASE + '/api/user/usages?email=' + encodeURIComponent(email));
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+        var usages = await resp.json();
+        loading.style.display = 'none';
+
+        if (!usages || usages.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+
+        // Build table rows
+        var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        var rows = '';
+        for (var i = 0; i < usages.length; i++) {
+            var u = usages[i];
+            var d = u.date ? new Date(u.date) : null;
+            var dateStr = d ? d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() : '—';
+            var timeStr = d ? ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) : '';
+
+            // Color-code the credits used
+            var creditColor = u.credits_used > 1 ? '#ffb4ab' : '#fbbf24';
+
+            rows += '<tr style="border-bottom:1px solid #21262D;">' +
+                '<td style="padding:10px 8px;color:#F0F6FC;white-space:nowrap;">' + dateStr + '<br><span style="font-size:10px;color:#8B949E;">' + timeStr + '</span></td>' +
+                '<td style="padding:10px 8px;color:#F0F6FC;font-weight:500;">' + (u.action || '—') + '</td>' +
+                '<td style="padding:10px 8px;color:' + creditColor + ';font-weight:700;text-align:right;white-space:nowrap;">-' + u.credits_used + '</td>' +
+                '</tr>';
+        }
+        tbody.innerHTML = rows;
+        table.style.display = 'block';
+    } catch (err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        document.getElementById('usage-error-msg').textContent = 'Gagal memuat riwayat: ' + err.message;
+    }
+}
+
+function closeUsageHistory() {
+    document.getElementById('usage-history-modal').classList.add('hidden');
 }
 
 function doLogout() {

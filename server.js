@@ -110,6 +110,13 @@ const CREDIT_COSTS = {
     '/api/admin-gallery-filter/swap': 1
 };
 
+// Human-readable action names for credit usage history
+const CREDIT_ACTION_NAMES = {
+    '/api/background-swap':         'Background Swap',
+    '/api/dress-swap/generate':     'Dress Swap',
+    '/api/admin-gallery-filter/swap': 'Filter Gallery Swap'
+};
+
 // Admin data directories — absolute local file saving for admin panel
 const ADMIN_IMAGE_GEN_DIR   = path.join(__dirname, 'admin_data_image_generate');
 const ADMIN_IMAGE_REF_DIR   = path.join(__dirname, 'admin_data_image_reference');
@@ -571,6 +578,7 @@ function ensureCreditsDatabase() {
 
     const db = readUnifiedDB();
     db.packages = defaultPackages;  // Always sync to latest pricing
+    db.credit_usages = db.credit_usages || [];  // Initialize credit usage log
     writeUnifiedDB(db);
     console.log('  [init] Synced database.json packages to:', defaultPackages.map(p => p.package_id).join(', '));
 }
@@ -3468,6 +3476,19 @@ async function validateAndDeductCredits(req, res, next) {
             });
         }
 
+        // Log credit usage for history (Riwayat Penggunaan Kredit)
+        const db = readCreditsDB();
+        db.credit_usages = db.credit_usages || [];
+        const actionName = CREDIT_ACTION_NAMES[currentPath] || currentPath;
+        db.credit_usages.push({
+            email: userEmail.trim().toLowerCase(),
+            action: actionName,
+            credits_used: creditCost,
+            date: new Date().toISOString()
+        });
+        writeCreditsDB(db);
+        console.log(`  [usage] Logged — ${userEmail} → "${actionName}" (${creditCost} credits)`);
+
         // Store cost on request for potential refund
         req.creditCost = creditCost;
         req.creditEmail = userEmail;
@@ -3750,6 +3771,36 @@ app.get('/api/user/transactions', (req, res) => {
     } catch (err) {
         console.error('[/api/user/transactions] Error:', err);
         res.status(500).json({ error: 'Failed to retrieve transaction history.' });
+    }
+});
+
+/**
+ * GET /api/user/usages
+ * ------------------------------------------------------------------
+ * Returns the credit usage history (Riwayat Penggunaan Kredit) for a user.
+ * Query: ?email=budi@gmail.com
+ *
+ * Response: array of {
+ *   email, action, credits_used, date
+ * } sorted newest-first.
+ */
+app.get('/api/user/usages', (req, res) => {
+    try {
+        const email = (req.query.email || '').trim().toLowerCase();
+        if (!email) {
+            return res.status(400).json({ error: 'Email parameter is required.' });
+        }
+
+        const db = readCreditsDB();
+        const usages = (db.credit_usages || [])
+            .filter(u => u.email === email)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        console.log(`  [api/user/usages] ${email} → ${usages.length} usages`);
+        res.json(usages);
+    } catch (err) {
+        console.error('[/api/user/usages] Error:', err);
+        res.status(500).json({ error: 'Failed to retrieve credit usage history.' });
     }
 });
 
