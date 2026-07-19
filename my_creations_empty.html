@@ -605,20 +605,21 @@ function startProcessingPoll(generationId, serverCreatedAt) {
         if (spinnerEl) spinnerEl.style.display = 'none';
         if (dotEl)    { dotEl.style.background = '#22c55e'; dotEl.style.animation = 'none'; }
 
+        // Remove from localStorage FIRST so mergeProcessingCards() doesn't re-create it
+        removeProcessingItem(generationId);
+        // Clean URL
+        if (window.location.search.indexOf('pending=')!==-1) {
+          var u = new URL(window.location);
+          u.searchParams.delete('pending');
+          window.history.replaceState({}, '', u.toString());
+        }
+
         setTimeout(function() {
           cardEl.classList.add('resolving');
           setTimeout(function() {
             if (cardEl.parentNode) cardEl.remove();
             updateGalleryCount();
             loadGallery();
-            // Remove from localStorage
-            removeProcessingItem(generationId);
-            // Clean URL
-            if (window.location.search.indexOf('pending=')!==-1) {
-              var u = new URL(window.location);
-              u.searchParams.delete('pending');
-              window.history.replaceState({}, '', u.toString());
-            }
           }, 500);
         }, 800);
       } else if (status === 'FAILED') {

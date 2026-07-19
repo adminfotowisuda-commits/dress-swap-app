@@ -412,13 +412,24 @@ async function openTransactionHistory() {
             }
 
             var packageLabel = t.package_name || '—';
-            var creditStr = '+' + t.credits;
+            // Determine credit sign based on transaction type
+            var creditValue = t.credits;
+            var creditStr;
+            if (t.type === 'usage' || t.type === 'deduction' || t.type === 'refund') {
+                // Deductions and refunds — show as negative (already stored as negative)
+                creditStr = String(creditValue);  // e.g. "-2"
+            } else if (creditValue >= 0) {
+                creditStr = '+' + creditValue;
+            } else {
+                creditStr = String(creditValue);
+            }
+            var creditColor = creditValue < 0 ? '#ffb4ab' : '#22c55e';
 
             rows += '<tr style="border-bottom:1px solid #21262D;">' +
                 '<td style="padding:10px 8px;color:#F0F6FC;white-space:nowrap;">' + dateStr + '<br><span style="font-size:10px;color:#8B949E;">' + timeStr + '</span></td>' +
                 '<td style="padding:10px 8px;color:#8B949E;font-family:monospace;font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (t.invoice_number || '') + '">' + (t.invoice_number || '—') + '</td>' +
                 '<td style="padding:10px 8px;color:#F0F6FC;font-weight:500;">' + packageLabel + '</td>' +
-                '<td style="padding:10px 8px;color:#22c55e;font-weight:700;text-align:right;white-space:nowrap;">' + creditStr + '</td>' +
+                '<td style="padding:10px 8px;color:' + creditColor + ';font-weight:700;text-align:right;white-space:nowrap;">' + creditStr + '</td>' +
                 '<td style="padding:10px 8px;text-align:center;">' + statusBadge + '</td>' +
                 '</tr>';
         }

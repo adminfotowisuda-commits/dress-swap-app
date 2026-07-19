@@ -1821,9 +1821,11 @@ app.get('/api/status/:generationId', async (req, res) => {
         // Fallback: check the database for a failed/timed-out record
         const db = await readDatabase();
         const dbRecord = db.find(r => r.generation_id === generationId);
-        if (dbRecord && (dbRecord.status === 'failed' || dbRecord.status === 'complete')) {
+        if (dbRecord && (dbRecord.status === 'FAILED' || dbRecord.status === 'failed'
+                      || dbRecord.status === 'COMPLETE' || dbRecord.status === 'complete')) {
+            const isFailed = dbRecord.status === 'FAILED' || dbRecord.status === 'failed';
             return res.json({
-                status: dbRecord.status === 'failed' ? 'FAILED' : 'COMPLETE',
+                status: isFailed ? 'FAILED' : 'COMPLETE',
                 imageUrl: dbRecord.image_url || undefined,
                 error: dbRecord.error || undefined,
                 createdAt: dbRecord.created_at ? new Date(dbRecord.created_at).getTime() : undefined
