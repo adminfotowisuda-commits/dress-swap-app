@@ -224,18 +224,18 @@
 
 <!-- PREVIEW OVERLAY — carousel track for real-time swipe -->
 <div class="preview-overlay" id="preview-overlay" onclick="closePreview()">
-  <!-- Carousel viewport: clips to one slide at a time -->
-  <div id="preview-viewport" style="overflow:hidden;width:100%;display:flex;align-items:center;justify-content:center;z-index:1;">
-    <!-- Track: holds 3 slides side-by-side; offset -100% shows center slide -->
-    <div id="preview-track" style="display:flex;width:300%;transform:translateX(-100%);will-change:transform;">
-      <div class="preview-slide" style="flex:0 0 33.333%;display:flex;align-items:center;justify-content:center;">
-        <img id="preview-img-0" src="" style="max-width:90vw;max-height:75vh;object-fit:contain;border-radius:0;pointer-events:none;">
+  <!-- Carousel viewport: clips to one slide at a time, fills overlay -->
+  <div id="preview-viewport" style="overflow:hidden;width:100%;height:100%;z-index:1;">
+    <!-- Track: 3 slides side-by-side; offset -100% shows center; fills viewport -->
+    <div id="preview-track" style="display:flex;width:300%;height:100%;transform:translateX(-100%);will-change:transform;">
+      <div class="preview-slide" style="flex:0 0 33.333%;height:100%;display:flex;align-items:center;justify-content:center;">
+        <img id="preview-img-0" src="" style="max-width:90%;max-height:80vh;object-fit:contain;border-radius:0;pointer-events:none;">
       </div>
-      <div class="preview-slide" style="flex:0 0 33.333%;display:flex;align-items:center;justify-content:center;">
-        <img id="preview-img-1" src="" style="max-width:90vw;max-height:75vh;object-fit:contain;border-radius:0;">
+      <div class="preview-slide" style="flex:0 0 33.333%;height:100%;display:flex;align-items:center;justify-content:center;">
+        <img id="preview-img-1" src="" style="max-width:90%;max-height:80vh;object-fit:contain;border-radius:0;">
       </div>
-      <div class="preview-slide" style="flex:0 0 33.333%;display:flex;align-items:center;justify-content:center;">
-        <img id="preview-img-2" src="" style="max-width:90vw;max-height:75vh;object-fit:contain;border-radius:0;pointer-events:none;">
+      <div class="preview-slide" style="flex:0 0 33.333%;height:100%;display:flex;align-items:center;justify-content:center;">
+        <img id="preview-img-2" src="" style="max-width:90%;max-height:80vh;object-fit:contain;border-radius:0;pointer-events:none;">
       </div>
     </div>
   </div>
