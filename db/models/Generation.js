@@ -34,6 +34,10 @@ const generationSchema = new mongoose.Schema({
     reference_image_1_path: { type: String, default: '' },
     reference_image_2_path: { type: String, default: '' },
 
+    // Admin filter management
+    isActive:    { type: Boolean, default: true },
+    usageCount:  { type: Number, default: 0 },
+
     created_at: { type: Date, default: Date.now }
 });
 
@@ -41,5 +45,6 @@ const generationSchema = new mongoose.Schema({
 generationSchema.index({ email: 1, created_at: -1 });
 generationSchema.index({ owner_email: 1, created_at: -1 });
 generationSchema.index({ type: 1, created_at: -1 });
+generationSchema.index({ isActive: 1, type: 1 });
 
 module.exports = mongoose.model('Generation', generationSchema);

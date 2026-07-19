@@ -452,6 +452,7 @@ app.get('/admin_creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res
 
 // Admin Portal — central hub landing page (PROTECTED)
 app.get('/admin', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin.html')));
+app.get('/admin-filters', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_filters.html')));
 
 // ------------------------------------------------------------------
 // Multer — accept up to 2 reference images in memory
@@ -2861,7 +2862,10 @@ app.get('/api/admin-gallery-filter/images', async (req, res) => {
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
+        // Admin can pass ?all=1 to see inactive filters too
+        const showAll = req.query.all === '1';
         const query = { type: 'filter-factory', image_url: { $ne: '', $exists: true } };
+        if (!showAll) query.isActive = true;
         const records = await db.Generation.find(query)
             .sort({ created_at: -1 })
             .skip(offset)
@@ -3310,6 +3314,72 @@ app.delete('/api/filter-gallery/:id', requireAdminApi, async (req, res) => {
     } catch (err) {
         console.error('[/api/filter-gallery/:id] Error:', err);
         res.status(500).json({ error: 'Failed to delete record.' });
+    }
+});
+
+// ------------------------------------------------------------------
+// Admin Filter Management API — table view with toggle & delete
+// ------------------------------------------------------------------
+
+/**
+ * GET /api/admin/filters
+ * Returns ALL filter-factory records (including inactive) for the
+ * admin filter management table. Supports ?limit=N&offset=N.
+ */
+app.get('/api/admin/filters', requireAdminApi, async (req, res) => {
+    try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
+        const limit  = Math.min(parseInt(req.query.limit) || 200, 500);
+        const offset = parseInt(req.query.offset) || 0;
+
+        const query = { type: 'filter-factory', image_url: { $ne: '', $exists: true } };
+        const [records, total] = await Promise.all([
+            db.Generation.find(query).sort({ created_at: -1 }).skip(offset).limit(limit).lean(),
+            db.Generation.countDocuments(query)
+        ]);
+
+        const filters = records.map(r => ({
+            generation_id: r.generation_id,
+            title: r.title || r.filterTitle || 'Untitled',
+            tags: r.tags || [],
+            dimensions: r.dimensions || '',
+            image_url: r.image_url || r.cover_image_url || '',
+            cover_image_url: r.cover_image_url || r.image_url || '',
+            isActive: r.isActive !== false,  // default true
+            usageCount: r.usageCount || 0,
+            created_at: r.created_at
+        }));
+
+        res.json({ total, limit, offset, filters });
+    } catch (err) {
+        console.error('[/api/admin/filters] Error:', err);
+        res.status(500).json({ error: 'Failed to read filters.' });
+    }
+});
+
+/**
+ * PATCH /api/admin/filters/:id/toggle
+ * Toggles the isActive flag on a filter-factory record.
+ */
+app.patch('/api/admin/filters/:id/toggle', requireAdminApi, async (req, res) => {
+    try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
+        const record = await db.Generation.findOne({ generation_id: req.params.id, type: 'filter-factory' });
+        if (!record) return res.status(404).json({ error: 'Filter not found.' });
+
+        const newState = !record.isActive;
+        await db.Generation.updateOne(
+            { generation_id: req.params.id },
+            { $set: { isActive: newState } }
+        );
+
+        console.log(`  [admin/filters] Toggled ${req.params.id} → isActive=${newState}`);
+        res.json({ success: true, generation_id: req.params.id, isActive: newState });
+    } catch (err) {
+        console.error('[/api/admin/filters/:id/toggle] Error:', err);
+        res.status(500).json({ error: 'Failed to toggle filter.' });
     }
 });
 

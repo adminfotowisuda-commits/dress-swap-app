@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Filter Management — fotowisuda.ai Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-background":"#0A0C10","surface-card":"#161B22","border-subtle":"#30363D","text-primary":"#F0F6FC","text-secondary":"#8B949E","electric-cyan":"#00D1FF","vivid-purple":"#9D5BFF"}}}}</script>
+    <style>
+        html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .animate-in{animation:fadeIn 0.35s ease-out}
+        .spinner{width:24px;height:24px;border:2px solid rgba(0,209,255,0.15);border-top-color:#00D1FF;border-radius:50%;animation:spin 0.7s linear infinite}
+        .toggle-track{width:44px;height:24px;border-radius:12px;transition:background 0.2s;cursor:pointer}
+        .toggle-thumb{width:20px;height:20px;border-radius:50%;background:#fff;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+        .toggle-on .toggle-thumb{transform:translateX(20px)}
+        .toggle-on{background:#00D1FF}.toggle-off{background:#30363D}
+        .table-row{transition:background 0.15s}
+        .table-row:hover{background:rgba(0,209,255,0.04)}
+    </style>
+    <script src="/sidebar.js"></script>
+</head>
+<body class="bg-surface-background text-text-primary">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-40 flex items-center justify-between h-16 px-6 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle">
+    <div class="flex items-center gap-3">
+        <button id="sidebar-toggle-btn" class="p-2 text-slate-400 hover:text-white transition-colors" aria-label="Open menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="/admin" class="text-lg font-bold text-white hover:opacity-80 transition-opacity">fotowisuda.ai <span class="text-electric-cyan text-xs ml-1">Admin</span></a>
+    </div>
+    <a href="/admin-filters" class="px-4 py-2 bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20 rounded-lg text-sm font-semibold">Filter Management</a>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 animate-in">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-white">Filter Management</h1>
+            <p class="text-text-secondary text-sm mt-1">Kelola visibilitas filter untuk publik. Toggle ON/OFF, preview, atau hapus.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="text-text-secondary text-sm" id="filter-count">— filters</span>
+            <button onclick="loadFilters()" class="px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-lg text-xs font-semibold hover:border-electric-cyan/30 hover:text-white transition-all">
+                <i class="fa-solid fa-rotate mr-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+        <div class="spinner mb-4"></div>
+        <p class="text-text-secondary text-sm">Memuat data filter...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-state" class="hidden text-center py-20">
+        <p class="text-red-400 text-sm" id="error-msg">Gagal memuat.</p>
+        <button onclick="loadFilters()" class="mt-4 px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-lg text-xs">Coba Lagi</button>
+    </div>
+
+    <!-- Empty -->
+    <div id="empty-state" class="hidden text-center py-20">
+        <i class="fa-solid fa-images text-5xl text-text-secondary opacity-30 mb-4 block"></i>
+        <p class="text-text-secondary">Belum ada filter yang tersimpan.</p>
+    </div>
+
+    <!-- Table -->
+    <div id="table-container" class="hidden">
+        <div class="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-border-subtle text-left">
+                            <th class="py-3 px-4 text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Cover</th>
+                            <th class="py-3 px-4 text-[10px] font-semibold text-text-secondary uppercase tracking-wider">Filter Name</th>
+                            <th class="py-3 px-4 text-[10px] font-semibold text-text-secondary uppercase tracking-wider text-center">Usage</th>
+                            <th class="py-3 px-4 text-[10px] font-semibold text-text-secondary uppercase tracking-wider text-center">Status</th>
+                            <th class="py-3 px-4 text-[10px] font-semibold text-text-secondary uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <p class="text-[10px] text-text-secondary text-center mt-3" id="table-footer">—</p>
+    </div>
+</main>
+
+<!-- ═══ PREVIEW MODAL ═══ -->
+<div id="preview-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);" onclick="closePreviewModal()">
+    <div class="bg-surface-card border border-border-subtle rounded-3xl p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto animate-in" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white" id="preview-title">—</h3>
+            <button onclick="closePreviewModal()" class="p-2 hover:bg-surface-container rounded-lg transition-colors text-text-secondary hover:text-white">&times;</button>
+        </div>
+        <img id="preview-cover" src="" class="w-full rounded-xl object-cover max-h-[50vh]" alt="Cover">
+        <div class="mt-4 space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-text-secondary">Tags</span><span class="text-white" id="preview-tags">—</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Dimensions</span><span class="text-white" id="preview-dims">—</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Usage Count</span><span class="text-white" id="preview-usage">0</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Status</span><span id="preview-status">—</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">ID</span><span class="text-white text-[10px] font-mono" id="preview-id">—</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ DELETE CONFIRM MODAL ═══ -->
+<div id="delete-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);" onclick="closeDeleteModal()">
+    <div class="bg-surface-card border border-border-subtle rounded-2xl p-6 max-w-sm w-full text-center animate-in" onclick="event.stopPropagation()">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3 class="text-base font-bold text-white mb-1">Hapus Filter?</h3>
+        <p class="text-text-secondary text-sm mb-5">Filter ini akan dihapus secara permanen dan tidak dapat dikembalikan.</p>
+        <div class="flex gap-3">
+            <button onclick="closeDeleteModal()" class="flex-1 py-2.5 bg-transparent border border-border-subtle text-text-secondary rounded-xl text-xs font-semibold hover:border-white/20 transition-all">Batal</button>
+            <button id="delete-confirm-btn" class="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-500 transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+        </div>
+    </div>
+</div>
+
+<script>
+var API_BASE = window.location.origin;
+var _filters = [];
+var _deleteTarget = null;
+
+// ═══ Load Filters ═══
+async function loadFilters() {
+    var loading = document.getElementById('loading-state');
+    var error = document.getElementById('error-state');
+    var empty = document.getElementById('empty-state');
+    var table = document.getElementById('table-container');
+    var tbody = document.getElementById('table-body');
+    var count = document.getElementById('filter-count');
+    var footer = document.getElementById('table-footer');
+
+    loading.style.display = 'flex';
+    error.classList.add('hidden');
+    empty.classList.add('hidden');
+    table.classList.add('hidden');
+    tbody.innerHTML = '';
+
+    try {
+        var resp = await fetch(API_BASE + '/api/admin/filters?limit=500');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var data = await resp.json();
+        _filters = data.filters || [];
+
+        loading.style.display = 'none';
+
+        if (_filters.length === 0) {
+            empty.classList.remove('hidden');
+            count.textContent = '0 filters';
+            return;
+        }
+
+        count.textContent = _filters.length + ' filters';
+        footer.textContent = 'Showing ' + _filters.length + ' of ' + (data.total || _filters.length) + ' filters';
+
+        var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        var rows = '';
+        for (var i = 0; i < _filters.length; i++) {
+            var f = _filters[i];
+            var coverUrl = f.cover_image_url || f.image_url || '';
+            var title = f.title || 'Untitled';
+            var dims = f.dimensions || '—';
+            var active = f.isActive !== false;
+            var usage = f.usageCount || 0;
+            var genId = f.generation_id || '';
+
+            var statusBadge = active
+                ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active</span>'
+                : '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/20"><span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Hidden</span>';
+
+            var coverHtml = coverUrl
+                ? '<img src="' + coverUrl + '" class="w-10 h-10 rounded-lg object-cover" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect fill=%22%23161B22%22 width=%2240%22 height=%2240%22/></svg>\'">'
+                : '<div class="w-10 h-10 rounded-lg bg-surface-background border border-border-subtle flex items-center justify-center text-text-secondary text-[10px]">N/A</div>';
+
+            rows += '<tr class="table-row border-b border-border-subtle/50" data-id="' + genId + '">' +
+                '<td class="py-3 px-4">' + coverHtml + '</td>' +
+                '<td class="py-3 px-4">' +
+                    '<p class="text-sm font-semibold text-white truncate max-w-[200px]">' + escapeHtml(title) + '</p>' +
+                    '<p class="text-[10px] text-text-secondary mt-0.5">' + escapeHtml(dims) + '</p>' +
+                '</td>' +
+                '<td class="py-3 px-4 text-center"><span class="text-sm text-white font-mono">' + usage + '</span></td>' +
+                '<td class="py-3 px-4 text-center">' + statusBadge + '</td>' +
+                '<td class="py-3 px-4">' +
+                    '<div class="flex items-center justify-end gap-2">' +
+                        // Preview button
+                        '<button onclick="previewFilter(\'' + genId + '\')" class="w-8 h-8 rounded-lg bg-surface-background border border-border-subtle flex items-center justify-center text-text-secondary hover:text-electric-cyan hover:border-electric-cyan/30 transition-all" title="Preview"><i class="fa-solid fa-eye text-xs"></i></button>' +
+                        // Toggle button
+                        '<button onclick="toggleFilter(\'' + genId + '\')" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all ' + (active ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-slate-500/10 border border-slate-500/20 text-slate-400') + '" title="' + (active ? 'Hide from public' : 'Show to public') + '"><i class="fa-solid fa-' + (active ? 'toggle-on' : 'toggle-off') + ' text-xs"></i></button>' +
+                        // Delete button
+                        '<button onclick="confirmDeleteFilter(\'' + genId + '\', \'' + escapeHtml(title).replace(/'/g, "\\'") + '\')" class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-all" title="Delete"><i class="fa-solid fa-trash-can text-xs"></i></button>' +
+                    '</div>' +
+                '</td>' +
+                '</tr>';
+        }
+        tbody.innerHTML = rows;
+        table.classList.remove('hidden');
+    } catch (err) {
+        loading.style.display = 'none';
+        error.classList.remove('hidden');
+        document.getElementById('error-msg').textContent = 'Gagal memuat: ' + err.message;
+    }
+}
+
+function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = (str || '');
+    return div.innerHTML;
+}
+
+// ═══ Preview ═══
+function previewFilter(genId) {
+    var f = findFilter(genId);
+    if (!f) return;
+    var modal = document.getElementById('preview-modal');
+    document.getElementById('preview-title').textContent = f.title || 'Untitled';
+    document.getElementById('preview-cover').src = f.cover_image_url || f.image_url || '';
+    document.getElementById('preview-tags').textContent = (f.tags && f.tags.length) ? f.tags.join(', ') : '—';
+    document.getElementById('preview-dims').textContent = f.dimensions || '—';
+    document.getElementById('preview-usage').textContent = f.usageCount || 0;
+    document.getElementById('preview-status').innerHTML = f.isActive !== false
+        ? '<span class="text-emerald-400 font-semibold">Active (visible to public)</span>'
+        : '<span class="text-slate-400 font-semibold">Hidden (not visible)</span>';
+    document.getElementById('preview-id').textContent = genId;
+    modal.classList.remove('hidden');
+}
+
+function closePreviewModal() {
+    document.getElementById('preview-modal').classList.add('hidden');
+}
+
+// ═══ Toggle ═══
+async function toggleFilter(genId) {
+    var row = document.querySelector('[data-id="' + genId + '"]');
+    try {
+        var resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(genId) + '/toggle', { method: 'PATCH' });
+        var data = await resp.json();
+        if (data.success) {
+            // Update local state
+            var f = findFilter(genId);
+            if (f) f.isActive = data.isActive;
+            // Re-render the row to update toggle icon and status badge
+            loadFilters();
+        }
+    } catch (err) {
+        console.error('Toggle failed:', err);
+    }
+}
+
+// ═══ Delete ═══
+function confirmDeleteFilter(genId, title) {
+    _deleteTarget = genId;
+    var modal = document.getElementById('delete-modal');
+    modal.querySelector('p').textContent = 'Filter "' + (title || genId) + '" akan dihapus secara permanen dan tidak dapat dikembalikan.';
+    modal.classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal').classList.add('hidden');
+    _deleteTarget = null;
+}
+
+async function executeDelete() {
+    if (!_deleteTarget) return;
+    var genId = _deleteTarget;
+    var btn = document.getElementById('delete-confirm-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:1.5px;"></span> Menghapus...';
+
+    try {
+        var resp = await fetch(API_BASE + '/api/filter-gallery/' + encodeURIComponent(genId), { method: 'DELETE' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        closeDeleteModal();
+        loadFilters();
+    } catch (err) {
+        alert('Gagal menghapus: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Hapus';
+    }
+}
+
+function findFilter(genId) {
+    for (var i = 0; i < _filters.length; i++) {
+        if (_filters[i].generation_id === genId) return _filters[i];
+    }
+    return null;
+}
+
+// ═══ Keyboard ═══
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePreviewModal();
+        closeDeleteModal();
+    }
+});
+
+// ═══ Init ═══
+document.getElementById('delete-confirm-btn').addEventListener('click', executeDelete);
+document.addEventListener('DOMContentLoaded', function() {
+    initUnifiedSidebar('admin-filters');
+    loadFilters();
+});
+</script>
+</body>
+</html>

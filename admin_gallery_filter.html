@@ -440,7 +440,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(function() { controller.abort(); }, 8000);
 
-                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/images?limit=100`, { signal: controller.signal });
+                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/images?limit=100&all=1`, { signal: controller.signal });
                 clearTimeout(timeoutId);
 
                 console.log('[Admin] API response status:', resp.status);
