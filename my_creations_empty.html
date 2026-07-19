@@ -44,6 +44,9 @@
   .preview-nav.prev{left:16px} .preview-nav.next{right:16px}
   .preview-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(30,32,36,0.8);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .preview-counter{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(30,32,36,0.8);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+  /* Chrome fade: all overlay UI fades in/out with the FLIP animation */
+  .preview-chrome{opacity:0;transition:opacity 0.3s ease;pointer-events:none}
+  .preview-chrome.visible{opacity:1;pointer-events:auto}
   @keyframes spin{to{transform:rotate(360deg)}}
   .spinner{width:40px;height:40px;border:3px solid #30363D;border-top-color:#9D5BFF;border-radius:50%;animation:spin 0.8s linear infinite}
 
@@ -216,15 +219,17 @@
 
 <!-- PREVIEW OVERLAY -->
 <div class="preview-overlay" id="preview-overlay" onclick="closePreview()">
-  <button class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
-  <button class="preview-nav prev" onclick="event.stopPropagation();navPreview(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-  <button class="preview-nav next" onclick="event.stopPropagation();navPreview(1)"><i class="fa-solid fa-chevron-right"></i></button>
-  <span class="preview-counter" id="preview-counter">—</span>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:100%;max-height:100%;" onclick="event.stopPropagation()">
-    <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:0;">
-    <div style="display:flex;gap:12px;">
-      <button id="preview-dl" class="btn btn-primary" onclick="event.stopPropagation();downloadCurrentPreview()"><i class="fa-solid fa-download"></i> <span id="preview-dl-text">Download</span></button>
-      <button class="btn btn-outline" onclick="deleteCurrentPreview()" style="color:#ffb4ab;border-color:rgba(255,180,171,0.3);"><i class="fa-solid fa-trash-can"></i></button>
+  <div class="preview-chrome" id="preview-chrome">
+    <button class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
+    <button class="preview-nav prev" onclick="event.stopPropagation();navPreview(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+    <button class="preview-nav next" onclick="event.stopPropagation();navPreview(1)"><i class="fa-solid fa-chevron-right"></i></button>
+    <span class="preview-counter" id="preview-counter">—</span>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:100%;max-height:100%;" onclick="event.stopPropagation()">
+      <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:0;">
+      <div style="display:flex;gap:12px;" id="preview-actions">
+        <button id="preview-dl" class="btn btn-primary" onclick="event.stopPropagation();downloadCurrentPreview()"><i class="fa-solid fa-download"></i> <span id="preview-dl-text">Download</span></button>
+        <button class="btn btn-outline" onclick="deleteCurrentPreview()" style="color:#ffb4ab;border-color:rgba(255,180,171,0.3);"><i class="fa-solid fa-trash-can"></i></button>
+      </div>
     </div>
   </div>
 </div>
@@ -735,6 +740,15 @@ var _flipAnimating = false;  // guard against concurrent animations
 var _flipThumbImg = null;    // the img inside the source card
 var _flipRect = null;        // cached bounding rect of the source card
 
+function showChrome() {
+  var chrome = document.getElementById('preview-chrome');
+  if (chrome) chrome.classList.add('visible');
+}
+function hideChrome() {
+  var chrome = document.getElementById('preview-chrome');
+  if (chrome) chrome.classList.remove('visible');
+}
+
 // ── FLIP shared-element transition ─────────────────────────────
 // Captures the thumbnail's position, then animates the modal image
 // from that position to its final centered state.
@@ -823,6 +837,7 @@ function openPreview(idx) {
     _flipAnimating = true;
     ov.style.transition = 'background ' + (DURATION_OPEN / 1000) + 's ease';
     ov.style.background = 'rgba(0,0,0,0.92)';
+    showChrome();  // fade in counter, arrows, buttons
 
     img.style.transition = 'transform ' + (DURATION_OPEN / 1000) + 's ' + EASING
                          + ', border-radius ' + (DURATION_OPEN / 1000) + 's ease';
@@ -849,6 +864,7 @@ function openPreview(idx) {
   } else {
     // No card found — instant show
     ov.style.background = 'rgba(0,0,0,0.92)';
+    showChrome();
   }
 }
 
@@ -881,6 +897,7 @@ function closePreview() {
     var s  = Math.max(sX, sY);  // cover: fill the target, crop excess
 
     _flipAnimating = true;
+    hideChrome();  // instantly fade out counter, arrows, buttons
     ov.style.transition = 'background ' + (DURATION_CLOSE / 1000) + 's ease';
     ov.style.background = 'rgba(0,0,0,0)';
     ov.style.overflow = 'hidden';  // clip cover overflow
@@ -969,7 +986,8 @@ function navPreview(dir) {
   if (_creations.length === 0 || _flipAnimating) return;
   var newIdx = (_previewIdx + dir + _creations.length) % _creations.length;
 
-  // Quick dismiss: fade out current image instantly, then FLIP the new one in
+  // Quick dismiss: fade out chrome + current image, then FLIP the new one in
+  hideChrome();
   var img = document.getElementById('preview-img');
   var ov = document.getElementById('preview-overlay');
   if (img) {
