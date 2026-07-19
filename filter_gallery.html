@@ -577,16 +577,9 @@
                     coverPreview.src = '';
                     if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
                 };
-                // Also handle the case where the image loads from cache before onload fires
-                if (coverPreview.complete && coverPreview.naturalWidth === 0) {
-                    coverPreview.classList.add('hidden');
-                    coverPreview.src = '';
-                    if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
-                } else {
-                    coverPreview.src = resolvedCoverUrl;
-                    coverPreview.classList.remove('hidden');
-                    if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
-                }
+                coverPreview.src = resolvedCoverUrl;
+                coverPreview.classList.remove('hidden');
+                if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
             } else {
                 if (coverPreview) { coverPreview.classList.add('hidden'); coverPreview.src = ''; }
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
@@ -613,17 +606,9 @@
                     beforePreview.src = '';
                     if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
                 };
-                // Also handle the case where the image loads from cache before onload fires
-                if (beforePreview.complete && beforePreview.naturalWidth === 0) {
-                    // Image already failed (cached 404) — trigger fallback
-                    beforePreview.classList.add('hidden');
-                    beforePreview.src = '';
-                    if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
-                } else {
-                    beforePreview.src = resolvedBeforeUrl;
-                    beforePreview.classList.remove('hidden');
-                    if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
-                }
+                beforePreview.src = resolvedBeforeUrl;
+                beforePreview.classList.remove('hidden');
+                if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
             } else {
                 if (beforePreview) { beforePreview.classList.add('hidden'); beforePreview.src = ''; }
                 if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
