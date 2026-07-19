@@ -481,10 +481,17 @@ app.get('/filter_gallery', (_req, res) => res.sendFile(path.join(__dirname, 'fil
 // Admin Login page (public — no guard)
 app.get('/admin-login', (_req, res) => res.sendFile(path.join(__dirname, 'admin-login.html')));
 
-// Admin Logout — clears the admin session cookie
+// Admin Logout (GET) — clears cookie and redirects to login page
 app.get('/admin-logout', (_req, res) => {
     res.clearCookie('admin_session', { path: '/' });
     res.redirect('/admin-login');
+});
+
+// Admin Logout (POST) — API endpoint for programmatic logout from the dashboard
+app.post('/api/auth/admin-logout', (_req, res) => {
+    res.clearCookie('admin_session', { path: '/' });
+    console.log('[ADMIN AUTH] Admin logged out — session cleared');
+    res.json({ success: true, message: 'Logged out successfully.' });
 });
 
 // Filter Gallery Admin (PROTECTED)

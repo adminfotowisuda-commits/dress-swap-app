@@ -100,8 +100,12 @@
             </div>
         </nav>
         <!-- Sidebar footer -->
-        <div class="pt-6 border-t border-slate-800/60">
+        <div class="pt-6 border-t border-slate-800/60 flex flex-col gap-3">
             <p class="text-[9px] text-slate-600 tracking-wider font-medium">fotowisuda.ai &mdash; Admin</p>
+            <button id="admin-logout-btn" onclick="handleAdminLogout()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 hover:border-red-800/60 text-red-400 hover:text-red-300 text-[11px] font-bold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                <span>Keluar</span>
+            </button>
         </div>
     </aside>
 
@@ -201,6 +205,34 @@
                 openSidebar();
             } else {
                 closeSidebar();
+            }
+        }
+
+        async function handleAdminLogout() {
+            var btn = document.getElementById('admin-logout-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(239,68,68,0.3);border-top-color:#ef4444;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;"></span> <span>Keluar...</span>';
+            }
+
+            try {
+                var resp = await fetch(window.location.origin + '/api/auth/admin-logout', { method: 'POST' });
+                var data = await resp.json();
+                if (data.success) {
+                    window.location.href = '/admin-login';
+                } else {
+                    alert('Gagal logout: ' + (data.message || 'Unknown error'));
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-right-from-bracket text-xs"></i> <span>Keluar</span>';
+                    }
+                }
+            } catch (err) {
+                alert('Kesalahan jaringan: ' + err.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-right-from-bracket text-xs"></i> <span>Keluar</span>';
+                }
             }
         }
     </script>
