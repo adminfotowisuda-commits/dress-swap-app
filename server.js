@@ -3728,7 +3728,7 @@ app.post('/api/auth/google', async (req, res) => {
             db.users[key] = {
                 email: key,
                 password: randomPassword,
-                credits_balance: 20,
+                credits_balance: 0,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
@@ -3736,7 +3736,7 @@ app.post('/api/auth/google', async (req, res) => {
 
             try {
                 writeCreditsDB(db);
-                console.log(`[GOOGLE AUTH] New user written to database.json: ${key} (20 credits)`);
+                console.log(`[GOOGLE AUTH] New user written to database.json: ${key} (0 credits)`);
             } catch (writeErr) {
                 console.error('[GOOGLE AUTH] CRITICAL — cannot write database.json:', writeErr.message);
                 return res.status(500).json({ success: false, error: 'Gagal menyimpan data. Silakan coba lagi.' });
