@@ -230,8 +230,8 @@ function ensureDatabase() {
  * frontend doesn't render infinite loading spinners for zombie jobs
  * that will never complete (crashed server, lost in-memory state, etc.).
  */
-function cleanupStaleProcessingRecords() {
-    const db = readDatabase();
+async function cleanupStaleProcessingRecords() {
+    const db = await readDatabase();
     const cutoff = Date.now() - 5 * 60 * 1000; // 5 minutes ago
     let cleaned = 0;
 
@@ -299,7 +299,7 @@ async function upsertDatabaseRecord(record) {
     await db.Generation.findOneAndUpdate(
         { generation_id: record.generation_id },
         { $set: record },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
     );
     console.log(`  [mongodb] Record upserted — ${record.generation_id}`);
 }
@@ -475,7 +475,7 @@ async function ensureUserExists(email) {
     let user = await db.User.findOneAndUpdate(
         { email: key },
         { $setOnInsert: { email: key, credits_balance: 0, created_at: new Date(), updated_at: new Date() } },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
     );
     if (user.__v === 0) console.log(`  [mongodb] New user created: ${key}`);
     return user;
@@ -490,7 +490,7 @@ async function addCredits(email, amount, invoiceNumber) {
     const user = await db.User.findOneAndUpdate(
         { email: key },
         { $inc: { credits_balance: amount }, $set: { updated_at: new Date() } },
-        { new: true }
+        { returnDocument: 'after' }
     );
 
     // Upsert transaction
@@ -1744,13 +1744,13 @@ app.post('/api/generate', upload.fields([
  * ------------------------------------------------------------------
  * Returns the current status of a generation from the in-memory store.
  */
-app.get('/api/status/:generationId', (req, res) => {
+app.get('/api/status/:generationId', async (req, res) => {
     const { generationId } = req.params;
     const record = activeGenerations.get(generationId);
 
     if (!record) {
         // Fallback: check the database for a failed/timed-out record
-        const db = readDatabase();
+        const db = await readDatabase();
         const dbRecord = db.find(r => r.generation_id === generationId);
         if (dbRecord && (dbRecord.status === 'failed' || dbRecord.status === 'complete')) {
             return res.json({
@@ -1812,43 +1812,39 @@ app.get('/api/active-generations', (_req, res) => {
  *   ?limit=N   — cap results (default 50)
  *   ?offset=N  — pagination offset (default 0)
  */
-app.get('/api/gallery', (req, res) => {
+app.get('/api/gallery', async (req, res) => {
     try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
-        let records = readDatabase();
+        // Query MongoDB: exclude admin-owned and user-generated types
+        // Keep filter-factory records + processing placeholders
+        const query = {
+            owner_email: { $ne: ADMIN_EMAIL },
+            type: { $nin: ['bgswap', 'dresswap', 'filter-swap'] }
+        };
+        // Also include processing records regardless of owner
+        const processingRecords = await db.Generation.find({ status: 'processing' }).lean();
+        const mainRecords = await db.Generation.find(query)
+            .sort({ created_at: -1 })
+            .lean();
 
-        // Exclude complete filter-factory records (they belong to Filter Gallery).
-        // Exclude admin-owned records (admin.fotowisuda@gmail.com) — admin creations
-        // are isolated to /admin-creations and must never appear in the public gallery.
-        // Exclude user-generated types (filter-swap, background-swap, dress-swap) —
-        // those are displayed exclusively on /my-creations.
-        // But KEEP processing placeholders so the frontend can render pending cards.
-        const USER_GENERATION_TYPES = ['filter-swap', 'background-swap', 'dress-swap'];
-        records = (Array.isArray(records) ? records : []).filter(r => {
-            if (r.status === 'processing') return true;               // always show processing
-            // Exclude admin-stamped records
-            if (r.owner_email === ADMIN_EMAIL) return false;
-            // Exclude user-generation types (isolated to /my-creations)
-            if (r.type && USER_GENERATION_TYPES.includes(r.type)) return false;
-            if (r.type) return r.type !== 'filter-factory';
-            // Legacy fallback: exclude gen_-prefixed records that lack a type field
-            return !(r.generation_id && r.generation_id.startsWith('gen_'));
-        });
+        // Merge + deduplicate
+        const seen = new Set();
+        const merged = [];
+        for (const r of [...processingRecords, ...mainRecords]) {
+            if (seen.has(r.generation_id)) continue;
+            seen.add(r.generation_id);
+            merged.push(r);
+        }
+        merged.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-        // Sort newest first
-        records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const total = merged.length;
+        const page  = merged.slice(offset, offset + limit);
 
-        const total = records.length;
-        const page  = records.slice(offset, offset + limit);
-
-        res.json({
-            total,
-            limit,
-            offset,
-            records: page
-        });
+        res.json({ total, limit, offset, records: page });
     } catch (err) {
         console.error('[/api/gallery] Error:', err);
         res.status(500).json({ error: 'Failed to read gallery records' });
@@ -1870,89 +1866,36 @@ app.get('/api/gallery', (req, res) => {
  *   ?limit=N   — cap results (default 50, DB mode only)
  *   ?offset=N  — pagination offset (default 0, DB mode only)
  */
-app.get('/api/user-creations', (req, res) => {
+app.get('/api/user-creations', async (req, res) => {
     try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
         const rawEmail = req.query.email || '';
-
-        // --- Email-prefix isolation mode: filesystem-based ---
-        if (rawEmail) {
-            const safePrefix = sanitizeEmail(rawEmail);
-
-            console.log(`\n  [user-creations] ============================================`);
-            console.log(`  [user-creations] Raw email from query: "${rawEmail}"`);
-            console.log(`  [user-creations] Sanitized prefix:    "${safePrefix}"`);
-            console.log(`  [user-creations] Filter pattern:      "${safePrefix}_"`);
-            console.log(`  [user-creations] Scanning directory:   ${USER_IMAGE_GEN_DIR}`);
-
-            if (safePrefix === 'guest_user') {
-                console.log(`  [user-creations] → GUEST — returning []`);
-                return res.json([]);
-            }
-
-            if (!fs.existsSync(USER_IMAGE_GEN_DIR)) {
-                console.log(`  [user-creations] → Directory missing — returning []`);
-                return res.json([]);
-            }
-
-            const allFiles = fs.readdirSync(USER_IMAGE_GEN_DIR);
-            console.log(`  [user-creations] Total files in directory: ${allFiles.length}`);
-            allFiles.forEach(f => console.log(`    - ${f}`));
-
-            const imageFiles = allFiles.filter(file => {
-                if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(file)) return false;
-                const matches = file.startsWith(safePrefix + '_');
-                if (matches) console.log(`    ✓ MATCH: ${file}`);
-                return matches;
-            });
-
-            console.log(`  [user-creations] Matched files: ${imageFiles.length}`);
-
-            const creations = imageFiles.map(file => {
-                const filePath = path.join(USER_IMAGE_GEN_DIR, file);
-                const stats = fs.statSync(filePath);
-                return {
-                    id: file,
-                    url: `/user_data_image_generate/${file}`,
-                    name: file.replace(/\.[^/.]+$/, ''),
-                    createdAt: stats.mtime
-                };
-            });
-
-            creations.sort((a, b) => b.createdAt - a.createdAt);
-            console.log(`  [user-creations] Email="${rawEmail}" prefix="${safePrefix}" → ${creations.length} files`);
-            return res.json(creations);
-        }
-
-        // --- Legacy DB mode (no email provided) ---
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
-        let records = readDatabase();
+        // Build MongoDB query: user-generated types, exclude admin
+        const query = {
+            owner_email: { $ne: ADMIN_EMAIL },
+            type: { $in: ['bgswap', 'dresswap', 'filter-swap', 'filter-factory'] }
+        };
 
-        // Include ONLY user-generated types from the three generator pages.
-        // Exclude admin-stamped records (those belong to Admin Creations).
-        const USER_GENERATION_TYPES = ['filter-swap', 'background-swap', 'dress-swap'];
-        records = (Array.isArray(records) ? records : []).filter(r => {
-            if (r.status === 'processing') return true;  // show pending cards
-            if (r.owner_email === ADMIN_EMAIL) return false;
-            if (r.type && USER_GENERATION_TYPES.includes(r.type)) return true;
-            // Legacy: include records that were flagged as public user
-            if (r.user_gen_path || r.user_ref_path || r.user_prompt_path) return true;
-            return false;
-        });
+        // Filter by email if provided
+        if (rawEmail) {
+            const key = rawEmail.trim().toLowerCase();
+            if (key === 'guest_user') return res.json([]);
+            query.email = key;
+        }
 
-        // Sort newest first
-        records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const records = await db.Generation.find(query)
+            .sort({ created_at: -1 })
+            .skip(offset)
+            .limit(limit)
+            .lean();
 
-        const total = records.length;
-        const page  = records.slice(offset, offset + limit);
+        const total = await db.Generation.countDocuments(query);
 
-        res.json({
-            total,
-            limit,
-            offset,
-            records: page
-        });
+        res.json({ total, limit, offset, records });
     } catch (err) {
         console.error('[/api/user-creations] Error:', err);
         res.status(500).json({ error: 'Failed to read user creation records' });
@@ -1974,60 +1917,31 @@ app.get('/api/user-creations', (req, res) => {
  * This endpoint is a direct filesystem view — it complements the
  * database-driven /api/user-creations endpoint.
  */
-app.get('/api/user-creations-files', (req, res) => {
+app.get('/api/user-creations-files', async (req, res) => {
     try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
         const rawEmail = req.query.email || '';
-        const safePrefix = sanitizeEmail(rawEmail);
+        if (!rawEmail || rawEmail === 'guest_user') return res.json([]);
 
-        console.log(`\n  [user-creations-files] ========================================`);
-        console.log(`  [user-creations-files] Raw email from query: "${rawEmail}"`);
-        console.log(`  [user-creations-files] Sanitized prefix:    "${safePrefix}"`);
-        console.log(`  [user-creations-files] Filter pattern:      "${safePrefix}_"`);
-        console.log(`  [user-creations-files] Scanning directory:   ${USER_IMAGE_GEN_DIR}`);
+        const key = rawEmail.trim().toLowerCase();
 
-        // If guest or no email provided, return empty array for pristine isolation.
-        // The safePrefix is generated by sanitizeEmail() which converts
-        // e.g. "budi@gmail.com" → "budi_at_gmail_com" — this MUST match the
-        // prefix used when saving files in startBackgroundPoll() and
-        // /api/save-user-generation, otherwise files won't be found.
-        if (!rawEmail || safePrefix === 'guest_user') {
-            console.log(`  [user-creations-files] → GUEST (no email or guest_user) — returning []`);
-            return res.json([]);
-        }
+        // Query MongoDB for this user's generations that have an image_url
+        const records = await db.Generation.find({
+            email: key,
+            image_url: { $ne: '', $exists: true }
+        })
+            .sort({ created_at: -1 })
+            .lean();
 
-        if (!fs.existsSync(USER_IMAGE_GEN_DIR)) {
-            console.log(`  [user-creations-files] → Directory does not exist — returning []`);
-            return res.json([]);
-        }
+        const creations = records.map(r => ({
+            id: r.generation_id,
+            url: r.image_url || r.cover_image_url || '',
+            name: (r.prompt || r.generation_id || '').slice(0, 60),
+            createdAt: r.created_at
+        }));
 
-        const allFiles = fs.readdirSync(USER_IMAGE_GEN_DIR);
-        console.log(`  [user-creations-files] Total files in directory: ${allFiles.length}`);
-        allFiles.forEach(f => console.log(`    - ${f}`));
-
-        const imageFiles = allFiles.filter(file => {
-            if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(file)) return false;
-            // Only include files that start with this user's sanitized email prefix
-            const matches = file.startsWith(safePrefix + '_');
-            if (matches) console.log(`    ✓ MATCH: ${file}`);
-            return matches;
-        });
-
-        console.log(`  [user-creations-files] Matched files: ${imageFiles.length}`);
-
-        const creations = imageFiles.map(file => {
-            const filePath = path.join(USER_IMAGE_GEN_DIR, file);
-            const stats = fs.statSync(filePath);
-            return {
-                id: file,
-                url: `/user_data_image_generate/${file}`,
-                name: file.replace(/\.[^/.]+$/, ""),
-                createdAt: stats.mtime
-            };
-        });
-
-        // Sort newest first
-        creations.sort((a, b) => b.createdAt - a.createdAt);
-        console.log(`  [user-creations-files] Email="${rawEmail}" prefix="${safePrefix}" → ${creations.length} files`);
+        console.log(`  [user-creations-files] ${key} → ${creations.length} records from MongoDB`);
         res.json(creations);
     } catch (err) {
         console.error('[/api/user-creations-files] Error:', err);
@@ -2043,10 +1957,10 @@ app.get('/api/user-creations-files', (req, res) => {
  *
  * Returns { deleted: true } on success, 404 if not found.
  */
-app.delete('/api/gallery/:id', (req, res) => {
+app.delete('/api/gallery/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const deleted = removeFromDatabase(id);
+        const deleted = await removeFromDatabase(id);
 
         if (!deleted) {
             return res.status(404).json({
@@ -2068,10 +1982,10 @@ app.delete('/api/gallery/:id', (req, res) => {
  * Toggles the isFavorite boolean flag on a creation record.
  * Returns the new favorite state.
  */
-app.patch('/api/creations/:id/toggle-favorite', (req, res) => {
+app.patch('/api/creations/:id/toggle-favorite', async (req, res) => {
     try {
         const { id } = req.params;
-        const db = readDatabase();
+        const db = await readDatabase();
         const record = db.find(r => r.generation_id === id);
 
         if (!record) {
@@ -2294,7 +2208,7 @@ app.post('/api/background-swap', upload.fields([
         console.error('[/api/background-swap] Unexpected error:', err);
         // Refund credits on failure
         if (req.creditCost && req.creditEmail) {
-            refundCredits(req.creditEmail, req.creditCost);
+            await refundCredits(req.creditEmail, req.creditCost);
         }
         res.status(500).json({ error: err.message || 'Internal server error' });
     }
@@ -2765,7 +2679,7 @@ app.post('/api/dress-swap/generate', upload.fields([
         }
         // Refund credits on failure
         if (req.creditCost && req.creditEmail) {
-            refundCredits(req.creditEmail, req.creditCost);
+            await refundCredits(req.creditEmail, req.creditCost);
         }
         res.status(500).json({ error: err.message || 'Internal server error' });
     }
@@ -2820,37 +2734,30 @@ app.get('/api/dress-swap/status/:generationId', (req, res) => {
  * (generation_id starting with "gen_" — excludes bgswap_ and dresswap_).
  * Sorted newest-first. Supports ?limit=N and ?offset=N query params.
  */
-app.get('/api/admin-gallery-filter/images', requireAdminApi, (req, res) => {
+app.get('/api/admin-gallery-filter/images', requireAdminApi, async (req, res) => {
     try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
-        let records = readDatabase();
+        const query = { type: 'filter-factory', image_url: { $ne: '', $exists: true } };
+        const records = await db.Generation.find(query)
+            .sort({ created_at: -1 })
+            .skip(offset)
+            .limit(limit)
+            .lean();
 
-        // Filter: only Filter Image Factory records (type 'filter-factory')
-        // Falls back to prefix matching for legacy records without a type field
-        records = (Array.isArray(records) ? records : []).filter(r => {
-            if (r.type) return r.type === 'filter-factory' && r.cover_image_path;
-            // Legacy fallback for records without type field
-            return r.generation_id &&
-                   r.generation_id.startsWith('gen_') &&
-                   r.cover_image_path;
-        });
+        const total = await db.Generation.countDocuments(query);
 
-        // Enrich legacy records with fallback title + tags
-        records = records.map(r => ({
+        // Enrich with fallback title + tags
+        const enriched = records.map(r => ({
             ...r,
             title: r.title || (r.prompt ? r.prompt.substring(0, 30).replace(/\n/g, ' ').trim() + '…' : 'Untitled'),
             tags: (Array.isArray(r.tags) && r.tags.length > 0) ? r.tags : ['Studio', 'Indoor']
         }));
 
-        // Sort newest first
-        records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-        const total = records.length;
-        const page  = records.slice(offset, offset + limit);
-
-        res.json({ total, limit, offset, records: page });
+        res.json({ total, limit, offset, records: enriched });
     } catch (err) {
         console.error('[/api/admin-gallery-filter/images] Error:', err);
         res.status(500).json({ error: 'Failed to read gallery records' });
@@ -2967,7 +2874,7 @@ app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
         }
         // Refund credits on failure
         if (req.creditCost && req.creditEmail) {
-            refundCredits(req.creditEmail, req.creditCost);
+            await refundCredits(req.creditEmail, req.creditCost);
         }
         res.status(500).json({ error: err.message || 'Internal server error' });
     }
@@ -3004,7 +2911,7 @@ app.get('/api/admin-gallery-filter/status/:generationId', requireAdminApi, (req,
  *
  * Returns { deleted: true } on success, 404 if not found.
  */
-app.delete('/api/user-creations/:filename', (req, res) => {
+app.delete('/api/user-creations/:filename', async (req, res) => {
     try {
         const { filename } = req.params;
 
@@ -3034,7 +2941,7 @@ app.delete('/api/user-creations/:filename', (req, res) => {
 
         // 2. Extract generation ID (filename without extension) and clean up DB record
         const genId = filename.replace(/\.[^/.]+$/, '');
-        const db = readDatabase();
+        const db = await readDatabase();
         const idx = db.findIndex(r => r.generation_id === genId);
 
         if (idx !== -1) {
@@ -3091,10 +2998,10 @@ app.delete('/api/user-creations/:filename', (req, res) => {
  *
  * Returns { deleted: true } on success, 404 if not found.
  */
-app.delete('/api/filter-gallery/:id', requireAdminApi, (req, res) => {
+app.delete('/api/filter-gallery/:id', requireAdminApi, async (req, res) => {
     try {
         const { id } = req.params;
-        const db = readDatabase();
+        const db = await readDatabase();
         const idx = db.findIndex(r => r.generation_id === id);
 
         if (idx === -1) {
@@ -3356,23 +3263,23 @@ app.post('/api/save-user-generation', upload.fields([
  *   ?limit=N   — cap results (default 50)
  *   ?offset=N  — pagination offset (default 0)
  */
-app.get('/api/admin-creations', requireAdminApi, (req, res) => {
+app.get('/api/admin-creations', requireAdminApi, async (req, res) => {
     try {
+        if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
+
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
-        let records = readDatabase();
+        const query = { owner_email: ADMIN_EMAIL };
+        const records = await db.Generation.find(query)
+            .sort({ created_at: -1 })
+            .skip(offset)
+            .limit(limit)
+            .lean();
 
-        // Strictly isolate: ONLY records owned by the admin account
-        records = (Array.isArray(records) ? records : []).filter(r => r.owner_email === ADMIN_EMAIL);
+        const total = await db.Generation.countDocuments(query);
 
-        // Sort newest first
-        records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-        const total = records.length;
-        const page  = records.slice(offset, offset + limit);
-
-        res.json({ total, limit, offset, records: page });
+        res.json({ total, limit, offset, records });
     } catch (err) {
         console.error('[/api/admin-creations] Error:', err);
         res.status(500).json({ error: 'Failed to read admin creation records' });
@@ -3499,10 +3406,19 @@ async function validateAndDeductCredits(req, res, next) {
         req.creditCost = creditCost;
         req.creditEmail = userEmail;
         console.log(`  [credits] ✓ Validated — ${userEmail} deducted ${creditCost} credits (balance: ${result.balance})`);
-        next();
+        if (typeof next === 'function') {
+            next();
+        } else {
+            console.error('  [credits] ERROR — next is not a function in middleware chain');
+        }
     } catch (err) {
         console.error('  [credits] Middleware error:', err.message);
-        res.status(500).json({ success: false, error: 'Gagal memproses validasi kredit.' });
+        // Only call next(err) if next is available; otherwise just send response
+        if (typeof next === 'function' && err) {
+            next(err);
+        } else {
+            res.status(500).json({ success: false, error: 'Gagal memproses validasi kredit.' });
+        }
     }
 }
 
