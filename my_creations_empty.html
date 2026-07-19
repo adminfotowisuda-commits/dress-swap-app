@@ -614,14 +614,42 @@ function startProcessingPoll(generationId, serverCreatedAt) {
           window.history.replaceState({}, '', u.toString());
         }
 
-        setTimeout(function() {
-          cardEl.classList.add('resolving');
-          setTimeout(function() {
-            if (cardEl.parentNode) cardEl.remove();
-            updateGalleryCount();
-            loadGallery();
-          }, 500);
-        }, 800);
+        // ── Auto-refresh with retry ──────────────────────────────
+        // The MongoDB write may still be in-flight (Cloudinary upload).
+        // Retry up to 3 times (every 1.5s) until the new record appears,
+        // then swap the placeholder card for the real one.
+        cardEl.classList.add('resolving');
+        var retries = 0;
+        var MAX_RETRIES = 4;
+
+        function tryLoadUntilFound() {
+          loadGallery().then(function() {
+            // Check if the completed generation is now in the gallery
+            var found = false;
+            for (var c = 0; c < _creations.length; c++) {
+              var cid = _creations[c].id || _creations[c].generation_id;
+              if (cid === generationId || _creations[c].name === generationId) {
+                found = true;
+                break;
+              }
+            }
+
+            if (found || retries >= MAX_RETRIES) {
+              // Success or exhausted retries — remove placeholder
+              setTimeout(function() {
+                if (cardEl.parentNode) cardEl.remove();
+                updateGalleryCount();
+              }, 300);
+            } else {
+              // Not yet — retry after delay
+              retries++;
+              if (subEl) subEl.textContent = 'Menyelaraskan data… (' + retries + '/' + MAX_RETRIES + ')';
+              setTimeout(tryLoadUntilFound, 1500);
+            }
+          });
+        }
+
+        setTimeout(tryLoadUntilFound, 1000);
       } else if (status === 'FAILED') {
         clearTimers(generationId);
         if (statusEl) { statusEl.textContent = 'Gagal — Error Server'; statusEl.style.color = '#ffb4ab'; }
