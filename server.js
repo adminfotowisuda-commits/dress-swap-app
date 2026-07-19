@@ -518,15 +518,24 @@ function addCredits(email, amount, invoiceNumber) {
     db.users[key].credits_balance += amount;
     db.users[key].updated_at = new Date().toISOString();
 
-    // Log transaction
-    db.transactions.push({
-        invoice_number: invoiceNumber,
-        email: key,
-        amount: amount,
-        type: 'top-up',
-        status: 'success',
-        created_at: new Date().toISOString()
-    });
+    // Upsert transaction — update existing PENDING record if found, else push new
+    const existing = db.transactions.find(t => t.invoice_number === invoiceNumber);
+    if (existing) {
+        existing.status = 'success';
+        existing.amount = amount;        // keep unified amount field
+        existing.created_at = new Date().toISOString();
+        console.log(`  [credits] Updated existing txn → ${invoiceNumber} (status: success)`);
+    } else {
+        db.transactions.push({
+            invoice_number: invoiceNumber,
+            email: key,
+            amount: amount,
+            type: 'top-up',
+            status: 'success',
+            created_at: new Date().toISOString()
+        });
+        console.log(`  [credits] New txn pushed → ${invoiceNumber}`);
+    }
 
     writeCreditsDB(db);
     console.log(`  [credits] +${amount} credits → ${key} (balance: ${db.users[key].credits_balance}, invoice: ${invoiceNumber})`);
@@ -4155,12 +4164,6 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             const credits = pkg.credits_given;
             addCredits(email, credits, invoice);
 
-            // Update transaction status
-            const db = readCreditsDB();
-            const txn = db.transactions.find(t => t.invoice_number === invoice);
-            if (txn) txn.status = 'success';
-            writeCreditsDB(db);
-
             console.log(`  [doku-callback] SANDBOX SIM — ${email} received ${credits} credits (invoice: ${invoice})`);
 
             // Return HTML page for browser, JSON for programmatic calls
@@ -4260,12 +4263,6 @@ app.post('/api/payments/doku-callback', async (req, res) => {
                 addCredits(userEmail, credits, invoice_number);
             }
 
-            // Update transaction status
-            const db = readCreditsDB();
-            const txn = db.transactions.find(t => t.invoice_number === invoice_number);
-            if (txn) txn.status = 'success';
-            writeCreditsDB(db);
-
             console.log(`  [doku-callback] PAYMENT SUCCESS — ${userEmail} received ${credits} credits (invoice: ${invoice_number})`);
         }
 
@@ -4299,10 +4296,6 @@ app.get('/api/payments/doku-callback', async (req, res) => {
     if (!pkg) return res.status(400).send('Invalid package ID.');
     const credits = pkg.credits_given;
     addCredits(email, credits, invoice);
-    const db = readCreditsDB();
-    const txn = db.transactions.find(t => t.invoice_number === invoice);
-    if (txn) txn.status = 'success';
-    writeCreditsDB(db);
     console.log(`[WEBHOOK GET] SANDBOX — ${email} received ${credits} credits (invoice: ${invoice})`);
     res.status(200).send('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pembayaran Berhasil — fotowisuda.ai</title><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#0A0C10;color:#F0F6FC;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:24px}.card{background:#161B22;border:1px solid #30363D;border-radius:24px;padding:40px 32px;max-width:400px;width:100%}.check{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:32px}.check::after{content:"\\2713";color:#fff}h2{font-size:20px;font-weight:700;margin-bottom:8px}.email{color:#00D1FF;font-weight:600}.credits{font-size:32px;font-weight:800;color:#22c55e;margin:16px 0}.detail{font-size:13px;color:#8B949E;margin-bottom:24px}.btn{display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#9D5BFF,#00D1FF);color:#fff;border-radius:14px;text-decoration:none;font-size:13px;font-weight:700}</style></head><body><div class="card"><div class="check"></div><h2>Pembayaran Berhasil!</h2><p class="detail"><span class="email">'+email+'</span> telah menerima</p><div class="credits">+'+credits+' Kredit</div><p class="detail">Invoice: '+invoice+'<br>Paket: '+pkg.name+'</p><a href="/" class="btn">Kembali ke Beranda</a></div></body></html>');
 });

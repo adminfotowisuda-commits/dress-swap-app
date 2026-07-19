@@ -465,7 +465,7 @@ async function openTransactionHistory() {
             if (t.status === 'success') {
                 statusBadge = '<span style="background:rgba(34,197,94,0.12);color:#22c55e;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Berhasil</span>';
             } else if (t.status === 'pending') {
-                statusBadge = '<span style="background:rgba(251,191,36,0.12);color:#fbbf24;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Pending</span>';
+                statusBadge = '<span style="background:rgba(251,191,36,0.15);color:#f59e0b;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Menunggu Pembayaran</span>';
             } else if (t.status === 'refund') {
                 statusBadge = '<span style="background:rgba(0,209,255,0.12);color:#00D1FF;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">Refund</span>';
             } else {
