@@ -3486,6 +3486,70 @@ app.get('/api/admin-creations', requireAdminApi, (req, res) => {
     }
 });
 
+/**
+ * GET /api/admin/overview
+ * ------------------------------------------------------------------
+ * Returns 4 dashboard metrics for the admin overview:
+ *   total_users, lifetime_revenue, monthly_revenue, user_generations
+ * Protected by requireAdminApi middleware.
+ */
+app.get('/api/admin/overview', requireAdminApi, (_req, res) => {
+    try {
+        const db = readCreditsDB();
+
+        // Metric 1: Total registered users
+        const totalUsers = Object.keys(db.users || {}).length;
+
+        // Metric 2 & 3: Lifetime and monthly revenue
+        const now = new Date();
+        const currentMonth = now.getMonth();      // 0-11
+        const currentYear  = now.getFullYear();
+
+        let lifetimeRevenue = 0;
+        let monthlyRevenue  = 0;
+
+        const transactions = db.transactions || [];
+        for (const txn of transactions) {
+            if (txn.status !== 'success') continue;
+            const txnDate = new Date(txn.created_at || txn.date || 0);
+            const amount  = txn.amount || 0;
+
+            lifetimeRevenue += amount;
+
+            if (txnDate.getMonth() === currentMonth && txnDate.getFullYear() === currentYear) {
+                monthlyRevenue += amount;
+            }
+        }
+
+        // Metric 4: Total user-generated images (exclude admin/system prefixes)
+        let userGenerations = 0;
+        try {
+            const files = fs.readdirSync(USER_IMAGE_GEN_DIR);
+            // Exclude admin-prefixed files and system gen_agfilter prefixed files
+            userGenerations = files.filter(f => {
+                const lower = f.toLowerCase();
+                return !lower.startsWith('admin_fotowisuda_at_gmail_com') &&
+                       !lower.startsWith('gen_agfilter') &&
+                       !lower.startsWith('guest_user');
+            }).length;
+        } catch (_) {
+            userGenerations = 0;
+        }
+
+        console.log(`  [api/admin/overview] users=${totalUsers} lifetime_rev=${lifetimeRevenue} monthly_rev=${monthlyRevenue} user_gens=${userGenerations}`);
+
+        res.json({
+            total_users: totalUsers,
+            lifetime_revenue: lifetimeRevenue,
+            monthly_revenue: monthlyRevenue,
+            user_generations: userGenerations
+        });
+    } catch (err) {
+        console.error('[/api/admin/overview] Error:', err);
+        res.status(500).json({ error: 'Failed to retrieve admin overview.' });
+    }
+});
+
 // ------------------------------------------------------------------
 // Credit Middleware — validates and deducts credits before generation
 // ------------------------------------------------------------------

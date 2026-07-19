@@ -80,6 +80,88 @@
         .btn-hover-lift:hover {
             transform: translateY(-1px);
         }
+
+        /* Admin Overview Dashboard */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .overview-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+            border-radius: 18px;
+            padding: 20px 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            opacity: 0.06;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .overview-card:hover {
+            border-color: rgba(168, 85, 247, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .overview-card:hover::before {
+            opacity: 0.12;
+            transform: scale(1.2);
+        }
+        .card-users::before    { background: #00D1FF; }
+        .card-revenue::before  { background: #22c55e; }
+        .card-monthly::before  { background: #f59e0b; }
+        .card-creations::before{ background: #9D5BFF; }
+
+        .overview-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .icon-users    { background: rgba(0,209,255,0.1);  border: 1px solid rgba(0,209,255,0.2);  color: #00D1FF; }
+        .icon-revenue  { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.2);  color: #22c55e; }
+        .icon-monthly  { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: #f59e0b; }
+        .icon-creations{ background: rgba(157,91,255,0.1); border: 1px solid rgba(157,91,255,0.2); color: #9D5BFF; }
+
+        .overview-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+        .overview-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #F0F6FC;
+            line-height: 1.2;
+        }
+        .overview-spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(148,163,184,0.2);
+            border-top-color: #9D5BFF;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 
@@ -123,7 +205,43 @@
     <!-- ============================================================
          MAIN WORKSPACE
          ============================================================ -->
-    <main class="flex-grow flex items-center justify-center p-6 relative overflow-hidden mt-12 md:mt-0">
+    <main class="flex-grow flex flex-col items-center justify-center p-6 relative overflow-y-auto mt-12 md:mt-0 gap-8">
+
+        <!-- ═══ OVERVIEW DASHBOARD ═══ -->
+        <div class="overview-grid z-10">
+            <!-- Total Users -->
+            <div class="overview-card card-users">
+                <div class="overview-icon icon-users"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <div class="overview-label">Total Pengguna</div>
+                    <div class="overview-value" id="ov-users"><span class="overview-spinner"></span></div>
+                </div>
+            </div>
+            <!-- Lifetime Revenue -->
+            <div class="overview-card card-revenue">
+                <div class="overview-icon icon-revenue"><i class="fa-solid fa-sack-dollar"></i></div>
+                <div>
+                    <div class="overview-label">Total Omset (Lifetime)</div>
+                    <div class="overview-value" id="ov-lifetime"><span class="overview-spinner"></span></div>
+                </div>
+            </div>
+            <!-- Monthly Revenue -->
+            <div class="overview-card card-monthly">
+                <div class="overview-icon icon-monthly"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                    <div class="overview-label">Omset Bulan Ini</div>
+                    <div class="overview-value" id="ov-monthly"><span class="overview-spinner"></span></div>
+                </div>
+            </div>
+            <!-- User Generations -->
+            <div class="overview-card card-creations">
+                <div class="overview-icon icon-creations"><i class="fa-solid fa-images"></i></div>
+                <div>
+                    <div class="overview-label">Total Kreasi User</div>
+                    <div class="overview-value" id="ov-creations"><span class="overview-spinner"></span></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Ambient background glows -->
         <div class="absolute top-[-15%] right-[-15%] w-[600px] h-[600px] bg-purple-600/8 blur-[150px] rounded-full pointer-events-none"></div>
@@ -207,6 +325,35 @@
                 closeSidebar();
             }
         }
+
+        // ═══ Admin Overview Dashboard ═══
+        function formatRupiah(amount) {
+            if (!amount && amount !== 0) return '...';
+            return 'Rp ' + Number(amount).toLocaleString('id-ID');
+        }
+
+        async function fetchOverview() {
+            try {
+                var resp = await fetch(window.location.origin + '/api/admin/overview');
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                var data = await resp.json();
+
+                document.getElementById('ov-users').textContent = data.total_users || 0;
+                document.getElementById('ov-lifetime').textContent = formatRupiah(data.lifetime_revenue);
+                document.getElementById('ov-monthly').textContent = formatRupiah(data.monthly_revenue);
+                document.getElementById('ov-creations').textContent = data.user_generations || 0;
+            } catch (err) {
+                console.error('[OVERVIEW] Failed to fetch:', err.message);
+                // Show fallback
+                ['ov-users','ov-lifetime','ov-monthly','ov-creations'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el && el.querySelector('.overview-spinner')) el.textContent = '—';
+                });
+            }
+        }
+
+        // Load overview on page load
+        fetchOverview();
 
         async function handleAdminLogout() {
             var btn = document.getElementById('admin-logout-btn');
