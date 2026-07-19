@@ -443,7 +443,7 @@
                                 data-ratio="4:3">4:3</button>
                     </div>
                     <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">
-                        Dimensions: 1696 Ã— 2528 px
+                        Dimensions: 1696 x 2528 px
                     </p>
                 </div>
 
@@ -491,9 +491,9 @@
 
         /**
          * Aspect ratio â†’ pixel dimensions (PRD spec):
-         *   2:3 â†’ 1696 Ã— 2528
-         *   4:5 â†’ 1856 Ã— 2304
-         *   4:3 â†’ 2400 Ã— 1792
+         *   2:3 â†’ 1696 x 2528
+         *   4:5 â†’ 1856 x 2304
+         *   4:3 â†’ 2400 x 1792
          */
         const ASPECT_RATIO_DIMENSIONS = {
             '2:3': { width: 1696, height: 2528 },
@@ -595,7 +595,7 @@
 
             if (DOM.dimensionReadout && state.selectedDimensions) {
                 DOM.dimensionReadout.textContent =
-                    `Dimensions: ${state.selectedDimensions.width} Ã— ${state.selectedDimensions.height} px`;
+                    `Dimensions: ${state.selectedDimensions.width} x ${state.selectedDimensions.height} px`;
             }
         }
 
@@ -1250,7 +1250,7 @@
 
             console.log('Background Swap Tool initialized.');
             console.log(`API base: ${API_BASE}`);
-            console.log(`Default aspect ratio: ${state.selectedRatio} â†’ ${state.selectedDimensions.width}Ã—${state.selectedDimensions.height}`);
+            console.log(`Default aspect ratio: ${state.selectedRatio} â†’ ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
         }
 
         // =====================================================

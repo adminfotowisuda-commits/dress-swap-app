@@ -233,7 +233,7 @@
                     <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
                     <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
                 </div>
-                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 1696 Ã— 2528 px</p>
+                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 1696 x 2528 px</p>
             </div>
 
             <!-- Generate Button -->
@@ -263,7 +263,7 @@
 
         function getAspectClass(record) {
             const dims = (record.dimensions || '').toString();
-            const match = dims.match(/(\d+)\s*[Ã—x]\s*(\d+)/i);
+            const match = dims.match(/(\d+)\s*[xx]\s*(\d+)/i);
             if (match) {
                 const w = parseInt(match[1], 10);
                 const h = parseInt(match[2], 10);
@@ -706,7 +706,7 @@
             state.modalDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
             if (state.modalDimensions) {
                 document.getElementById('modal-dimension-readout').textContent =
-                    `Dimensions: ${state.modalDimensions.width} Ã— ${state.modalDimensions.height} px`;
+                    `Dimensions: ${state.modalDimensions.width} x ${state.modalDimensions.height} px`;
             }
         }
 

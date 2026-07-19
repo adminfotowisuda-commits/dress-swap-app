@@ -740,7 +740,7 @@
                 // ============================================================
                 appendLog('Polling generation status via server...');
 
-                const MAX_POLLS = 120;         // 120 × 3 s = 6 minutes
+                const MAX_POLLS = 120;         // 120 x 3 s = 6 minutes
                 const POLL_INTERVAL = 3000;
 
                 for (let attempt = 1; attempt <= MAX_POLLS; attempt++) {
@@ -798,7 +798,7 @@
                 title: title, prompt: prompt,
                 tags: [selection.tag1, selection.tag2],
                 ratio: selection.ratio,
-                dimensions: dims.width + '×' + dims.height,
+                dimensions: dims.width + 'x' + dims.height,
                 image: finalImageUrl,
                 cover_image_path: finalImageUrl,
                 image_url: finalImageUrl,

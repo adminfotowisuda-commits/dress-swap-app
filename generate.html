@@ -402,7 +402,7 @@
                         <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
                     </div>
                     <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">
-                        Dimensions: 1696 × 2528 px
+                        Dimensions: 1696 x 2528 px
                     </p>
                 </div>
 
@@ -613,7 +613,7 @@
             state.selectedRatio = ratio;
             state.selectedDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
             if (DOM.dimensionReadout) {
-                DOM.dimensionReadout.textContent = `Dimensions: ${state.selectedDimensions.width} × ${state.selectedDimensions.height} px`;
+                DOM.dimensionReadout.textContent = `Dimensions: ${state.selectedDimensions.width} x ${state.selectedDimensions.height} px`;
             }
         }
 
@@ -1152,9 +1152,9 @@
                 var hasExisting = creations.some(function(c) { return c.owner_email === email; });
                 if (hasExisting) return;
                 var demos = [
-                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 × 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
-                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 × 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
-                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 × 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
+                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 x 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 x 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 x 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
                 ];
                 safeSet(localStorage, CREATIONS_KEY, creations.concat(demos));
             }

@@ -369,7 +369,7 @@
                     <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
                     <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
                 </div>
-                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 1696 × 2528 px</p>
+                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 1696 x 2528 px</p>
             </div>
 
             <!-- Generate Button -->
@@ -398,7 +398,7 @@
 
         function getAspectClass(record) {
             const dims = (record.dimensions || '').toString();
-            const match = dims.match(/(\d+)\s*[×x]\s*(\d+)/i);
+            const match = dims.match(/(\d+)\s*[xx]\s*(\d+)/i);
             if (match) {
                 const w = parseInt(match[1], 10);
                 const h = parseInt(match[2], 10);
@@ -771,7 +771,7 @@
             state.modalDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
             if (state.modalDimensions) {
                 document.getElementById('modal-dimension-readout').textContent =
-                    `Dimensions: ${state.modalDimensions.width} × ${state.modalDimensions.height} px`;
+                    `Dimensions: ${state.modalDimensions.width} x ${state.modalDimensions.height} px`;
             }
         }
 
@@ -821,7 +821,7 @@
                             title: state.selectedRecord.title || 'Admin Filter Creation',
                             prompt: state.selectedRecord.prompt || '',
                             createdAt: Date.now(),
-                            dimensions: state.modalDimensions.width + ' × ' + state.modalDimensions.height
+                            dimensions: state.modalDimensions.width + ' x ' + state.modalDimensions.height
                         });
                         localStorage.setItem('all_creations', JSON.stringify(queue));
                         console.log('[AdminSave] Processing record saved to localStorage.');
@@ -854,7 +854,7 @@
                         title: state.selectedRecord.title || 'Admin Filter Creation',
                         prompt: state.selectedRecord.prompt || '',
                         createdAt: Date.now(),
-                        dimensions: state.modalDimensions.width + ' × ' + state.modalDimensions.height
+                        dimensions: state.modalDimensions.width + ' x ' + state.modalDimensions.height
                     });
                     localStorage.setItem('all_creations', JSON.stringify(fbQueue));
                 } catch (_) {}
@@ -1104,9 +1104,9 @@
                 var hasExisting = creations.some(function(c) { return c.owner_email === email; });
                 if (hasExisting) return;
                 var demos = [
-                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 × 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
-                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 × 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
-                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 × 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
+                    { owner_email: email, title: 'Wisuda Studio Biru', tags: 'Studio, Soft Light', dimensions: '1696 x 2528', image_url: 'https://picsum.photos/seed/wisuda1/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Kampus Outdoor Cerah', tags: 'Outdoor, Natural Ambient', dimensions: '1856 x 2304', image_url: 'https://picsum.photos/seed/wisuda2/400/600', createdAt: new Date().toISOString() },
+                    { owner_email: email, title: 'Wisuda Kebaya Anggun', tags: 'Indoor, Soft Light', dimensions: '2400 x 1792', image_url: 'https://picsum.photos/seed/wisuda3/400/600', createdAt: new Date().toISOString() }
                 ];
                 safeSet(localStorage, CREATIONS_KEY, creations.concat(demos));
             }

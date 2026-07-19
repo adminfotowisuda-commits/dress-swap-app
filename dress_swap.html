@@ -493,7 +493,7 @@
                         <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
                         <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:3">4:3</button>
                     </div>
-                    <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">Dimensions: 1696 × 2528 px</p>
+                    <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">Dimensions: 1696 x 2528 px</p>
                 </div>
 
                 <!-- 6. Generate Dress Button -->
@@ -528,9 +528,9 @@
 
         /**
          * Aspect ratio â†’ pixel dimensions (PRD spec):
-         *   2:3 â†’ 1696 Ã— 2528
-         *   4:5 â†’ 1856 Ã— 2304
-         *   4:3 â†’ 2400 Ã— 1792
+         *   2:3 â†’ 1696 x 2528
+         *   4:5 â†’ 1856 x 2304
+         *   4:3 â†’ 2400 x 1792
          */
         const ASPECT_RATIO_DIMENSIONS = {
             '2:3': { width: 1696, height: 2528 },
@@ -646,7 +646,7 @@
 
             if (DOM.dimensionReadout && state.selectedDimensions) {
                 DOM.dimensionReadout.textContent =
-                    `Dimensions: ${state.selectedDimensions.width} Ã— ${state.selectedDimensions.height} px`;
+                    `Dimensions: ${state.selectedDimensions.width} x ${state.selectedDimensions.height} px`;
             }
         }
 
@@ -770,7 +770,7 @@
             // Update badges
             if (DOM.badgeDimensions && state.selectedDimensions) {
                 DOM.badgeDimensions.textContent =
-                    `${state.selectedDimensions.width} Ã— ${state.selectedDimensions.height} px`;
+                    `${state.selectedDimensions.width} x ${state.selectedDimensions.height} px`;
             }
             if (DOM.badgeRatio) {
                 DOM.badgeRatio.textContent = state.selectedRatio;
@@ -1385,7 +1385,7 @@
 
             console.log('Dress Swap Tool initialized.');
             console.log(`API base: ${API_BASE}`);
-            console.log(`Default aspect ratio: ${state.selectedRatio} â†’ ${state.selectedDimensions.width}Ã—${state.selectedDimensions.height}`);
+            console.log(`Default aspect ratio: ${state.selectedRatio} â†’ ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
         }
 
         // =====================================================

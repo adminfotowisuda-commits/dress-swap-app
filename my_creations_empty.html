@@ -254,6 +254,7 @@ var _creations = [];
 var _previewIdx = -1;
 var _pollTimers = {};       // active polling timers per generationId
 var _stopwatchTimers = {};  // active stopwatch timers per generationId
+var _cycleTimers = {};      // active cycling-text timers per generationId
 
 function getEmail() {
   var e = localStorage.getItem('active_user_email') || '';
@@ -559,6 +560,14 @@ function startProcessingPoll(generationId, serverCreatedAt) {
   }
 
   // â”€â”€ Stopwatch tick (every 100ms) â”€â”€
+  // Cycling status messages (every 2.5s)
+  var _cycleMsgs = ['Memproses AI...', 'Menganalisa gambar...', 'Menyempurnakan detail...', 'Hampir selesai...'];
+  var _cycleIdx = 0;
+  _cycleTimers[generationId] = setInterval(function() {
+    _cycleIdx = (_cycleIdx + 1) % _cycleMsgs.length;
+    if (statusEl && _pollTimers[generationId]) statusEl.textContent = _cycleMsgs[_cycleIdx];
+  }, 2500);
+
   _stopwatchTimers[generationId] = setInterval(function() {
     var elapsed = baseOffsetMs + (performance.now() - startHr);
     if (timerEl) timerEl.textContent = formatTimer(elapsed);
@@ -683,6 +692,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
 function clearTimers(generationId) {
   if (_pollTimers[generationId])      { clearInterval(_pollTimers[generationId]);      delete _pollTimers[generationId]; }
   if (_stopwatchTimers[generationId]) { clearInterval(_stopwatchTimers[generationId]); delete _stopwatchTimers[generationId]; }
+  if (_cycleTimers[generationId])     { clearInterval(_cycleTimers[generationId]);     delete _cycleTimers[generationId]; }
 }
 
 function removeProcessingItem(generationId) {

@@ -1597,8 +1597,29 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         dimensions: ratioLabel,
                         ratio: record._ratio || ratioLabel,
                         reference_image_1_path: persistedRefs?.ref1 || null,
-                        reference_image_2_path: persistedRefs?.ref2 || null
+                        reference_image_2_path: persistedRefs?.ref2 || null,
+                        reference_image_1_url: '',
+                        reference_image_2_url: ''
                     };
+
+                    // Upload reference images to Cloudinary so they survive redeploys
+                    // The local paths in reference_image_*_path get wiped on each deploy.
+                    for (const [idx, refPath] of [[1, persistedRefs?.ref1], [2, persistedRefs?.ref2]]) {
+                        if (!refPath) continue;
+                        const absRefPath = path.join(__dirname, refPath);
+                        if (fs.existsSync(absRefPath)) {
+                            try {
+                                const refBuffer = fs.readFileSync(absRefPath);
+                                const refUpload = await db.uploadToCloudinary(refBuffer, 'references', `ref_${localGenId}_${idx}`);
+                                if (refUpload && refUpload.url) {
+                                    updateFields[`reference_image_${idx}_url`] = refUpload.url;
+                                    console.log(`  [cloudinary] Ref image ${idx} uploaded → ${refUpload.url}`);
+                                }
+                            } catch (refErr) {
+                                console.error(`  [cloudinary] Ref image ${idx} upload failed:`, refErr.message);
+                            }
+                        }
+                    }
                     // Only set owner_email if we have a non-empty value (don't overwrite with empty)
                     if (ownerEmail) {
                         updateFields.owner_email = ownerEmail;
