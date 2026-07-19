@@ -227,7 +227,7 @@
   <!-- Carousel viewport: clips to one slide at a time, fills overlay -->
   <div id="preview-viewport" style="overflow:hidden;width:100%;height:100%;z-index:1;">
     <!-- Track: 3 slides side-by-side; offset -100% shows center; fills viewport -->
-    <div id="preview-track" style="display:flex;width:300%;height:100%;transform:translateX(-100%);will-change:transform;">
+    <div id="preview-track" style="display:flex;width:300%;height:100%;transform:translateX(-33.3333%);will-change:transform;">
       <div class="preview-slide" style="flex:0 0 33.333%;height:100%;display:flex;align-items:center;justify-content:center;">
         <img id="preview-img-0" src="" style="max-width:90%;max-height:80vh;object-fit:contain;border-radius:0;pointer-events:none;">
       </div>
@@ -759,14 +759,22 @@ var _flipThumbImg = null;    // the img inside the source card
 var _flipRect = null;        // cached bounding rect of the source card
 
 // ── Carousel helpers ────────────────────────────────────────────
-// Track: 3 slides [0=prev, 1=curr, 2=next] at translateX(-100%)
-var _carouselIdx = -1;  // which _creations index is in the center slot
+// Track is 300% wide. Each slide = 33.333% of track = 1 viewport.
+// translateX is % of track's OWN width, so:
+//   slide 0 (prev):  translateX(0)
+//   slide 1 (curr):  translateX(calc(-100% / 3)) ≈ -33.333%
+//   slide 2 (next):  translateX(calc(-200% / 3)) ≈ -66.667%
+var _carouselIdx = -1;
 
 function getCenterImg() { return document.getElementById('preview-img-1'); }
 function getTrack()     { return document.getElementById('preview-track'); }
 function getViewport()  { return document.getElementById('preview-viewport'); }
 
-// Load images into the 3 carousel slots around the given index
+function trackPos(slideIdx) { return (-slideIdx * 100 / 3).toFixed(4) + '%'; }
+function trackCenter()      { return trackPos(1); }  // -33.3333%
+function trackNext()        { return trackPos(2); }  // -66.6667%
+function trackPrev()        { return trackPos(0); }  // 0%
+
 function loadCarouselSlots(idx) {
   var imgs = [
     document.getElementById('preview-img-0'),
@@ -774,18 +782,18 @@ function loadCarouselSlots(idx) {
     document.getElementById('preview-img-2')
   ];
   if (!imgs[0] || !imgs[1] || !imgs[2]) return;
-  var prev = idx > 0 ? idx - 1 : (_creations.length > 1 ? _creations.length - 1 : -1);
-  var next = idx < _creations.length - 1 ? idx + 1 : (_creations.length > 1 ? 0 : -1);
-  imgs[0].src = prev >= 0 ? (_creations[prev].url || '') : '';
+  var total = _creations.length;
+  var prev = total > 1 ? (idx - 1 + total) % total : -1;
+  var next = total > 1 ? (idx + 1) % total : -1;
+  imgs[0].src = prev >= 0 && prev !== idx ? (_creations[prev].url || '') : '';
   imgs[1].src = _creations[idx].url || '';
-  imgs[2].src = next >= 0 ? (_creations[next].url || '') : '';
+  imgs[2].src = next >= 0 && next !== idx ? (_creations[next].url || '') : '';
   _carouselIdx = idx;
 }
 
-// Reset track to center position and reload slots
 function resetTrack(idx) {
   var track = getTrack();
-  if (track) { track.style.transition = 'none'; track.style.transform = 'translateX(-100%)'; }
+  if (track) { track.style.transition = 'none'; track.style.transform = 'translateX(' + trackCenter() + ')'; }
   loadCarouselSlots(idx);
 }
 
@@ -1030,34 +1038,29 @@ function slideToIndex(newIdx, dir, duration) {
   if (!track) return;
 
   _navSliding = true;
-  var targetX = dir > 0 ? '-200%' : '0%';  // slide to next (left) or prev (right)
+  // dir>0 (next): animate to slide 2 position; dir<0 (prev): animate to slide 0 position
+  var targetX = dir > 0 ? trackNext() : trackPrev();
   track.style.transition = 'transform ' + (duration / 1000) + 's ease';
   track.style.transform = 'translateX(' + targetX + ')';
 
-  track.addEventListener('transitionend', function finish() {
+  function finish() {
     track.removeEventListener('transitionend', finish);
     track.style.transition = 'none';
     _previewIdx = newIdx;
     if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
-    resetTrack(newIdx);
+    resetTrack(newIdx);  // jumps back to center position (invisible, no transition)
     _navSliding = false;
-  });
+  }
+  track.addEventListener('transitionend', finish);
 
-  // Safety
   setTimeout(function() {
-    if (_navSliding) {
-      track.style.transition = 'none';
-      _previewIdx = newIdx;
-      if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
-      resetTrack(newIdx);
-      _navSliding = false;
-    }
+    if (_navSliding) finish();
   }, duration + 100);
 }
 
 function navPreview(dir) {
-  if (_creations.length === 0 || _flipAnimating || _navSliding) return;
-  // Edge guard: don't navigate past bounds
+  if (_creations.length <= 1) return;
+  if (_flipAnimating || _navSliding) return;
   if (dir < 0 && _previewIdx <= 0) return;
   if (dir > 0 && _previewIdx >= _creations.length - 1) return;
 
@@ -1161,8 +1164,10 @@ document.addEventListener('touchmove', function(e) {
         resistance = 0.2;
       }
       var vpW = ov.offsetWidth;
-      var deltaPct = (dx / vpW) * 100 * resistance;
-      track.style.transform = 'translateX(' + (-100 + deltaPct) + '%)';
+      // Convert drag px → track-relative % (track = 3× viewport, so 1 vpW = 100/3 %)
+      var deltaPct = (dx / vpW) * (100 / 3) * resistance;
+      var basePct = -100 / 3;  // center slide position
+      track.style.transform = 'translateX(' + (basePct + deltaPct).toFixed(4) + '%)';
     }
   }
 }, {passive:true});
@@ -1180,12 +1185,12 @@ document.addEventListener('touchend', function(e) {
       // At boundary — spring back
       if (track) {
         track.style.transition = 'transform 0.25s ease';
-        track.style.transform = 'translateX(-100%)';
+        track.style.transform = 'translateX(' + trackCenter() + ')';
       }
     } else {
       // Snap to adjacent slide
       var newIdx = _previewIdx + dir;
-      var targetX = dir > 0 ? '-200%' : '0%';
+      var targetX = dir > 0 ? trackNext() : trackPrev();
       if (track) {
         track.style.transition = 'transform 0.2s ease';
         track.style.transform = 'translateX(' + targetX + ')';
@@ -1201,7 +1206,7 @@ document.addEventListener('touchend', function(e) {
     // Small drag — spring back to center
     if (track) {
       track.style.transition = 'transform 0.25s ease';
-      track.style.transform = 'translateX(-100%)';
+      track.style.transform = 'translateX(' + trackCenter() + ')';
     }
   }
   _touchDragging = false;
