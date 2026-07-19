@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 /**
  * server.js — Express backend for fotowisuda.ai
  * ------------------------------------------------------------------
@@ -38,7 +40,6 @@ const sharp    = require('sharp');
 const { GoogleGenAI } = require('@google/genai');
 const { OAuth2Client } = require('google-auth-library');
 const db = require('./db');
-require('dotenv').config();
 
 // ═══ CRASH PREVENTION — keep the server alive no matter what ═══
 process.on('uncaughtException', (err) => {
@@ -1463,42 +1464,43 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                 if (imageUrl) {
                     // Upload the Leonardo image to Cloudinary for permanent storage
                     let cloudinaryUrl = imageUrl;  // fallback: original Leonardo URL
-                    let cloudinaryUpload = null;
                     try {
                         const genResp = await fetch(imageUrl);
                         if (genResp.ok) {
                             const genBuffer = Buffer.from(await genResp.arrayBuffer());
-                            cloudinaryUpload = await db.uploadToCloudinary(genBuffer, 'generations', localGenId);
-                            if (cloudinaryUpload) {
+                            const cloudinaryUpload = await db.uploadToCloudinary(genBuffer, 'generations', localGenId);
+                            if (cloudinaryUpload && cloudinaryUpload.url) {
                                 cloudinaryUrl = cloudinaryUpload.url;
                                 console.log(`  [cloudinary] Image uploaded → ${cloudinaryUrl}`);
+                            } else {
+                                console.warn(`  [cloudinary] Upload returned no URL — using Leonardo CDN fallback`);
                             }
                         }
                     } catch (err) {
                         console.error(`  [cloudinary] Upload failed, using Leonardo URL:`, err.message);
                     }
 
-                    // Determine aspect-ratio label
-                    const ratioLabel = dimensionToRatioLabel(record.width, record.height);
+                    // Title: STRICTLY use frontend-provided title, NEVER use prompt as title
+                    // Priority: record._title > record.filterTitle > fallback
+                    const title = record._title || record.filterTitle || 'Untitled';
 
-                    // Title: use frontend-provided title, fall back to prompt snippet
-                    const title = record.filterTitle || (record.prompt || '').substring(0, 35).trim() || 'Untitled';
-
-                    // Tags: strictly use what the frontend provided (no hardcoded defaults)
-                    const tags = [];
-                    if (record.selected_tag) tags.push(record.selected_tag);
-                    if (record.lighting) tags.push(record.lighting);
-                    // Also accept tags from req.body if passed through the record
+                    // Tags: STRICTLY use frontend-provided tags array
+                    // Priority: record._tags (from req.body.tags) > individual fields
+                    let tags = [];
                     if (Array.isArray(record._tags) && record._tags.length > 0) {
-                        for (const t of record._tags) if (!tags.includes(t)) tags.push(t);
+                        tags = record._tags;
+                    } else {
+                        if (record.selected_tag) tags.push(record.selected_tag);
+                        if (record.lighting) tags.push(record.lighting);
                     }
 
-                    // Determine owner_email: user generations should carry the user's email,
-                    // admin generations carry ADMIN_EMAIL
+                    // Ratio / dimensions: use frontend-provided ratio if available
+                    const ratioLabel = record._ratio || dimensionToRatioLabel(record.width, record.height);
+
+                    // Determine owner_email
                     let ownerEmail = record._userEmail || null;
                     const isAdminType = record._adminSave || (!record._publicUser && (record.type === 'filter-swap' || record.type === 'filter-factory'));
                     if (isAdminType) ownerEmail = ADMIN_EMAIL;
-                    // If neither user nor admin, fall back to the email from the record
                     if (!ownerEmail && record._safeEmailPrefix && record._safeEmailPrefix !== 'guest_user') {
                         ownerEmail = record._userEmail || record._safeEmailPrefix || null;
                     }
@@ -1516,8 +1518,9 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         width: record.width || 1024,
                         height: record.height || 1024,
                         dimensions: ratioLabel,
+                        ratio: record._ratio || ratioLabel,
                         image_url: cloudinaryUrl,
-                        cover_image_url: cloudinaryUrl,  // Cloudinary URL as primary image
+                        cover_image_url: cloudinaryUrl,
                         reference_image_1_path: persistedRefs?.ref1 || null,
                         reference_image_2_path: persistedRefs?.ref2 || null,
                         status: 'COMPLETE',
@@ -1525,7 +1528,8 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         created_at: new Date()
                     };
 
-                    upsertDatabaseRecord(dbRecord);
+                    await upsertDatabaseRecord(dbRecord);
+                    console.log(`  [poll] MongoDB upserted → ${localGenId} (title: "${title}", tags: [${tags.join(', ')}], ratio: ${ratioLabel})`);
                 }
             } else if (status === 'FAILED') {
                 record.error = error || 'Generation failed on Leonardo';
@@ -3088,13 +3092,22 @@ app.post('/api/save-admin-generation', requireAdminApi, upload.fields([
         if (record) {
             record._adminSave = true;
             record._adminRefPath = refCloudinaryUrl || '';
-            record.filterTitle = filterTitle || record.filterTitle || '';
+            record.filterTitle = filterTitle || req.body.title || record.filterTitle || '';
+            record._title = req.body.title || filterTitle || '';
+            record._ratio = req.body.ratio || '';
             record._userEmail = ADMIN_EMAIL;
             record._safeEmailPrefix = sanitizeEmail(ADMIN_EMAIL);
             if (req.body.tags) {
                 try {
                     record._tags = typeof req.body.tags === 'string' ? JSON.parse(req.body.tags) : req.body.tags;
                 } catch (_) { record._tags = []; }
+            }
+            if (!record._tags || record._tags.length === 0) {
+                const fallbackTags = [];
+                if (req.body.category) fallbackTags.push(req.body.category);
+                if (req.body.selected_tag) fallbackTags.push(req.body.selected_tag);
+                if (req.body.lighting) fallbackTags.push(req.body.lighting);
+                if (fallbackTags.length > 0) record._tags = fallbackTags;
             }
         }
 
@@ -3187,12 +3200,22 @@ app.post('/api/save-user-generation', upload.fields([
             record._userRefPath = refCloudinaryUrl || '';
             record._userEmail = rawEmail;
             record._safeEmailPrefix = safeEmailPrefix;
-            record.filterTitle = filterTitle || record.filterTitle || '';
-            // Pass frontend tags through
+            record.filterTitle = filterTitle || req.body.title || record.filterTitle || '';
+            record._title = req.body.title || filterTitle || '';
+            record._ratio = req.body.ratio || '';
+            // Pass frontend tags through strictly
             if (req.body.tags) {
                 try {
                     record._tags = typeof req.body.tags === 'string' ? JSON.parse(req.body.tags) : req.body.tags;
                 } catch (_) { record._tags = []; }
+            }
+            // Also capture category and lighting as individual tag fallbacks
+            if (!record._tags || record._tags.length === 0) {
+                const fallbackTags = [];
+                if (req.body.category) fallbackTags.push(req.body.category);
+                if (req.body.selected_tag) fallbackTags.push(req.body.selected_tag);
+                if (req.body.lighting) fallbackTags.push(req.body.lighting);
+                if (fallbackTags.length > 0) record._tags = fallbackTags;
             }
         }
 
