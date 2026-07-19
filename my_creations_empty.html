@@ -809,17 +809,44 @@ function deleteCurrentPreview() {
 function confirmDelete() {
   if (!_deleteTarget) return;
   var item = _deleteTarget;
-  document.getElementById('confirm-modal').classList.remove('active');
+  var btn = document.querySelector('#confirm-modal button[onclick="confirmDelete()"]');
+  var origHTML = btn ? btn.innerHTML : '';
+
+  // Show loading state on the Hapus button
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;"></span> Menghapus...'; }
+
   fetch('/api/user-creations/' + encodeURIComponent(item.id), { method: 'DELETE' }).then(function(r){ return r.json(); }).then(function(d){
     if (d.deleted) {
+      // Close modal first
+      document.getElementById('confirm-modal').classList.remove('active');
+      // Remove from local array
       _creations = _creations.filter(function(c){ return c.id !== item.id; });
-      if (_creations.length === 0) { closePreview(); loadGallery(); return; }
+      // Smooth-remove the current preview card from the grid
+      var card = document.querySelector('#creations-grid .card[onclick*="openPreview"]');
+      // Navigate preview to next/prev item without full loadGallery re-render
+      if (_creations.length === 0) {
+        closePreview();
+        loadGallery();
+        return;
+      }
       if (_previewIdx >= _creations.length) _previewIdx = _creations.length - 1;
       openPreview(_previewIdx);
+      // Refresh the grid silently
       loadGallery();
+    } else {
+      // Server returned non-deleted — show error
+      alert('Gagal menghapus: Server tidak dapat menghapus kreasi ini.');
+      document.getElementById('confirm-modal').classList.remove('active');
     }
     _deleteTarget = null;
-  }).catch(function(){ _deleteTarget = null; });
+    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+  }).catch(function(err){
+    console.error('Delete failed:', err);
+    alert('Gagal menghapus: ' + (err.message || 'Kesalahan jaringan'));
+    document.getElementById('confirm-modal').classList.remove('active');
+    _deleteTarget = null;
+    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+  });
 }
 
 function cancelDelete() {

@@ -3181,16 +3181,15 @@ app.delete('/api/user-creations/:filename', async (req, res) => {
             return res.status(400).json({ error: 'Invalid filename.' });
         }
 
-        // Only allow image file extensions
-        if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(filename)) {
-            return res.status(400).json({ error: 'Invalid file type.' });
-        }
-
-        const filePath = path.join(USER_IMAGE_GEN_DIR, filename);
+        // Accept both filenames with extensions (e.g. "gen_123.jpg") and
+        // raw generation IDs (e.g. "filterswap_1765898765_abc123").
+        const hasExtension = /\.(jpg|jpeg|png|webp|gif)$/i.test(filename);
+        const genId = hasExtension ? filename.replace(/\.[^/.]+$/, '') : filename;
         let fileDeleted = false;
 
-        // 1. Delete the physical generated image file
-        if (fs.existsSync(filePath)) {
+        // 1. Try to delete the physical generated image file (if it exists)
+        const filePath = hasExtension ? path.join(USER_IMAGE_GEN_DIR, filename) : null;
+        if (filePath && fs.existsSync(filePath)) {
             try {
                 fs.unlinkSync(filePath);
                 fileDeleted = true;
@@ -3199,9 +3198,6 @@ app.delete('/api/user-creations/:filename', async (req, res) => {
                 console.error(`  [user-creations:delete] Failed to remove ${filePath}:`, err.message);
             }
         }
-
-        // 2. Extract generation ID (filename without extension) and clean up DB record
-        const genId = filename.replace(/\.[^/.]+$/, '');
 
         if (db.isConnected()) {
             const record = await db.Generation.findOne({ generation_id: genId }).lean();
