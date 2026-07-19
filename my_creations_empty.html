@@ -831,8 +831,10 @@ function findCardIndexById(id) {
 }
 
 function captureThumbRect(idx) {
+  // Restore previous thumbnail before capturing a new one
+  if (_flipThumbImg) _flipThumbImg.style.opacity = '';
   var thumb = getCardElement(idx);
-  if (!thumb) return null;
+  if (!thumb) { _flipThumb = null; _flipThumbImg = null; return null; }
   var thumbImg = thumb.querySelector('img');
   _flipThumb = thumb;
   _flipThumbImg = thumbImg || null;
