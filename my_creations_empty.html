@@ -919,59 +919,67 @@ function closePreview() {
 
   var ov = document.getElementById('preview-overlay');
   var img = getCenterImg();
+  var vp = getViewport();
   if (!ov || !img) { _previewIdx = -1; return; }
 
-  // Try to find the card for the current preview item
   var thumb = _flipThumb;
   var thumbImg = _flipThumbImg;
   var toRect = null;
 
   if (thumb && _previewIdx >= 0 && _previewIdx < _creations.length) {
-    // Re-capture in case user scrolled
     thumb.scrollIntoView({ behavior: 'instant', block: 'nearest' });
     toRect = (thumbImg || thumb).getBoundingClientRect();
   }
 
   if (toRect) {
-    var fromRect = img.getBoundingClientRect();
-
-    var dX = toRect.left + toRect.width / 2 - (fromRect.left + fromRect.width / 2);
-    var dY = toRect.top + toRect.height / 2 - (fromRect.top + fromRect.height / 2);
-    // Use uniform scale (cover mode) to prevent aspect-ratio distortion
-    var sX = toRect.width / fromRect.width;
-    var sY = toRect.height / fromRect.height;
-    var s  = Math.max(sX, sY);  // cover: fill the target, crop excess
-
     _flipAnimating = true;
-    hideChrome();  // instantly fade out counter, arrows, buttons
+    hideChrome();
+
+    // Hide carousel and thumbnail during animation
+    if (vp) vp.style.opacity = '0';
+    if (thumbImg) thumbImg.style.opacity = '0';
+
+    // ── Create clone wrapper with overflow:hidden ──────────────
+    // The wrapper provides continuous clipping as it shrinks.
+    // Inner image uses object-fit:cover → scales automatically.
+    var fromRect = img.getBoundingClientRect();
+    var clone = document.createElement('div');
+    clone.id = 'flip-clone';
+    clone.style.cssText = 'position:fixed;z-index:1001;overflow:hidden;pointer-events:none;'
+      + 'left:' + fromRect.left + 'px;top:' + fromRect.top + 'px;'
+      + 'width:' + fromRect.width + 'px;height:' + fromRect.height + 'px;'
+      + 'border-radius:0;';
+
+    var cloneImg = document.createElement('img');
+    cloneImg.src = img.src;
+    cloneImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    clone.appendChild(cloneImg);
+    document.body.appendChild(clone);
+
+    // Force layout
+    clone.offsetHeight;
+
+    // Fade overlay background
     ov.style.transition = 'background ' + (DURATION_CLOSE / 1000) + 's ease';
     ov.style.background = 'rgba(0,0,0,0)';
-    ov.style.overflow = 'hidden';  // clip cover overflow
 
-    // Match thumbnail rendering: object-fit cover prevents stretching
-    img.style.objectFit = 'cover';
-    img.style.transition = 'transform ' + (DURATION_CLOSE / 1000) + 's ' + EASING
-                         + ', border-radius ' + (DURATION_CLOSE / 1000) + 's ease';
-    img.style.transformOrigin = 'center center';
-    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + s + ', ' + s + ')';
-    img.style.borderRadius = '0px';
-    img.style.willChange = 'transform, border-radius';
+    // Animate clone wrapper to grid cell position + size
+    clone.style.transition = 'all ' + (DURATION_CLOSE / 1000) + 's ' + EASING;
+    clone.style.left   = toRect.left + 'px';
+    clone.style.top    = toRect.top + 'px';
+    clone.style.width  = toRect.width + 'px';
+    clone.style.height = toRect.height + 'px';
 
     var onDone = function() {
+      if (clone.parentNode) clone.remove();
       ov.style.display = 'none';
-      ov.style.overflow = '';
       ov.style.transition = '';
-      img.style.objectFit = '';
-      img.style.transition = '';
-      img.style.transform = '';
-      img.style.transformOrigin = '';
-      img.style.borderRadius = '';
-      img.style.willChange = '';
+      if (vp) vp.style.opacity = '';
       if (thumbImg) thumbImg.style.opacity = '';
       _flipAnimating = false;
-      img.removeEventListener('transitionend', onDone);
+      clone.removeEventListener('transitionend', onDone);
     };
-    img.addEventListener('transitionend', onDone);
+    clone.addEventListener('transitionend', onDone);
 
     setTimeout(function() {
       if (_flipAnimating) { onDone(); }
