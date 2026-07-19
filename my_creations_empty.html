@@ -802,14 +802,17 @@ function openPreview(idx) {
     // Measure the image's natural position in the modal
     var toRect = img.getBoundingClientRect();
 
-    // FLIP Invert: translate + scale from modal-center back to thumbnail
+    // FLIP Invert: translate + uniform scale (cover mode, no distortion)
     var dX = fromRect.left + fromRect.width / 2 - (toRect.left + toRect.width / 2);
     var dY = fromRect.top + fromRect.height / 2 - (toRect.top + toRect.height / 2);
     var sX = fromRect.width / toRect.width;
     var sY = fromRect.height / toRect.height;
+    var s  = Math.max(sX, sY);  // cover: fill target area, crop excess
 
+    ov.style.overflow = 'hidden';
+    img.style.objectFit = 'cover';
     img.style.transformOrigin = 'center center';
-    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + sX + ', ' + sY + ')';
+    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + s + ', ' + s + ')';
     img.style.borderRadius = '0px';
     img.style.willChange = 'transform, border-radius';
 
@@ -828,6 +831,8 @@ function openPreview(idx) {
 
     var onDone = function() {
       _flipAnimating = false;
+      ov.style.overflow = '';
+      img.style.objectFit = '';
       img.style.transition = '';
       img.style.transform = '';
       img.style.transformOrigin = '';
@@ -870,23 +875,30 @@ function closePreview() {
 
     var dX = toRect.left + toRect.width / 2 - (fromRect.left + fromRect.width / 2);
     var dY = toRect.top + toRect.height / 2 - (fromRect.top + fromRect.height / 2);
+    // Use uniform scale (cover mode) to prevent aspect-ratio distortion
     var sX = toRect.width / fromRect.width;
     var sY = toRect.height / fromRect.height;
+    var s  = Math.max(sX, sY);  // cover: fill the target, crop excess
 
     _flipAnimating = true;
     ov.style.transition = 'background ' + (DURATION_CLOSE / 1000) + 's ease';
     ov.style.background = 'rgba(0,0,0,0)';
+    ov.style.overflow = 'hidden';  // clip cover overflow
 
+    // Match thumbnail rendering: object-fit cover prevents stretching
+    img.style.objectFit = 'cover';
     img.style.transition = 'transform ' + (DURATION_CLOSE / 1000) + 's ' + EASING
                          + ', border-radius ' + (DURATION_CLOSE / 1000) + 's ease';
     img.style.transformOrigin = 'center center';
-    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + sX + ', ' + sY + ')';
+    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + s + ', ' + s + ')';
     img.style.borderRadius = '0px';
     img.style.willChange = 'transform, border-radius';
 
     var onDone = function() {
       ov.style.display = 'none';
+      ov.style.overflow = '';
       ov.style.transition = '';
+      img.style.objectFit = '';
       img.style.transition = '';
       img.style.transform = '';
       img.style.transformOrigin = '';
