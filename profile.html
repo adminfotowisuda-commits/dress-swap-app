@@ -13,6 +13,11 @@
         html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         .animate-in{animation:fadeIn 0.4s ease-out}
+        /* Toast notification system */
+        @keyframes toastSlideIn{from{opacity:0;transform:translate(-50%, -24px)}to{opacity:1;transform:translate(-50%, 0)}}
+        @keyframes toastSlideOut{from{opacity:1;transform:translate(-50%, 0)}to{opacity:0;transform:translate(-50%, -24px)}}
+        .toast-enter{animation:toastSlideIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards}
+        .toast-exit{animation:toastSlideOut 0.3s cubic-bezier(0.4,0,1,1) forwards}
     </style>
 </head>
 <body>
@@ -228,12 +233,50 @@
 <script>
 // ═══ GLOBAL ERROR CATCHER — ensure nothing is ever silent ═══
 window.onerror = function(msg, url, line) {
-    alert('⚠️ JS Error: ' + msg + ' (line ' + line + ')');
     console.error('GLOBAL ERROR:', msg, url, line);
+    // Only show toast if the toast system is available
+    try { showToast('JS Error: ' + msg + ' (line ' + line + ')', 'error'); dismissToast(4000); } catch(_) {}
 };
 console.log('[profile] Script loaded — ' + new Date().toISOString());
 
 var API_BASE = window.location.origin;
+
+// ═══ Custom Toast Notification ═══
+function showToast(message, type) {
+    type = type || 'success'; // 'success' | 'error' | 'warning'
+    var existing = document.getElementById('custom-toast');
+    if (existing) existing.remove();
+
+    var icon = type === 'success' ? '✔' : (type === 'error' ? '✖' : '⚠');
+    var bgColor = type === 'success' ? 'rgba(34,197,94,0.06)' : (type === 'error' ? 'rgba(239,68,68,0.06)' : 'rgba(251,191,36,0.06)');
+    var borderColor = type === 'success' ? 'rgba(34,197,94,0.25)' : (type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(251,191,36,0.25)');
+    var iconColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#fbbf24');
+    var textColor = type === 'success' ? '#bbf7d0' : (type === 'error' ? '#fecaca' : '#fde68a');
+
+    var toast = document.createElement('div');
+    toast.id = 'custom-toast';
+    toast.className = 'toast-enter';
+    toast.style.cssText = 'position:fixed;top:24px;left:50%;z-index:9999;padding:14px 24px;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:14px;font-size:14px;font-weight:600;color:' + textColor + ';display:flex;align-items:center;gap:10px;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.4);pointer-events:none;white-space:nowrap;';
+    toast.innerHTML = '<span style="font-size:16px;color:' + iconColor + ';">' + icon + '</span><span>' + message + '</span>';
+
+    document.body.appendChild(toast);
+    return toast;
+}
+
+function dismissToast(delay, callback) {
+    var toast = document.getElementById('custom-toast');
+    if (!toast) { if (callback) callback(); return; }
+    setTimeout(function() {
+        if (toast) {
+            toast.classList.remove('toast-enter');
+            toast.classList.add('toast-exit');
+            setTimeout(function() {
+                if (toast.parentNode) toast.remove();
+                if (callback) callback();
+            }, 300);
+        }
+    }, delay || 1500);
+}
 
 function getEmail() { try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; } }
 function setEmail(e) { try { localStorage.setItem('active_user_email', e); } catch(_) {} }
@@ -272,12 +315,12 @@ async function handleCredentialResponse(response) {
         var data = await resp.json();
 
         if (!data.success) {
-            alert('❌ Google Sign-In gagal: ' + (data.error || 'Unknown error'));
+            showToast('Google Sign-In gagal: ' + (data.error || 'Unknown error'), 'error');
+            dismissToast(3000);
             return;
         }
 
         setEmail(data.email);
-        alert('✅ Login Berhasil! Selamat datang, ' + (data.email || ''));
 
         // Update sidebar dynamically
         if (window._refreshCredits) window._refreshCredits();
@@ -285,9 +328,16 @@ async function handleCredentialResponse(response) {
 
         // Transition to profile view
         loadProfile();
+
+        // Show success toast then redirect to home
+        showToast('Login Berhasil! Mengalihkan...', 'success');
+        dismissToast(1500, function() {
+            window.location.href = '/';
+        });
     } catch (err) {
         console.error('[GSI] Error:', err.message);
-        alert('❌ Kesalahan jaringan: ' + err.message + '\n\nSilakan muat ulang halaman dan coba lagi.');
+        showToast('Kesalahan jaringan: ' + err.message, 'error');
+        dismissToast(3500);
     }
 }
 
@@ -309,7 +359,8 @@ async function handleLogin(e) {
     // ── Safety net: if anything throws before we can show an inline
     //    error, the user still sees an alert so it's never silent.
     window._loginSafetyTimer = setTimeout(function() {
-        alert('⚠️ Login sedang diproses. Jika halaman tidak merespon, muat ulang dan coba lagi.');
+        showToast('Login sedang diproses. Jika halaman tidak merespon, muat ulang dan coba lagi.', 'warning');
+        dismissToast(5000);
     }, 8000);
 
     var email = document.getElementById('login-email-input').value.trim();
@@ -347,7 +398,8 @@ async function handleLogin(e) {
         if (!data.success) {
             var errMsg = data.error || 'Login gagal. Periksa email dan password Anda.';
             showError(errMsg);
-            alert('❌ Gagal masuk: ' + errMsg);
+            showToast('Gagal masuk: ' + errMsg, 'error');
+            dismissToast(3500);
             btn.disabled = false;
             btn.textContent = 'Masuk';
             clearTimeout(window._loginSafetyTimer);
@@ -355,7 +407,6 @@ async function handleLogin(e) {
         }
 
         clearTimeout(window._loginSafetyTimer);
-        alert('✅ Login Berhasil! Selamat datang, ' + (data.email || email));
         setEmail(email);
 
         // Update sidebar dynamically
@@ -366,12 +417,19 @@ async function handleLogin(e) {
         loadProfile();
         btn.disabled = false;
         btn.textContent = 'Masuk';
+
+        // Show success toast then redirect to home
+        showToast('Login Berhasil! Mengalihkan...', 'success');
+        dismissToast(1500, function() {
+            window.location.href = '/';
+        });
     } catch(err) {
         clearTimeout(window._loginSafetyTimer);
         console.error('[LOGIN] Catch block —', err.message);
         var netErrMsg = 'Kesalahan jaringan: ' + err.message;
         showError(netErrMsg);
-        alert('❌ ' + netErrMsg + '\n\nSilakan muat ulang halaman dan coba lagi.');
+        showToast(netErrMsg, 'error');
+        dismissToast(4000);
         btn.disabled = false;
         btn.textContent = 'Masuk';
     }
@@ -389,7 +447,8 @@ function showError(msg) {
         }, 10000);
     } else {
         // Ultimate fallback
-        alert('❌ ' + msg);
+        showToast(msg, 'error');
+        dismissToast(3500);
     }
 }
 
@@ -614,12 +673,14 @@ async function confirmDeleteAccount() {
                 }, 300);
             }, 2500);
         } else {
-            alert('Gagal: ' + (data.error || 'Unknown error'));
+            showToast('Gagal: ' + (data.error || 'Unknown error'), 'error');
+            dismissToast(3500);
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Hapus Akun';
         }
     } catch(err) {
-        alert('Error: ' + err.message);
+        showToast('Error: ' + err.message, 'error');
+        dismissToast(3500);
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Hapus Akun';
     }

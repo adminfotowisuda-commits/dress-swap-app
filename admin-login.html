@@ -13,6 +13,10 @@
         html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         .animate-in{animation:fadeIn 0.4s ease-out}
+        @keyframes toastSlideIn{from{opacity:0;transform:translate(-50%, -24px)}to{opacity:1;transform:translate(-50%, 0)}}
+        @keyframes toastSlideOut{from{opacity:1;transform:translate(-50%, 0)}to{opacity:0;transform:translate(-50%, -24px)}}
+        .toast-enter{animation:toastSlideIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards}
+        .toast-exit{animation:toastSlideOut 0.3s cubic-bezier(0.4,0,1,1) forwards}
     </style>
 </head>
 <body>
@@ -48,6 +52,42 @@
 <script>
 var API_BASE = window.location.origin;
 var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
+
+// ═══ Custom Toast Notification ═══
+function showToast(message, type) {
+    type = type || 'error';
+    var existing = document.getElementById('custom-toast');
+    if (existing) existing.remove();
+
+    var icon = type === 'success' ? '✔' : (type === 'error' ? '✖' : '⚠');
+    var bgColor = type === 'success' ? 'rgba(34,197,94,0.06)' : (type === 'error' ? 'rgba(239,68,68,0.06)' : 'rgba(251,191,36,0.06)');
+    var borderColor = type === 'success' ? 'rgba(34,197,94,0.25)' : (type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(251,191,36,0.25)');
+    var iconColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#fbbf24');
+    var textColor = type === 'success' ? '#bbf7d0' : (type === 'error' ? '#fecaca' : '#fde68a');
+
+    var toast = document.createElement('div');
+    toast.id = 'custom-toast';
+    toast.className = 'toast-enter';
+    toast.style.cssText = 'position:fixed;top:24px;left:50%;z-index:9999;padding:14px 24px;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:14px;font-size:14px;font-weight:600;color:' + textColor + ';display:flex;align-items:center;gap:10px;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.4);pointer-events:none;white-space:nowrap;';
+    toast.innerHTML = '<span style="font-size:16px;color:' + iconColor + ';">' + icon + '</span><span>' + message + '</span>';
+    document.body.appendChild(toast);
+    return toast;
+}
+
+function dismissToast(delay, callback) {
+    var toast = document.getElementById('custom-toast');
+    if (!toast) { if (callback) callback(); return; }
+    setTimeout(function() {
+        if (toast) {
+            toast.classList.remove('toast-enter');
+            toast.classList.add('toast-exit');
+            setTimeout(function() {
+                if (toast.parentNode) toast.remove();
+                if (callback) callback();
+            }, 300);
+        }
+    }, delay || 3000);
+}
 
 // ═══ Initialize Google Sign-In ═══
 function initGoogleSignIn() {
@@ -86,24 +126,32 @@ async function handleAdminCredentialResponse(response) {
             errorEl.textContent = '🚫 Akses Ditolak: Anda bukan Admin! Hanya admin.fotowisuda@gmail.com yang diizinkan.';
             errorEl.style.display = 'block';
             console.error('[ADMIN LOGIN] Access denied:', data.error);
-            alert('Akses Ditolak: Anda bukan Admin!');
+            showToast('Akses Ditolak: Anda bukan Admin!', 'error');
+            dismissToast(4000);
             return;
         }
 
         if (!data.success) {
             errorEl.textContent = '❌ ' + (data.error || 'Autentikasi gagal.');
             errorEl.style.display = 'block';
+            showToast(data.error || 'Autentikasi gagal.', 'error');
+            dismissToast(3500);
             return;
         }
 
         // Success — redirect to admin dashboard
         console.log('[ADMIN LOGIN] Authenticated — redirecting to /admin');
-        window.location.href = '/admin';
+        showToast('Admin Login Berhasil! Mengalihkan...', 'success');
+        dismissToast(1200, function() {
+            window.location.href = '/admin';
+        });
 
     } catch (err) {
         console.error('[ADMIN LOGIN] Network error:', err.message);
         errorEl.textContent = '⚠️ Kesalahan jaringan: ' + err.message;
         errorEl.style.display = 'block';
+        showToast('Kesalahan jaringan: ' + err.message, 'error');
+        dismissToast(3500);
     }
 }
 
