@@ -38,8 +38,7 @@
   .btn-primary:hover{box-shadow:0 0 24px rgba(157,91,255,0.3);transform:translateY(-1px)}
   .btn-outline{background:transparent;border:1px solid #30363D;color:#8B949E}
   .btn-outline:hover{border-color:#9D5BFF;color:#c4b5fd}
-  .preview-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:16px}
-  .preview-overlay.active{display:flex}
+  .preview-overlay{display:none;position:fixed;inset:0;z-index:999;background:transparent;align-items:center;justify-content:center;padding:16px}
   .preview-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(30,32,36,0.8);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
   .preview-nav:hover{background:rgba(30,32,36,1)}
   .preview-nav.prev{left:16px} .preview-nav.next{right:16px}
@@ -731,22 +730,186 @@ function markProcessingFailed(generationId) {
   } catch(_) {}
 }
 
+var _flipThumb = null;      // source card element for FLIP animation
+var _flipAnimating = false;  // guard against concurrent animations
+var _flipThumbImg = null;    // the img inside the source card
+var _flipRect = null;        // cached bounding rect of the source card
+
+// ── FLIP shared-element transition ─────────────────────────────
+// Captures the thumbnail's position, then animates the modal image
+// from that position to its final centered state.
+
+function getCardElement(idx) {
+  var cards = document.querySelectorAll('#creations-grid .card');
+  // Filter out processing cards
+  for (var i = 0, c = 0; i < cards.length; i++) {
+    if (cards[i].classList.contains('processing-card')) continue;
+    if (c === idx) return cards[i];
+    c++;
+  }
+  return null;
+}
+
+function findCardIndexById(id) {
+  for (var i = 0; i < _creations.length; i++) {
+    if (_creations[i].id === id) return i;
+  }
+  return -1;
+}
+
+function captureThumbRect(idx) {
+  var thumb = getCardElement(idx);
+  if (!thumb) return null;
+  var thumbImg = thumb.querySelector('img');
+  _flipThumb = thumb;
+  _flipThumbImg = thumbImg || null;
+  _flipRect = (thumbImg || thumb).getBoundingClientRect();
+  return _flipRect;
+}
+
+var EASING = 'cubic-bezier(0.25, 1, 0.5, 1)';
+var DURATION_OPEN = 320;
+var DURATION_CLOSE = 250;
+
 function openPreview(idx) {
   if (idx < 0 || idx >= _creations.length) return;
+  if (_flipAnimating) return;
+
   _previewIdx = idx;
   var ov = document.getElementById('preview-overlay');
   var img = document.getElementById('preview-img');
-  var dl = document.getElementById('preview-dl');
   var cnt = document.getElementById('preview-counter');
   if (!ov || !img) return;
+
+  // Set the image source
   img.src = _creations[idx].url;
-  // Download handled by downloadCurrentPreview() — no-op here
-  if (cnt) cnt.textContent = (idx+1)+' / '+_creations.length;
-  ov.classList.add('active');
+  if (cnt) cnt.textContent = (idx + 1) + ' / ' + _creations.length;
+
+  var fromRect = captureThumbRect(idx);
+
+  // Show overlay (transparent, no flex centering interference during animation)
+  ov.style.background = 'rgba(0,0,0,0)';
+  ov.style.alignItems = 'center';
+  ov.style.justifyContent = 'center';
+  ov.style.display = 'flex';
+  // Force layout so getBoundingClientRect reads the natural modal position
+  ov.offsetHeight;
+
+  if (fromRect) {
+    // Hide the thumbnail during animation
+    if (_flipThumbImg) _flipThumbImg.style.opacity = '0';
+
+    // Measure the image's natural position in the modal
+    var toRect = img.getBoundingClientRect();
+
+    // FLIP Invert: translate + scale from modal-center back to thumbnail
+    var dX = fromRect.left + fromRect.width / 2 - (toRect.left + toRect.width / 2);
+    var dY = fromRect.top + fromRect.height / 2 - (toRect.top + toRect.height / 2);
+    var sX = fromRect.width / toRect.width;
+    var sY = fromRect.height / toRect.height;
+
+    img.style.transformOrigin = 'center center';
+    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + sX + ', ' + sY + ')';
+    img.style.borderRadius = '8px';
+    img.style.willChange = 'transform, border-radius';
+
+    // Force layout
+    img.offsetHeight;
+
+    // Animate to final state
+    _flipAnimating = true;
+    ov.style.transition = 'background ' + (DURATION_OPEN / 1000) + 's ease';
+    ov.style.background = 'rgba(0,0,0,0.92)';
+
+    img.style.transition = 'transform ' + (DURATION_OPEN / 1000) + 's ' + EASING
+                         + ', border-radius ' + (DURATION_OPEN / 1000) + 's ease';
+    img.style.transform = 'translate(0, 0) scale(1, 1)';
+    img.style.borderRadius = '16px';
+
+    var onDone = function() {
+      _flipAnimating = false;
+      img.style.transition = '';
+      img.style.transform = '';
+      img.style.transformOrigin = '';
+      img.style.borderRadius = '';
+      img.style.willChange = '';
+      img.removeEventListener('transitionend', onDone);
+    };
+    img.addEventListener('transitionend', onDone);
+
+    // Safety: force cleanup if transitionend never fires
+    setTimeout(function() {
+      if (_flipAnimating) { onDone(); }
+    }, DURATION_OPEN + 100);
+  } else {
+    // No card found — instant show
+    ov.style.background = 'rgba(0,0,0,0.92)';
+  }
 }
 
 function closePreview() {
-  document.getElementById('preview-overlay').classList.remove('active');
+  if (_flipAnimating) return;
+
+  var ov = document.getElementById('preview-overlay');
+  var img = document.getElementById('preview-img');
+  if (!ov || !img) { _previewIdx = -1; return; }
+
+  // Try to find the card for the current preview item
+  var thumb = _flipThumb;
+  var thumbImg = _flipThumbImg;
+  var toRect = null;
+
+  if (thumb && _previewIdx >= 0 && _previewIdx < _creations.length) {
+    // Re-capture in case user scrolled
+    thumb.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+    toRect = (thumbImg || thumb).getBoundingClientRect();
+  }
+
+  if (toRect) {
+    var fromRect = img.getBoundingClientRect();
+
+    var dX = toRect.left + toRect.width / 2 - (fromRect.left + fromRect.width / 2);
+    var dY = toRect.top + toRect.height / 2 - (fromRect.top + fromRect.height / 2);
+    var sX = toRect.width / fromRect.width;
+    var sY = toRect.height / fromRect.height;
+
+    _flipAnimating = true;
+    ov.style.transition = 'background ' + (DURATION_CLOSE / 1000) + 's ease';
+    ov.style.background = 'rgba(0,0,0,0)';
+
+    img.style.transition = 'transform ' + (DURATION_CLOSE / 1000) + 's ' + EASING
+                         + ', border-radius ' + (DURATION_CLOSE / 1000) + 's ease';
+    img.style.transformOrigin = 'center center';
+    img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + sX + ', ' + sY + ')';
+    img.style.borderRadius = '8px';
+    img.style.willChange = 'transform, border-radius';
+
+    var onDone = function() {
+      ov.style.display = 'none';
+      ov.style.transition = '';
+      img.style.transition = '';
+      img.style.transform = '';
+      img.style.transformOrigin = '';
+      img.style.borderRadius = '';
+      img.style.willChange = '';
+      if (thumbImg) thumbImg.style.opacity = '';
+      _flipAnimating = false;
+      img.removeEventListener('transitionend', onDone);
+    };
+    img.addEventListener('transitionend', onDone);
+
+    setTimeout(function() {
+      if (_flipAnimating) { onDone(); }
+    }, DURATION_CLOSE + 100);
+  } else {
+    ov.style.display = 'none';
+    if (thumbImg) thumbImg.style.opacity = '';
+  }
+
+  // Reset state
+  _flipThumb = null;
+  _flipThumbImg = null;
+  _flipRect = null;
   _previewIdx = -1;
 }
 
@@ -791,9 +954,30 @@ async function forceDownload(imageUrl, filename) {
 }
 
 function navPreview(dir) {
-  if (_creations.length === 0) return;
-  _previewIdx = (_previewIdx + dir + _creations.length) % _creations.length;
-  openPreview(_previewIdx);
+  if (_creations.length === 0 || _flipAnimating) return;
+  var newIdx = (_previewIdx + dir + _creations.length) % _creations.length;
+
+  // Quick dismiss: fade out current image instantly, then FLIP the new one in
+  var img = document.getElementById('preview-img');
+  var ov = document.getElementById('preview-overlay');
+  if (img) {
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.1s ease';
+  }
+
+  // Restore previous thumbnail if any
+  if (_flipThumbImg) _flipThumbImg.style.opacity = '';
+
+  // Clear animation state so openPreview runs cleanly
+  _flipAnimating = false;
+
+  setTimeout(function() {
+    if (img) {
+      img.style.opacity = '1';
+      img.style.transition = '';
+    }
+    openPreview(newIdx);
+  }, 120);
 }
 
 var _deleteTarget = null;
@@ -856,7 +1040,7 @@ function cancelDelete() {
 
 document.addEventListener('keydown', function(e) {
   var ov = document.getElementById('preview-overlay');
-  if (!ov || !ov.classList.contains('active')) return;
+  if (!ov || ov.style.display !== 'flex') return;
   if (e.key === 'Escape') closePreview();
   if (e.key === 'ArrowLeft') navPreview(-1);
   if (e.key === 'ArrowRight') navPreview(1);
@@ -866,7 +1050,7 @@ var _touchX = 0;
 document.addEventListener('touchstart', function(e) { _touchX = e.touches[0].clientX; }, {passive:true});
 document.addEventListener('touchend', function(e) {
   var ov = document.getElementById('preview-overlay');
-  if (!ov || !ov.classList.contains('active')) return;
+  if (!ov || ov.style.display !== 'flex') return;
   var dx = e.changedTouches[0].clientX - _touchX;
   if (Math.abs(dx) > 50) navPreview(dx < 0 ? 1 : -1);
 });
