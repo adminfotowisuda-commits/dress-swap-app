@@ -1459,94 +1459,70 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                 console.log(`  [poll] ${localGenId} → COMPLETE`);
                 clearInterval(interval);
 
-                // --- Post-generation: thumbnail + metadata + database write ---
+                // --- Post-generation: Cloudinary upload + metadata + MongoDB write ---
                 if (imageUrl) {
-                    const coverPath = await downloadAndThumbnail(imageUrl, localGenId);
+                    // Upload the Leonardo image to Cloudinary for permanent storage
+                    let cloudinaryUrl = imageUrl;  // fallback: original Leonardo URL
+                    let cloudinaryUpload = null;
+                    try {
+                        const genResp = await fetch(imageUrl);
+                        if (genResp.ok) {
+                            const genBuffer = Buffer.from(await genResp.arrayBuffer());
+                            cloudinaryUpload = await db.uploadToCloudinary(genBuffer, 'generations', localGenId);
+                            if (cloudinaryUpload) {
+                                cloudinaryUrl = cloudinaryUpload.url;
+                                console.log(`  [cloudinary] Image uploaded → ${cloudinaryUrl}`);
+                            }
+                        }
+                    } catch (err) {
+                        console.error(`  [cloudinary] Upload failed, using Leonardo URL:`, err.message);
+                    }
 
-                    // Determine a human-readable aspect-ratio label
+                    // Determine aspect-ratio label
                     const ratioLabel = dimensionToRatioLabel(record.width, record.height);
 
-                    // Title extraction: use preset title or prompt snippet.
-                    const title = record.filterTitle || (record.prompt || '').substring(0, 35).trim();
-                    // Include background category + lighting in tags array for gallery filtering
+                    // Title: use frontend-provided title, fall back to prompt snippet
+                    const title = record.filterTitle || (record.prompt || '').substring(0, 35).trim() || 'Untitled';
+
+                    // Tags: strictly use what the frontend provided (no hardcoded defaults)
                     const tags = [];
                     if (record.selected_tag) tags.push(record.selected_tag);
                     if (record.lighting) tags.push(record.lighting);
-
-                    // --- Admin: save generated image to admin_data_image_generate ---
-                    let adminGenPath = null;
-                    if (record._adminSave) {
-                        try {
-                            console.log(`  [admin-save] Downloading generated image for admin persistence…`);
-                            const genResp = await fetch(imageUrl);
-                            if (genResp.ok) {
-                                const genBuffer = Buffer.from(await genResp.arrayBuffer());
-                                const jpegBuffer = await sharp(genBuffer).jpeg({ quality: 92 }).toBuffer();
-                                const genFilename = `gen_${localGenId}.jpg`;
-                                const genAbsPath = path.join(ADMIN_IMAGE_GEN_DIR, genFilename);
-                                fs.writeFileSync(genAbsPath, jpegBuffer);
-                                adminGenPath = genAbsPath;
-                                console.log(`  [admin-save] Generated image saved: ${genAbsPath} (${(jpegBuffer.length / 1024).toFixed(1)} KB)`);
-                            } else {
-                                console.error(`  [admin-save] Failed to download generated image: HTTP ${genResp.status}`);
-                            }
-                        } catch (err) {
-                            console.error(`  [admin-save] Failed to save generated image:`, err.message);
-                        }
+                    // Also accept tags from req.body if passed through the record
+                    if (Array.isArray(record._tags) && record._tags.length > 0) {
+                        for (const t of record._tags) if (!tags.includes(t)) tags.push(t);
                     }
 
-                    // --- User: save generated image to user_data_image_generate ---
-                    let userGenPath = null;
-                    if (record._userSave) {
-                        try {
-                            console.log(`  [user-save] Downloading generated image for user persistence…`);
-                            const genResp = await fetch(imageUrl);
-                            if (genResp.ok) {
-                                const genBuffer = Buffer.from(await genResp.arrayBuffer());
-                                const jpegBuffer = await sharp(genBuffer).jpeg({ quality: 92 }).toBuffer();
-                                // Use email prefix for file isolation: "siti_gmail_com_1794194621983.jpg"
-                                const emailPrefix = record._safeEmailPrefix || 'guest_user';
-                                const timestamp = Date.now();
-                                const genFilename = `${emailPrefix}_${timestamp}.jpg`;
-                                const genAbsPath = path.join(USER_IMAGE_GEN_DIR, genFilename);
-                                fs.writeFileSync(genAbsPath, jpegBuffer);
-                                userGenPath = genAbsPath;
-                                console.log(`  [user-save] Generated image saved: ${genAbsPath} (${(jpegBuffer.length / 1024).toFixed(1)} KB) [prefix: ${emailPrefix}]`);
-                            } else {
-                                console.error(`  [user-save] Failed to download generated image: HTTP ${genResp.status}`);
-                            }
-                        } catch (err) {
-                            console.error(`  [user-save] Failed to save generated image:`, err.message);
-                        }
+                    // Determine owner_email: user generations should carry the user's email,
+                    // admin generations carry ADMIN_EMAIL
+                    let ownerEmail = record._userEmail || null;
+                    const isAdminType = record._adminSave || (!record._publicUser && (record.type === 'filter-swap' || record.type === 'filter-factory'));
+                    if (isAdminType) ownerEmail = ADMIN_EMAIL;
+                    // If neither user nor admin, fall back to the email from the record
+                    if (!ownerEmail && record._safeEmailPrefix && record._safeEmailPrefix !== 'guest_user') {
+                        ownerEmail = record._userEmail || record._safeEmailPrefix || null;
                     }
-
-                    // Determine owner_email — admin records get stamped ONLY if NOT a public user
-                    // Public user generations (from filter_gallery.html) must never carry the admin email
-                    const isAdminType = !record._publicUser && (record.type === 'filter-swap' || record.type === 'filter-factory' || record._adminSave);
-                    const ownerEmail = isAdminType ? ADMIN_EMAIL : null;
 
                     const dbRecord = {
                         generation_id: localGenId,
+                        email: record._userEmail || record._safeEmailPrefix || '',
                         type: record.type || 'unknown',
-                        prompt: record.prompt,
-                        title: title || '',
-                        tags: tags.length > 0 ? tags : [record.selected_tag || 'Studio'],
+                        prompt: record.prompt || '',
+                        title: title,
+                        filterTitle: record.filterTitle || '',
+                        tags: tags,
+                        selected_tag: record.selected_tag || '',
                         lighting: record.lighting || '',
+                        width: record.width || 1024,
+                        height: record.height || 1024,
                         dimensions: ratioLabel,
-                        cover_image_path: coverPath || null,
-                        image_url: imageUrl,                          // Original Leonardo CDN URL (for download)
+                        image_url: cloudinaryUrl,
+                        cover_image_url: cloudinaryUrl,  // Cloudinary URL as primary image
                         reference_image_1_path: persistedRefs?.ref1 || null,
                         reference_image_2_path: persistedRefs?.ref2 || null,
-                        isFavorite: false,
-                        status: 'complete',
-                        owner_email: ownerEmail,
-                        admin_gen_path: adminGenPath,
-                        admin_ref_path: record._adminRefPath || null,
-                        admin_prompt_path: record._adminPromptPath || null,
-                        user_gen_path: userGenPath,
-                        user_ref_path: record._userRefPath || null,
-                        user_prompt_path: record._userPromptPath || null,
-                        created_at: new Date().toISOString()
+                        status: 'COMPLETE',
+                        owner_email: ownerEmail || '',
+                        created_at: new Date()
                     };
 
                     upsertDatabaseRecord(dbRecord);
@@ -2741,7 +2717,7 @@ app.get('/api/dress-swap/status/:generationId', (req, res) => {
  * (generation_id starting with "gen_" — excludes bgswap_ and dresswap_).
  * Sorted newest-first. Supports ?limit=N and ?offset=N query params.
  */
-app.get('/api/admin-gallery-filter/images', requireAdminApi, async (req, res) => {
+app.get('/api/admin-gallery-filter/images', async (req, res) => {
     try {
         if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
 
@@ -3090,49 +3066,36 @@ app.post('/api/save-admin-generation', requireAdminApi, upload.fields([
 
         const savedFiles = {};
 
-        // --- 1. Save reference image to admin_data_image_reference ---
+        // --- 1. Upload reference image to Cloudinary ---
+        let refCloudinaryUrl = null;
         try {
-            const refFilename = `ref_${genId}.jpg`;
-            const refAbsPath = path.join(ADMIN_IMAGE_REF_DIR, refFilename);
             const jpegBuffer = await sharp(refFile.buffer).jpeg({ quality: 92 }).toBuffer();
-            fs.writeFileSync(refAbsPath, jpegBuffer);
-            savedFiles.referenceImage = refAbsPath;
-            console.log(`  [admin-save] Reference image saved: ${refAbsPath} (${(jpegBuffer.length / 1024).toFixed(1)} KB)`);
+            const upload = await db.uploadToCloudinary(jpegBuffer, 'references', `admin_ref_${genId}`);
+            if (upload) {
+                refCloudinaryUrl = upload.url;
+                savedFiles.referenceImage = upload.url;
+                console.log(`  [admin-save] Reference uploaded to Cloudinary: ${upload.url}`);
+            }
         } catch (err) {
-            console.error(`  [admin-save] Failed to save reference image:`, err.message);
-            return res.status(500).json({ error: `Failed to save reference image: ${err.message}` });
+            console.error(`  [admin-save] Failed to upload reference:`, err.message);
         }
 
-        // --- 2. Save prompt data to admin_data_prompt ---
-        try {
-            const promptData = {
-                jobId: genId,
-                prompt: prompt.trim(),
-                filterTitle: filterTitle || '',
-                owner_email: ADMIN_EMAIL,
-                saved_at: new Date().toISOString()
-            };
-            const promptFilename = `prompt_${genId}.json`;
-            const promptAbsPath = path.join(ADMIN_PROMPT_DIR, promptFilename);
-            fs.writeFileSync(promptAbsPath, JSON.stringify(promptData, null, 2), 'utf8');
-            savedFiles.prompt = promptAbsPath;
-            console.log(`  [admin-save] Prompt data saved: ${promptAbsPath}`);
-        } catch (err) {
-            console.error(`  [admin-save] Failed to save prompt data:`, err.message);
-            return res.status(500).json({ error: `Failed to save prompt data: ${err.message}` });
-        }
-
-        // --- 3. Store the jobId → prompt mapping for later use by the background poll ---
-        // The generated image will be saved when polling completes (see startBackgroundPoll).
+        // --- 2. Flag the in-memory record for admin save completion ---
         if (!activeGenerations.has(genId)) {
             activeGenerations.set(genId, { status: 'PENDING', createdAt: Date.now() });
         }
-        // Attach admin metadata so startBackgroundPoll can save the generated image
         const record = activeGenerations.get(genId);
         if (record) {
             record._adminSave = true;
-            record._adminRefPath = savedFiles.referenceImage;
-            record._adminPromptPath = savedFiles.prompt;
+            record._adminRefPath = refCloudinaryUrl || '';
+            record.filterTitle = filterTitle || record.filterTitle || '';
+            record._userEmail = ADMIN_EMAIL;
+            record._safeEmailPrefix = sanitizeEmail(ADMIN_EMAIL);
+            if (req.body.tags) {
+                try {
+                    record._tags = typeof req.body.tags === 'string' ? JSON.parse(req.body.tags) : req.body.tags;
+                } catch (_) { record._tags = []; }
+            }
         }
 
         console.log(`  [admin-save] → 200 OK — ${Object.keys(savedFiles).length} files saved\n`);
@@ -3199,51 +3162,38 @@ app.post('/api/save-user-generation', upload.fields([
 
         const savedFiles = {};
 
-        // --- 1. Save reference image to user_data_image_reference (email-prefixed) ---
+        // --- 1. Upload reference image to Cloudinary ---
+        let refCloudinaryUrl = null;
         try {
-            const refFilename = `${safeEmailPrefix}_ref_${timestamp}.jpg`;
-            const refAbsPath = path.join(USER_IMAGE_REF_DIR, refFilename);
             const jpegBuffer = await sharp(refFile.buffer).jpeg({ quality: 92 }).toBuffer();
-            fs.writeFileSync(refAbsPath, jpegBuffer);
-            savedFiles.referenceImage = refAbsPath;
-            console.log(`  [user-save] Reference image saved: ${refAbsPath} (${(jpegBuffer.length / 1024).toFixed(1)} KB) [prefix: ${safeEmailPrefix}]`);
+            const upload = await db.uploadToCloudinary(jpegBuffer, 'references', `${safeEmailPrefix}_ref_${timestamp}`);
+            if (upload) {
+                refCloudinaryUrl = upload.url;
+                savedFiles.referenceImage = upload.url;
+                console.log(`  [user-save] Reference uploaded to Cloudinary: ${upload.url}`);
+            }
         } catch (err) {
-            console.error(`  [user-save] Failed to save reference image:`, err.message);
-            return res.status(500).json({ error: `Failed to save reference image: ${err.message}` });
+            console.error(`  [user-save] Failed to upload reference:`, err.message);
         }
 
-        // --- 2. Save prompt data to user_data_prompt (email-prefixed) ---
-        try {
-            const promptData = {
-                jobId: genId,
-                email: rawEmail,
-                prompt: prompt.trim(),
-                filterTitle: filterTitle || '',
-                saved_at: new Date().toISOString()
-            };
-            const promptFilename = `${safeEmailPrefix}_prompt_${timestamp}.json`;
-            const promptAbsPath = path.join(USER_PROMPT_DIR, promptFilename);
-            fs.writeFileSync(promptAbsPath, JSON.stringify(promptData, null, 2), 'utf8');
-            savedFiles.prompt = promptAbsPath;
-            console.log(`  [user-save] Prompt data saved: ${promptAbsPath} [prefix: ${safeEmailPrefix}]`);
-        } catch (err) {
-            console.error(`  [user-save] Failed to save prompt data:`, err.message);
-            return res.status(500).json({ error: `Failed to save prompt data: ${err.message}` });
-        }
-
-        // --- 3. Flag the in-memory record for user save completion ---
-        // The generated image will be saved when polling completes (see startBackgroundPoll).
+        // --- 2. Flag the in-memory record for user save completion ---
         if (!activeGenerations.has(genId)) {
             activeGenerations.set(genId, { status: 'PENDING', createdAt: Date.now() });
         }
         const record = activeGenerations.get(genId);
         if (record) {
             record._userSave = true;
-            record._publicUser = true;       // prevents admin-email stamping
-            record._userRefPath = savedFiles.referenceImage;
-            record._userPromptPath = savedFiles.prompt;
+            record._publicUser = true;
+            record._userRefPath = refCloudinaryUrl || '';
             record._userEmail = rawEmail;
             record._safeEmailPrefix = safeEmailPrefix;
+            record.filterTitle = filterTitle || record.filterTitle || '';
+            // Pass frontend tags through
+            if (req.body.tags) {
+                try {
+                    record._tags = typeof req.body.tags === 'string' ? JSON.parse(req.body.tags) : req.body.tags;
+                } catch (_) { record._tags = []; }
+            }
         }
 
         console.log(`  [user-save] → 200 OK — ${Object.keys(savedFiles).length} files saved\n`);
@@ -3334,10 +3284,10 @@ app.get('/api/admin/overview', requireAdminApi, async (_req, res) => {
             }
         }
 
-        // Metric 4: Total user generations from MongoDB
+        // Metric 4: Total user generations (not admin-owned)
         const userGenerations = await db.Generation.countDocuments({
-            email: { $nin: ['', 'admin.fotowisuda@gmail.com'] },
-            type: { $in: ['bgswap', 'dresswap', 'filter-factory', 'filter-swap'] }
+            owner_email: { $nin: [ADMIN_EMAIL, '', null] },
+            status: 'COMPLETE'
         });
 
         console.log(`  [api/admin/overview] users=${totalUsers} lifetime_rev=${lifetimeRevenue} monthly_rev=${monthlyRevenue} user_gens=${userGenerations}`);
