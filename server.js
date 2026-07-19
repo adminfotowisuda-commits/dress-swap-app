@@ -307,7 +307,7 @@ async function upsertDatabaseRecord(record) {
     console.log(`  [mongodb] Record upserted — ${record.generation_id}`);
 }
 
-function insertProcessingPlaceholder(genId, type, prompt, width, height) {
+function insertProcessingPlaceholder(genId, type, prompt, width, height, ownerEmail) {
     upsertDatabaseRecord({
         generation_id: genId,
         type: type || 'unknown',
@@ -317,6 +317,8 @@ function insertProcessingPlaceholder(genId, type, prompt, width, height) {
         height: height,
         image_url: '',
         cover_image_url: '',
+        email: ownerEmail || '',
+        owner_email: ownerEmail || '',
         created_at: new Date()
     });
 }
@@ -524,19 +526,29 @@ async function addCredits(email, amount, invoiceNumber) {
     return user;
 }
 
-async function deductCredits(email, amount) {
+async function deductCredits(email, amount, description) {
     if (!db.isConnected()) return { success: false, error: 'Database unavailable', balance: 0 };
     const key = email.trim().toLowerCase();
 
-    // Atomic update: $inc prevents race conditions and bypasses pre-save hooks
+    // Atomic update: $inc + $push prevents race conditions and records history
     const user = await db.User.findOneAndUpdate(
-        { email: key, credits_balance: { $gte: amount } },   // only match if enough credits
-        { $inc: { credits_balance: -amount }, $set: { updated_at: new Date() } },
+        { email: key, credits_balance: { $gte: amount } },
+        {
+            $inc: { credits_balance: -amount },
+            $set: { updated_at: new Date() },
+            $push: {
+                transactions: {
+                    id: Date.now().toString(),
+                    amount: -amount,
+                    description: description || 'Credit Usage',
+                    date: new Date()
+                }
+            }
+        },
         { returnDocument: 'after' }
     );
 
     if (!user) {
-        // Either user doesn't exist or insufficient credits — determine which
         const exists = await db.User.findOne({ email: key });
         if (!exists) return { success: false, error: 'User not found', balance: 0 };
         return { success: false, error: 'Insufficient credits', balance: exists.credits_balance };
@@ -1524,11 +1536,12 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         ownerEmail = record._userEmail || record._safeEmailPrefix || null;
                     }
 
-                    const dbRecord = {
-                        generation_id: localGenId,
-                        email: record._userEmail || record._safeEmailPrefix || '',
-                        type: record.type || 'unknown',
-                        prompt: record.prompt || '',
+                    // Targeted update: only set fields that changed during polling.
+                    // Preserves owner_email, email, and other fields set at placeholder creation.
+                    const updateFields = {
+                        status: 'COMPLETE',
+                        image_url: cloudinaryUrl,
+                        cover_image_url: cloudinaryUrl,
                         title: title,
                         filterTitle: record.filterTitle || '',
                         tags: tags,
@@ -1538,17 +1551,20 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         height: record.height || 1024,
                         dimensions: ratioLabel,
                         ratio: record._ratio || ratioLabel,
-                        image_url: cloudinaryUrl,
-                        cover_image_url: cloudinaryUrl,
                         reference_image_1_path: persistedRefs?.ref1 || null,
-                        reference_image_2_path: persistedRefs?.ref2 || null,
-                        status: 'COMPLETE',
-                        owner_email: ownerEmail || '',
-                        created_at: new Date()
+                        reference_image_2_path: persistedRefs?.ref2 || null
                     };
+                    // Only set owner_email if we have a non-empty value (don't overwrite with empty)
+                    if (ownerEmail) {
+                        updateFields.owner_email = ownerEmail;
+                    }
 
-                    await upsertDatabaseRecord(dbRecord);
-                    console.log(`  [poll] MongoDB upserted → ${localGenId} (title: "${title}", tags: [${tags.join(', ')}], ratio: ${ratioLabel})`);
+                    await db.Generation.findOneAndUpdate(
+                        { generation_id: localGenId },
+                        { $set: updateFields },
+                        { returnDocument: 'after' }
+                    );
+                    console.log(`  [poll] MongoDB updated → ${localGenId} (title: "${title}", tags: [${tags.join(', ')}], ratio: ${ratioLabel})`);
                 }
             } else if (status === 'FAILED') {
                 record.error = error || 'Generation failed on Leonardo';
@@ -1666,7 +1682,7 @@ app.post('/api/generate', upload.fields([
         const localGenId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
         // Immediately persist a processing placeholder so the frontend can find it
-        insertProcessingPlaceholder(localGenId, 'filter-factory', finalPrompt, w, h);
+        insertProcessingPlaceholder(localGenId, 'filter-factory', finalPrompt, w, h, userEmail);
 
         // Will hold relative paths to locally saved reference images
         const persistedRefs = { ref1: null, ref2: null };
@@ -2164,7 +2180,8 @@ app.post('/api/background-swap', upload.fields([
 
         // --- Generate local tracking ID -------------------------------
         const localGenId = `bgswap_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        insertProcessingPlaceholder(localGenId, 'bgswap', 'Background Swap', w, h);
+        const userEmail = req.headers['x-user-email'] || req.body.email || '';
+        insertProcessingPlaceholder(localGenId, 'bgswap', 'Background Swap', w, h, userEmail);
 
         // --- Step 1: Save both files locally --------------------------
         const localPath1 = await saveReferenceImageLocally(file1.buffer, localGenId, 1, file1.mimetype);
@@ -2183,7 +2200,6 @@ app.post('/api/background-swap', upload.fields([
 
         // --- Step 3: Seed in-memory store & return 202 immediately -------
         // Store initial placeholder so the frontend can begin polling right away
-        const userEmail = req.headers['x-user-email'] || req.body.email || '';
         const safeEmailPrefix = sanitizeEmail(userEmail);
         console.log(`  [bg-swap] User email: ${userEmail} → prefix: ${safeEmailPrefix}`);
 
@@ -2630,7 +2646,8 @@ app.post('/api/dress-swap/generate', upload.fields([
 
         // --- Generate local tracking ID -------------------------------
         localGenId = `dresswap_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        insertProcessingPlaceholder(localGenId, 'dress-swap', 'Dress Replicate', w, h);
+        const userEmail = req.headers['x-user-email'] || req.body.email || '';
+        insertProcessingPlaceholder(localGenId, 'dress-swap', 'Dress Replicate', w, h, userEmail);
 
         // --- Step 1: Save both files locally --------------------------
         const localPath1 = await saveReferenceImageLocally(file1.buffer, localGenId, 1, file1.mimetype);
@@ -2649,7 +2666,6 @@ app.post('/api/dress-swap/generate', upload.fields([
 
         // --- Step 3: Seed in-memory store & return 202 immediately -------
         // Store initial placeholder so the frontend can begin polling right away
-        const userEmail = req.headers['x-user-email'] || req.body.email || '';
         const safeEmailPrefix = sanitizeEmail(userEmail);
         console.log(`  [dress-swap] User email: ${userEmail} → prefix: ${safeEmailPrefix}`);
 
@@ -2819,7 +2835,7 @@ app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
         localGenId = `agfilter_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
         // Immediately persist a processing placeholder
-        insertProcessingPlaceholder(localGenId, 'filter-swap', prompt, w, h);
+        insertProcessingPlaceholder(localGenId, 'filter-swap', prompt, w, h, ADMIN_EMAIL);
 
         // Save subject locally
         const localPath1 = await saveReferenceImageLocally(subjectFile.buffer, localGenId, 1, subjectFile.mimetype);
@@ -3387,8 +3403,9 @@ async function validateAndDeductCredits(req, res, next) {
             });
         }
 
-        // Deduct credits
-        const result = await deductCredits(userEmail, creditCost);
+        // Deduct credits (with action description for transaction history)
+        const actionName = CREDIT_ACTION_NAMES[currentPath] || currentPath;
+        const result = await deductCredits(userEmail, creditCost, actionName);
         if (!result.success) {
             return res.status(402).json({
                 success: false,
@@ -3396,10 +3413,6 @@ async function validateAndDeductCredits(req, res, next) {
                 message: result.error
             });
         }
-
-        // Log credit usage for history
-        const actionName = CREDIT_ACTION_NAMES[currentPath] || currentPath;
-        console.log(`  [usage] Logged — ${userEmail} → "${actionName}" (${creditCost} credits)`);
 
         // Store cost on request for potential refund
         req.creditCost = creditCost;

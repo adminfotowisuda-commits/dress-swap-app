@@ -6,11 +6,17 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     email:           { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-    password:        { type: String, default: '' },                        // legacy / random for Google users
+    password:        { type: String, default: '' },
     credits_balance: { type: Number, default: 0, min: 0 },
     role:            { type: String, enum: ['user', 'admin'], default: 'user' },
     created_at:      { type: Date, default: Date.now },
-    updated_at:      { type: Date, default: Date.now }
+    updated_at:      { type: Date, default: Date.now },
+    transactions:    [{
+        id:          { type: String },
+        amount:      { type: Number },
+        description: { type: String },
+        date:        { type: Date, default: Date.now }
+    }]
 });
 
 // Auto-update `updated_at` on save (sync hook — no next() needed)
