@@ -13,10 +13,9 @@ const userSchema = new mongoose.Schema({
     updated_at:      { type: Date, default: Date.now }
 });
 
-// Auto-update `updated_at` on save
-userSchema.pre('save', function (next) {
+// Auto-update `updated_at` on save (sync hook — no next() needed)
+userSchema.pre('save', function () {
     this.updated_at = new Date();
-    next();
 });
 
 module.exports = mongoose.model('User', userSchema);

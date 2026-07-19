@@ -507,14 +507,21 @@ async function addCredits(email, amount, invoiceNumber) {
 async function deductCredits(email, amount) {
     if (!db.isConnected()) return { success: false, error: 'Database unavailable', balance: 0 };
     const key = email.trim().toLowerCase();
-    const user = await db.User.findOne({ email: key });
-    if (!user) return { success: false, error: 'User not found', balance: 0 };
-    if (user.credits_balance < amount) {
-        return { success: false, error: 'Insufficient credits', balance: user.credits_balance };
+
+    // Atomic update: $inc prevents race conditions and bypasses pre-save hooks
+    const user = await db.User.findOneAndUpdate(
+        { email: key, credits_balance: { $gte: amount } },   // only match if enough credits
+        { $inc: { credits_balance: -amount }, $set: { updated_at: new Date() } },
+        { returnDocument: 'after' }
+    );
+
+    if (!user) {
+        // Either user doesn't exist or insufficient credits — determine which
+        const exists = await db.User.findOne({ email: key });
+        if (!exists) return { success: false, error: 'User not found', balance: 0 };
+        return { success: false, error: 'Insufficient credits', balance: exists.credits_balance };
     }
-    user.credits_balance -= amount;
-    user.updated_at = new Date();
-    await user.save();
+
     console.log(`  [mongodb] -${amount} credits → ${key} (balance: ${user.credits_balance})`);
     return { success: true, balance: user.credits_balance };
 }
