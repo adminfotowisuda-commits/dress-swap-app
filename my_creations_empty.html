@@ -1004,10 +1004,9 @@ function navPreview(dir) {
   var slideOutX = dir > 0 ? '-25%' : '25%';
   var slideInX  = dir > 0 ? '25%' : '-25%';
 
-  // 1. Slide current image out
-  img.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+  // 1. Slide current image out (transform only, no opacity fade)
+  img.style.transition = 'transform 0.22s ease';
   img.style.transform = 'translateX(' + slideOutX + ')';
-  img.style.opacity = '0';
 
   setTimeout(function() {
     // 2. Swap source and position off-screen
@@ -1019,24 +1018,20 @@ function navPreview(dir) {
     _previewIdx = newIdx;
     if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
 
-    // 3. Slide new image in
+    // 3. Slide new image in (transform only)
     requestAnimationFrame(function() {
-      img.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+      img.style.transition = 'transform 0.22s ease';
       img.style.transform = 'translateX(0)';
-      img.style.opacity = '1';
       img.addEventListener('transitionend', function cleanup() {
         img.style.transition = '';
         img.style.transform = '';
-        img.style.opacity = '';
         _navSliding = false;
         img.removeEventListener('transitionend', cleanup);
       });
-      // Safety timeout
       setTimeout(function() {
         if (_navSliding) {
           img.style.transition = '';
           img.style.transform = '';
-          img.style.opacity = '';
           _navSliding = false;
         }
       }, 300);
@@ -1136,7 +1131,6 @@ document.addEventListener('touchmove', function(e) {
       var dragX = dx * 0.6;
       img.style.transition = 'none';
       img.style.transform = 'translateX(' + dragX + 'px)';
-      img.style.opacity = 1 - Math.abs(dx) / 400;
     }
   }
 }, {passive:true});
@@ -1154,13 +1148,11 @@ document.addEventListener('touchend', function(e) {
     if (img) {
       // Animate the snap before calling navPreview
       var snapX = dx < 0 ? '-25%' : '25%';
-      img.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+      img.style.transition = 'transform 0.15s ease';
       img.style.transform = 'translateX(' + snapX + ')';
-      img.style.opacity = '0';
       setTimeout(function() {
         img.style.transition = '';
         img.style.transform = '';
-        img.style.opacity = '';
         navPreview(dir);
       }, 150);
     } else {
@@ -1169,13 +1161,11 @@ document.addEventListener('touchend', function(e) {
   } else if (_touchDragging) {
     // Small drag — spring back
     if (img) {
-      img.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+      img.style.transition = 'transform 0.2s ease';
       img.style.transform = 'translateX(0)';
-      img.style.opacity = '1';
       setTimeout(function() {
         img.style.transition = '';
         img.style.transform = '';
-        img.style.opacity = '';
       }, 200);
     }
   } else {
