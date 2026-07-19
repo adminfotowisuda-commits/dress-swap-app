@@ -569,15 +569,16 @@
                     row.setAttribute('data-id', filterId);
                     row.setAttribute('data-filter-id', filterId);
 
+                    row.setAttribute('data-record-index', index);
                     row.innerHTML =
                         // Cover thumbnail
-                        '<div class="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-surface-background border border-border-subtle cursor-pointer" onclick="event.stopPropagation();openModal(state.records['+index+'])">' +
+                        '<div class="preview-trigger w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-surface-background border border-border-subtle cursor-pointer">' +
                           (coverUrl
                             ? '<img src="' + coverUrl + '" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display=\'none\'">'
                             : '<div class="w-full h-full flex items-center justify-center text-text-secondary text-[10px]">N/A</div>') +
                         '</div>' +
                         // Title + dimensions
-                        '<div class="flex-1 min-w-0 cursor-pointer" onclick="event.stopPropagation();openModal(state.records['+index+'])">' +
+                        '<div class="preview-trigger flex-1 min-w-0 cursor-pointer">' +
                           '<p class="text-sm font-semibold text-white truncate">' + safeTitle + '</p>' +
                           '<p class="text-[10px] text-text-secondary mt-0.5">' + escapeHtml(dims) + (active ? '' : ' <span class="text-amber-400 ml-1">(Hidden)</span>') + '</p>' +
                         '</div>' +
@@ -586,7 +587,7 @@
                         // Actions
                         '<div class="flex items-center gap-1.5 flex-shrink-0">' +
                           // Preview
-                          '<button class="w-8 h-8 rounded-lg bg-surface-background border border-border-subtle flex items-center justify-center text-text-secondary hover:text-electric-cyan hover:border-electric-cyan/30 transition-all" title="Preview" onclick="event.stopPropagation();openModal(state.records['+index+'])"><i class="fa-solid fa-eye text-xs"></i></button>' +
+                          '<button class="preview-trigger w-8 h-8 rounded-lg bg-surface-background border border-border-subtle flex items-center justify-center text-text-secondary hover:text-electric-cyan hover:border-electric-cyan/30 transition-all" title="Preview"><i class="fa-solid fa-eye text-xs"></i></button>' +
                           // Toggle ON/OFF
                           '<button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all ' + (active ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-slate-500/10 border border-slate-500/20 text-slate-400') + '" title="' + (active ? 'Hide from public' : 'Show to public') + '" onclick="event.stopPropagation();toggleFilterActive(\'' + filterId + '\')"><i class="fa-solid fa-' + (active ? 'toggle-on' : 'toggle-off') + ' text-xs"></i></button>' +
                           // Delete
@@ -594,6 +595,14 @@
                         '</div>';
 
                     if (listBody) listBody.appendChild(row);
+
+                    // Wire preview click handlers via addEventListener (IIFE-safe)
+                    row.querySelectorAll('.preview-trigger').forEach(function(el) {
+                        el.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            openModal(record);
+                        });
+                    });
                 });
 
             } catch (err) {
