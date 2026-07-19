@@ -209,6 +209,9 @@
                 <div class="flex justify-between"><span class="text-text-secondary">Dimensions</span><span class="text-white" id="admin-preview-dims">—</span></div>
                 <div class="flex justify-between"><span class="text-text-secondary">Status</span><span id="admin-preview-status">—</span></div>
             </div>
+            <button onclick="useFilterForGeneration()" class="mt-5 w-full bg-electric-cyan text-surface-background font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-[0.98]">
+                <i class="fa-solid fa-bolt"></i> Use This Filter
+            </button>
         </div>
     </div>
 
@@ -513,10 +516,13 @@
         window.toggleFilterActive = toggleFilterActive;
         window.confirmDeleteFilter = confirmDeleteFilter;
 
-        // ── Admin Preview Modal — simple image viewer, NO generation ──
+        // ── Admin Preview Modal — simple image viewer + bridge to execution ──
+        var _adminPreviewRecord = null;
+
         function openAdminPreview(record) {
             var modal = document.getElementById('admin-preview-modal');
             if (!modal) return;
+            _adminPreviewRecord = record;
             document.getElementById('admin-preview-title').textContent = record.title || record.filterTitle || 'Untitled';
             var cover = document.getElementById('admin-preview-cover');
             cover.src = record.cover_image_path || record.image_url || '';
@@ -531,9 +537,19 @@
         function closeAdminPreview() {
             var modal = document.getElementById('admin-preview-modal');
             if (modal) modal.classList.add('hidden');
+            _adminPreviewRecord = null;
         }
+
+        // Bridge: close preview → open execution modal with the selected filter
+        function useFilterForGeneration() {
+            if (!_adminPreviewRecord) return;
+            closeAdminPreview();
+            openModal(_adminPreviewRecord);
+        }
+
         window.openAdminPreview = openAdminPreview;
         window.closeAdminPreview = closeAdminPreview;
+        window.useFilterForGeneration = useFilterForGeneration;
 
         function checkEmptyGrid() {
             const visibleCards = document.querySelectorAll('#filters-list-body .list-row:not([style*="opacity: 0"])');
