@@ -795,6 +795,8 @@ function resetTrack(idx) {
   var track = getTrack();
   if (track) { track.style.transition = 'none'; track.style.transform = 'translateX(' + trackCenter() + ')'; }
   loadCarouselSlots(idx);
+  // Keep FLIP close target in sync with the active carousel index
+  captureThumbRect(idx);
 }
 
 function showChrome() {
