@@ -1958,7 +1958,8 @@ app.get('/api/user-creations', async (req, res) => {
         // the user email in one field but not the other depending on the code path.
         const query = {
             owner_email: { $ne: ADMIN_EMAIL },
-            type: { $in: ['bgswap', 'dresswap', 'filter-swap', 'filter-factory'] }
+            type: { $in: ['bgswap', 'dresswap', 'filter-swap', 'filter-factory'] },
+            status: 'COMPLETE'
         };
 
         if (rawEmail) {

@@ -330,9 +330,19 @@ async function loadGallery() {
     } else {
       var html = '';
       for (var i = 0; i < data.length; i++) {
-        html += '<div class="card" onclick="openPreview('+i+')">'+
-          '<div class="card-img-wrap"><img src="'+data[i].url+'" alt="'+data[i].name+'" onerror="this.parentElement.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#5c6370;font-size:40px;>?</div>\'"></div>'+
-        '</div>';
+        var imgUrl = data[i].url || '';
+        if (imgUrl) {
+          html += '<div class="card" onclick="openPreview('+i+')">'+
+            '<div class="card-img-wrap"><img src="'+imgUrl+'" alt="'+data[i].name+'" onerror="this.parentElement.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#5c6370;font-size:40px;>?</div>\'"></div>'+
+          '</div>';
+        } else {
+          // PENDING / no image yet — show spinner placeholder
+          html += '<div class="card" style="pointer-events:none;cursor:default;">'+
+            '<div class="card-img-wrap" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0c0e12,#111318,#0c0e12);background-size:200% 200%;animation:gradientFlow 4s ease infinite;">'+
+              '<div class="spinner"></div>'+
+            '</div>'+
+          '</div>';
+        }
       }
       grid.innerHTML = html;
     }

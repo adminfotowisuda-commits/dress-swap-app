@@ -571,14 +571,22 @@
                 if (!/^https?:\/\//i.test(resolvedCoverUrl)) {
                     resolvedCoverUrl = API_BASE + '/' + coverUrl.replace(/^\//, '');
                 }
+                // Set onerror BEFORE src to avoid race condition on immediate 404
                 coverPreview.onerror = function() {
                     coverPreview.classList.add('hidden');
                     coverPreview.src = '';
                     if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
                 };
-                coverPreview.src = resolvedCoverUrl;
-                coverPreview.classList.remove('hidden');
-                if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
+                // Also handle the case where the image loads from cache before onload fires
+                if (coverPreview.complete && coverPreview.naturalWidth === 0) {
+                    coverPreview.classList.add('hidden');
+                    coverPreview.src = '';
+                    if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
+                } else {
+                    coverPreview.src = resolvedCoverUrl;
+                    coverPreview.classList.remove('hidden');
+                    if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
+                }
             } else {
                 if (coverPreview) { coverPreview.classList.add('hidden'); coverPreview.src = ''; }
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
@@ -597,15 +605,24 @@
                 if (!/^https?:\/\//i.test(resolvedBeforeUrl)) {
                     resolvedBeforeUrl = API_BASE + '/' + beforeUrl.replace(/^\//, '');
                 }
+                // Set onerror BEFORE src to avoid race condition on immediate 404
                 beforePreview.onerror = function() {
                     // Image failed to load — fall back to placeholder silently
                     beforePreview.classList.add('hidden');
                     beforePreview.src = '';
                     if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
                 };
-                beforePreview.src = resolvedBeforeUrl;
-                beforePreview.classList.remove('hidden');
-                if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
+                // Also handle the case where the image loads from cache before onload fires
+                if (beforePreview.complete && beforePreview.naturalWidth === 0) {
+                    // Image already failed (cached 404) — trigger fallback
+                    beforePreview.classList.add('hidden');
+                    beforePreview.src = '';
+                    if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
+                } else {
+                    beforePreview.src = resolvedBeforeUrl;
+                    beforePreview.classList.remove('hidden');
+                    if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
+                }
             } else {
                 if (beforePreview) { beforePreview.classList.add('hidden'); beforePreview.src = ''; }
                 if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
