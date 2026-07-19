@@ -221,7 +221,7 @@
   <button class="preview-nav next" onclick="event.stopPropagation();navPreview(1)"><i class="fa-solid fa-chevron-right"></i></button>
   <span class="preview-counter" id="preview-counter">—</span>
   <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:100%;max-height:100%;" onclick="event.stopPropagation()">
-    <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:16px;">
+    <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:0;">
     <div style="display:flex;gap:12px;">
       <button id="preview-dl" class="btn btn-primary" onclick="event.stopPropagation();downloadCurrentPreview()"><i class="fa-solid fa-download"></i> <span id="preview-dl-text">Download</span></button>
       <button class="btn btn-outline" onclick="deleteCurrentPreview()" style="color:#ffb4ab;border-color:rgba(255,180,171,0.3);"><i class="fa-solid fa-trash-can"></i></button>
@@ -824,7 +824,7 @@ function openPreview(idx) {
     img.style.transition = 'transform ' + (DURATION_OPEN / 1000) + 's ' + EASING
                          + ', border-radius ' + (DURATION_OPEN / 1000) + 's ease';
     img.style.transform = 'translate(0, 0) scale(1, 1)';
-    img.style.borderRadius = '16px';
+    img.style.borderRadius = '0px';
 
     var onDone = function() {
       _flipAnimating = false;
