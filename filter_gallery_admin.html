@@ -196,6 +196,22 @@
         </div>
     </main>
 
+    <!-- ═══ ADMIN PREVIEW MODAL — simple image viewer, no generation ═══ -->
+    <div id="admin-preview-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);" onclick="closeAdminPreview()">
+        <div class="bg-surface-card border border-border-subtle rounded-3xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto animate-in" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white" id="admin-preview-title">—</h3>
+                <button onclick="closeAdminPreview()" class="p-2 hover:bg-surface-container rounded-lg transition-colors text-text-secondary hover:text-white text-xl">&times;</button>
+            </div>
+            <img id="admin-preview-cover" src="" class="w-full rounded-xl object-contain max-h-[60vh]" alt="Preview">
+            <div class="mt-4 space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-text-secondary">Tags</span><span class="text-white" id="admin-preview-tags">—</span></div>
+                <div class="flex justify-between"><span class="text-text-secondary">Dimensions</span><span class="text-white" id="admin-preview-dims">—</span></div>
+                <div class="flex justify-between"><span class="text-text-secondary">Status</span><span id="admin-preview-status">—</span></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ============================================================
          MODAL — Execution Panel
          ============================================================ -->
@@ -497,6 +513,28 @@
         window.toggleFilterActive = toggleFilterActive;
         window.confirmDeleteFilter = confirmDeleteFilter;
 
+        // ── Admin Preview Modal — simple image viewer, NO generation ──
+        function openAdminPreview(record) {
+            var modal = document.getElementById('admin-preview-modal');
+            if (!modal) return;
+            document.getElementById('admin-preview-title').textContent = record.title || record.filterTitle || 'Untitled';
+            var cover = document.getElementById('admin-preview-cover');
+            cover.src = record.cover_image_path || record.image_url || '';
+            cover.onerror = function() { cover.src = ''; };
+            document.getElementById('admin-preview-tags').textContent = (Array.isArray(record.tags) && record.tags.length) ? record.tags.join(', ') : '—';
+            document.getElementById('admin-preview-dims').textContent = record.dimensions || '—';
+            document.getElementById('admin-preview-status').innerHTML = (record.isActive !== false)
+                ? '<span class="text-emerald-400 font-semibold">Active</span>'
+                : '<span class="text-slate-400 font-semibold">Hidden</span>';
+            modal.classList.remove('hidden');
+        }
+        function closeAdminPreview() {
+            var modal = document.getElementById('admin-preview-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        window.openAdminPreview = openAdminPreview;
+        window.closeAdminPreview = closeAdminPreview;
+
         function checkEmptyGrid() {
             const visibleCards = document.querySelectorAll('#filters-list-body .list-row:not([style*="opacity: 0"])');
             const empty = document.getElementById('grid-empty');
@@ -597,10 +635,11 @@
                     if (listBody) listBody.appendChild(row);
 
                     // Wire preview click handlers via addEventListener (IIFE-safe)
+                    // → opens simple admin preview, NOT the execution/generation modal
                     row.querySelectorAll('.preview-trigger').forEach(function(el) {
                         el.addEventListener('click', function(e) {
                             e.stopPropagation();
-                            openModal(record);
+                            openAdminPreview(record);
                         });
                     });
                 });
