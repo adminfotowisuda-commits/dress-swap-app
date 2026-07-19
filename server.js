@@ -1826,7 +1826,7 @@ app.get('/api/gallery', (req, res) => {
         // those are displayed exclusively on /my-creations.
         // But KEEP processing placeholders so the frontend can render pending cards.
         const USER_GENERATION_TYPES = ['filter-swap', 'background-swap', 'dress-swap'];
-        records = records.filter(r => {
+        records = (Array.isArray(records) ? records : []).filter(r => {
             if (r.status === 'processing') return true;               // always show processing
             // Exclude admin-stamped records
             if (r.owner_email === ADMIN_EMAIL) return false;
@@ -1932,7 +1932,7 @@ app.get('/api/user-creations', (req, res) => {
         // Include ONLY user-generated types from the three generator pages.
         // Exclude admin-stamped records (those belong to Admin Creations).
         const USER_GENERATION_TYPES = ['filter-swap', 'background-swap', 'dress-swap'];
-        records = records.filter(r => {
+        records = (Array.isArray(records) ? records : []).filter(r => {
             if (r.status === 'processing') return true;  // show pending cards
             if (r.owner_email === ADMIN_EMAIL) return false;
             if (r.type && USER_GENERATION_TYPES.includes(r.type)) return true;
@@ -2829,7 +2829,7 @@ app.get('/api/admin-gallery-filter/images', requireAdminApi, (req, res) => {
 
         // Filter: only Filter Image Factory records (type 'filter-factory')
         // Falls back to prefix matching for legacy records without a type field
-        records = records.filter(r => {
+        records = (Array.isArray(records) ? records : []).filter(r => {
             if (r.type) return r.type === 'filter-factory' && r.cover_image_path;
             // Legacy fallback for records without type field
             return r.generation_id &&
@@ -3364,7 +3364,7 @@ app.get('/api/admin-creations', requireAdminApi, (req, res) => {
         let records = readDatabase();
 
         // Strictly isolate: ONLY records owned by the admin account
-        records = records.filter(r => r.owner_email === ADMIN_EMAIL);
+        records = (Array.isArray(records) ? records : []).filter(r => r.owner_email === ADMIN_EMAIL);
 
         // Sort newest first
         records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
