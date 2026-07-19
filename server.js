@@ -29,6 +29,7 @@
 // ------------------------------------------------------------------
 const express  = require('express');
 const cors     = require('cors');
+const cookieParser = require('cookie-parser');
 const multer   = require('multer');
 const path     = require('path');
 const fs       = require('fs');
@@ -126,6 +127,36 @@ const ADMIN_IMAGE_GEN_DIR   = path.join(__dirname, 'admin_data_image_generate');
 const ADMIN_IMAGE_REF_DIR   = path.join(__dirname, 'admin_data_image_reference');
 const ADMIN_PROMPT_DIR      = path.join(__dirname, 'admin_data_prompt');
 const ADMIN_EMAIL           = 'admin.fotowisuda@gmail.com';
+const ADMIN_SESSION_SECRET  = crypto.randomBytes(32).toString('hex'); // rotates on every server restart
+
+// ═══ Admin Session Helpers ═══
+function createAdminToken(email) {
+    return crypto.createHmac('sha256', ADMIN_SESSION_SECRET).update(email).digest('hex');
+}
+
+function verifyAdminCookie(req) {
+    const token = req.cookies?.admin_session;
+    if (!token) return false;
+    const expected = createAdminToken(ADMIN_EMAIL);
+    // Use timing-safe comparison to prevent timing attacks
+    try {
+        return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+    } catch (_) {
+        return false;
+    }
+}
+
+// Middleware: protects admin HTML page routes — redirects to /admin-login on failure
+function requireAdminPage(req, res, next) {
+    if (verifyAdminCookie(req)) return next();
+    return res.redirect('/admin-login');
+}
+
+// Middleware: protects admin API routes — returns 401/403 JSON on failure
+function requireAdminApi(req, res, next) {
+    if (verifyAdminCookie(req)) return next();
+    return res.status(401).json({ error: 'Unauthorized — admin session required.' });
+}
 
 // User data directories — absolute local file saving for public user panel
 const USER_IMAGE_GEN_DIR    = path.join(__dirname, 'user_data_image_generate');
@@ -409,6 +440,7 @@ function sanitizeEmail(email) {
 // ------------------------------------------------------------------
 const app = express();
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
 // Serve the frontend + static assets from the project root
@@ -446,21 +478,30 @@ app.get('/pricing', (_req, res) => res.sendFile(path.join(__dirname, 'pricing.ht
 app.get('/profile', (_req, res) => res.sendFile(path.join(__dirname, 'profile.html')));
 app.get('/filter_gallery', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery.html')));
 
-// Filter Gallery Admin
-app.get('/admin-gallery-filter', (_req, res) => res.sendFile(path.join(__dirname, 'admin_gallery_filter.html')));
-app.get('/filter-gallery-admin', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_admin.html')));
-app.get('/filter_gallery_admin', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_admin.html')));
+// Admin Login page (public — no guard)
+app.get('/admin-login', (_req, res) => res.sendFile(path.join(__dirname, 'admin-login.html')));
 
-// Filter Gallery Factory
-app.get('/filter-gallery-factory', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_factory.html')));
-app.get('/filter_gallery_factory', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_factory.html')));
+// Admin Logout — clears the admin session cookie
+app.get('/admin-logout', (_req, res) => {
+    res.clearCookie('admin_session', { path: '/' });
+    res.redirect('/admin-login');
+});
 
-// Admin Creations
-app.get('/admin-creations', (_req, res) => res.sendFile(path.join(__dirname, 'admin_creations.html')));
-app.get('/admin_creations', (_req, res) => res.sendFile(path.join(__dirname, 'admin_creations.html')));
+// Filter Gallery Admin (PROTECTED)
+app.get('/admin-gallery-filter', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin_gallery_filter.html')));
+app.get('/filter-gallery-admin', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_admin.html')));
+app.get('/filter_gallery_admin', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_admin.html')));
 
-// Admin Portal — central hub landing page
-app.get('/admin', (_req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
+// Filter Gallery Factory (PROTECTED)
+app.get('/filter-gallery-factory', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_factory.html')));
+app.get('/filter_gallery_factory', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_factory.html')));
+
+// Admin Creations (PROTECTED)
+app.get('/admin-creations', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin_creations.html')));
+app.get('/admin_creations', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin_creations.html')));
+
+// Admin Portal — central hub landing page (PROTECTED)
+app.get('/admin', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
 // ------------------------------------------------------------------
 // Multer — accept up to 2 reference images in memory
@@ -2879,7 +2920,7 @@ app.get('/api/dress-swap/status/:generationId', (req, res) => {
  * (generation_id starting with "gen_" — excludes bgswap_ and dresswap_).
  * Sorted newest-first. Supports ?limit=N and ?offset=N query params.
  */
-app.get('/api/admin-gallery-filter/images', (req, res) => {
+app.get('/api/admin-gallery-filter/images', requireAdminApi, (req, res) => {
     try {
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
@@ -2931,7 +2972,7 @@ app.get('/api/admin-gallery-filter/images', (req, res) => {
  *   width             (text, required)
  *   height            (text, required)
  */
-app.post('/api/admin-gallery-filter/swap', upload.fields([
+app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
     { name: 'referenceImage1', maxCount: 1 }
 ]), validateAndDeductCredits, async (req, res) => {
     let localGenId;
@@ -3037,7 +3078,7 @@ app.post('/api/admin-gallery-filter/swap', upload.fields([
  * ------------------------------------------------------------------
  * Returns the current status of an admin-gallery-filter swap generation.
  */
-app.get('/api/admin-gallery-filter/status/:generationId', (req, res) => {
+app.get('/api/admin-gallery-filter/status/:generationId', requireAdminApi, (req, res) => {
     const { generationId } = req.params;
     const record = activeGenerations.get(generationId);
     if (!record) {
@@ -3150,7 +3191,7 @@ app.delete('/api/user-creations/:filename', (req, res) => {
  *
  * Returns { deleted: true } on success, 404 if not found.
  */
-app.delete('/api/filter-gallery/:id', (req, res) => {
+app.delete('/api/filter-gallery/:id', requireAdminApi, (req, res) => {
     try {
         const { id } = req.params;
         const db = readDatabase();
@@ -3209,7 +3250,7 @@ app.delete('/api/filter-gallery/:id', (req, res) => {
  *   filterTitle     (text, optional) — preset name
  *   jobId           (text, required) — local generation ID for file naming
  */
-app.post('/api/save-admin-generation', upload.fields([
+app.post('/api/save-admin-generation', requireAdminApi, upload.fields([
     { name: 'referenceImage', maxCount: 1 }
 ]), async (req, res) => {
     try {
@@ -3415,7 +3456,7 @@ app.post('/api/save-user-generation', upload.fields([
  *   ?limit=N   — cap results (default 50)
  *   ?offset=N  — pagination offset (default 0)
  */
-app.get('/api/admin-creations', (req, res) => {
+app.get('/api/admin-creations', requireAdminApi, (req, res) => {
     try {
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
@@ -3773,6 +3814,79 @@ app.post('/api/auth/google', async (req, res) => {
         return res.status(500).json({
             success: false,
             error: 'Server crashed during Google authentication.',
+            details: err.message || 'Unknown error'
+        });
+    }
+});
+
+/**
+ * POST /api/auth/admin-google
+ * ------------------------------------------------------------------
+ * Admin-only Google Sign-In. Verifies the Google ID token, then checks
+ * that the email is STRICTLY admin.fotowisuda@gmail.com.
+ *
+ * On success: sets a secure httpOnly cookie (admin_session) and returns 200.
+ * On failure: returns 403 Forbidden.
+ *
+ * Body: { idToken: "<Google ID token>" }
+ */
+app.post('/api/auth/admin-google', async (req, res) => {
+    console.log('[ADMIN AUTH] ======== INCOMING ADMIN GOOGLE AUTH REQUEST ========');
+
+    try {
+        if (!req.body || typeof req.body !== 'object') {
+            return res.status(400).json({ success: false, error: 'Invalid request body.' });
+        }
+
+        const { idToken } = req.body;
+        if (!idToken || typeof idToken !== 'string') {
+            return res.status(400).json({ success: false, error: 'Google ID token is required.' });
+        }
+
+        // Verify the Google ID token
+        let payload;
+        try {
+            const ticket = await googleAuthClient.verifyIdToken({
+                idToken: idToken,
+                audience: GOOGLE_CLIENT_ID
+            });
+            payload = ticket.getPayload();
+        } catch (verifyErr) {
+            console.error('[ADMIN AUTH] Token verification failed:', verifyErr.message);
+            return res.status(401).json({ success: false, error: 'Google authentication failed.' });
+        }
+
+        const googleEmail = (payload.email || '').trim().toLowerCase();
+        console.log(`[ADMIN AUTH] Verified Google email: ${googleEmail}`);
+
+        // STRICT CHECK: only the designated admin email is allowed
+        if (googleEmail !== ADMIN_EMAIL) {
+            console.warn(`[ADMIN AUTH] BLOCKED — ${googleEmail} is not the admin`);
+            return res.status(403).json({
+                success: false,
+                error: 'Akses Ditolak',
+                message: 'Hanya admin.fotowisuda@gmail.com yang diizinkan mengakses halaman admin.'
+            });
+        }
+
+        // Set secure admin session cookie
+        const token = createAdminToken(googleEmail);
+        res.cookie('admin_session', token, {
+            httpOnly: true,
+            secure: false,           // set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000,  // 24 hours
+            path: '/'
+        });
+
+        console.log('[ADMIN AUTH] SUCCESS — admin session granted to:', googleEmail);
+        return res.json({ success: true, email: googleEmail, message: 'Admin authenticated.' });
+
+    } catch (err) {
+        console.error('[ADMIN AUTH CRASH]', err.message);
+        return res.status(500).json({
+            success: false,
+            error: 'Server crashed during admin authentication.',
             details: err.message || 'Unknown error'
         });
     }

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Admin Login — fotowisuda.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-background":"#0A0C10","surface-card":"#161B22","border-subtle":"#30363D","text-primary":"#F0F6FC","text-secondary":"#8B949E","electric-cyan":"#00D1FF","vivid-purple":"#9D5BFF"}}}}</script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .animate-in{animation:fadeIn 0.4s ease-out}
+    </style>
+</head>
+<body>
+
+<!-- MAIN -->
+<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:#161B22;border:1px solid #30363D;border-radius:24px;padding:40px 32px;max-width:420px;width:100%;text-align:center;" class="animate-in">
+
+        <!-- Lock Icon -->
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(220,38,38,0.12));border:2px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;font-size:30px;color:#ef4444;margin:0 auto 20px;">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <h1 style="font-size:24px;font-weight:800;margin:0 0 6px;">Admin Access</h1>
+        <p style="font-size:13px;color:#8B949E;margin:0 0 28px;line-height:1.5;">
+            Halaman ini hanya untuk administrator.<br>
+            Silakan masuk menggunakan akun Google Admin.
+        </p>
+
+        <!-- Google Sign-In Button Container -->
+        <div id="g_id_signin_wrapper" style="display:flex;justify-content:center;min-height:44px;margin-bottom:24px;"></div>
+
+        <!-- Error Message -->
+        <div id="error-msg" style="display:none;padding:12px 16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;color:#fca5a5;font-size:13px;margin-bottom:16px;text-align:center;"></div>
+
+        <!-- Back to Home -->
+        <a href="/" style="display:inline-flex;align-items:center;gap:6px;color:#8B949E;font-size:12px;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#F0F6FC'" onmouseout="this.style.color='#8B949E'">
+            <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
+        </a>
+    </div>
+</main>
+
+<script>
+var API_BASE = window.location.origin;
+var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
+
+// ═══ Initialize Google Sign-In ═══
+function initGoogleSignIn() {
+    if (window.google && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleAdminCredentialResponse,
+            context: 'signin',
+            ux_mode: 'popup'
+        });
+        google.accounts.id.renderButton(
+            document.getElementById('g_id_signin_wrapper'),
+            { type: 'standard', theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'rectangular', width: '300' }
+        );
+        console.log('[ADMIN LOGIN] Google Sign-In initialized');
+    } else {
+        setTimeout(initGoogleSignIn, 500);
+    }
+}
+
+// ═══ Handle Google Credential Response ═══
+async function handleAdminCredentialResponse(response) {
+    console.log('[ADMIN LOGIN] Credential received, verifying...');
+    var errorEl = document.getElementById('error-msg');
+
+    try {
+        var resp = await fetch(API_BASE + '/api/auth/admin-google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken: response.credential })
+        });
+        var data = await resp.json();
+
+        if (resp.status === 403 || !data.success) {
+            // Access denied — not the admin email
+            errorEl.textContent = '🚫 Akses Ditolak: Anda bukan Admin! Hanya admin.fotowisuda@gmail.com yang diizinkan.';
+            errorEl.style.display = 'block';
+            console.error('[ADMIN LOGIN] Access denied:', data.error);
+            alert('Akses Ditolak: Anda bukan Admin!');
+            return;
+        }
+
+        if (!data.success) {
+            errorEl.textContent = '❌ ' + (data.error || 'Autentikasi gagal.');
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // Success — redirect to admin dashboard
+        console.log('[ADMIN LOGIN] Authenticated — redirecting to /admin');
+        window.location.href = '/admin';
+
+    } catch (err) {
+        console.error('[ADMIN LOGIN] Network error:', err.message);
+        errorEl.textContent = '⚠️ Kesalahan jaringan: ' + err.message;
+        errorEl.style.display = 'block';
+    }
+}
+
+// ═══ Boot ═══
+(function boot() {
+    initGoogleSignIn();
+    console.log('[ADMIN LOGIN] Page loaded — waiting for Google Sign-In');
+})();
+</script>
+</body>
+</html>
