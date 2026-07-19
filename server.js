@@ -2865,7 +2865,8 @@ app.get('/api/admin-gallery-filter/images', async (req, res) => {
         // Admin can pass ?all=1 to see inactive filters too
         const showAll = req.query.all === '1';
         const query = { type: 'filter-factory', image_url: { $ne: '', $exists: true } };
-        if (!showAll) query.isActive = true;
+        // Treat missing/legacy isActive as true so existing filters still show
+        if (!showAll) query.isActive = { $ne: false };
         const records = await db.Generation.find(query)
             .sort({ created_at: -1 })
             .skip(offset)

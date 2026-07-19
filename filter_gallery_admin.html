@@ -58,19 +58,10 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .grid-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .grid-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 209, 255, 0.12);
-        }
-        .grid-card.hidden {
-            display: none !important;
-        }
-        #filters-grid {
-            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-        }
+        .list-row { transition: background 0.15s; }
+        .list-row:hover { background: rgba(0,209,255,0.04); }
+        .list-row.hidden { display: none !important; }
+        .list-row-removing { opacity: 0; transform: translateX(20px); transition: all 0.25s ease; }
         /* Execution modal */
         .modal-overlay { background: rgba(10, 12, 16, 0.85); backdrop-filter: blur(8px); }
         .modal-panel {
@@ -175,9 +166,17 @@
             <button class="lighting-filter-pill px-4 py-2 bg-amber-950/10 border border-amber-500/20 text-amber-300/90 rounded-full text-sm font-medium transition-all hover:bg-amber-900/20 hover:border-amber-500/40" data-filter="Natural Ambient">Natural Ambient</button>
         </div>
 
-        <!-- Image Grid -->
-        <div id="filters-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 items-start">
-            <!-- Populated dynamically -->
+        <!-- Filter List (table layout) -->
+        <div id="filters-list" class="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden">
+            <div class="flex items-center gap-3 px-4 py-3 border-b border-border-subtle text-[10px] font-semibold text-text-secondary uppercase tracking-wider">
+                <span class="w-16 flex-shrink-0">Cover</span>
+                <span class="flex-1">Filter Name</span>
+                <span class="w-16 text-center hidden sm:block">Usage</span>
+                <span class="w-24 text-right">Actions</span>
+            </div>
+            <div id="filters-list-body" class="divide-y divide-border-subtle/50">
+                <!-- Populated dynamically -->
+            </div>
         </div>
 
         <!-- Loading state -->
@@ -463,8 +462,8 @@
             }
 
             // 4. Remove card from DOM with fade-out animation
-            const card = document.querySelector('.grid-card[data-id="' + filterId + '"]')
-                      || document.querySelector('.grid-card[data-filter-id="' + filterId + '"]');
+            const card = document.querySelector('.list-row[data-id="' + filterId + '"]')
+                      || document.querySelector('.list-row[data-filter-id="' + filterId + '"]');
             if (card) {
                 card.style.transition = 'opacity 0.25s ease-out, transform 0.25s ease-out';
                 card.style.opacity = '0';
@@ -476,8 +475,30 @@
             }
         }
 
+        // ── Toggle isActive via admin API ──
+        async function toggleFilterActive(filterId) {
+            try {
+                const resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(filterId) + '/toggle', { method: 'PATCH' });
+                const data = await resp.json();
+                if (data.success) {
+                    // Refresh list to update toggle icon + status
+                    loadImages();
+                }
+            } catch (err) {
+                console.error('Toggle failed:', err);
+            }
+        }
+
+        // ── Delete confirmation (wraps existing modal) ──
+        function confirmDeleteFilter(filterId) {
+            showDeleteConfirm(filterId);
+        }
+
+        window.toggleFilterActive = toggleFilterActive;
+        window.confirmDeleteFilter = confirmDeleteFilter;
+
         function checkEmptyGrid() {
-            const visibleCards = document.querySelectorAll('#filters-grid .grid-card:not([style*="opacity: 0"])');
+            const visibleCards = document.querySelectorAll('#filters-list-body .list-row:not([style*="opacity: 0"])');
             const empty = document.getElementById('grid-empty');
             if (visibleCards.length === 0 && empty) {
                 empty.classList.remove('hidden');
@@ -507,99 +528,77 @@
         // =====================================================
 
         async function loadImages() {
-            const grid = document.getElementById('filters-grid');
+            const listBody = document.getElementById('filters-list-body');
             const loading = document.getElementById('grid-loading');
             const empty = document.getElementById('grid-empty');
 
-            console.log('[Gallery] loadImages: starting fetch...');
+            console.log('[Admin] loadImages: starting fetch...');
 
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(function() { controller.abort(); }, 8000);
 
-                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/images?limit=100&all=1`, { signal: controller.signal });
+                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/images?limit=200&all=1`, { signal: controller.signal });
                 clearTimeout(timeoutId);
 
-                console.log('[Gallery] API response status:', resp.status);
+                console.log('[Admin] API response status:', resp.status);
                 if (!resp.ok) throw new Error('Failed to load images — status ' + resp.status);
                 const data = await resp.json();
                 state.records = data.records || [];
-                console.log('[Gallery] Records loaded:', state.records.length);
+                console.log('[Admin] Records loaded:', state.records.length);
 
                 if (loading) loading.classList.add('hidden');
+                if (listBody) listBody.innerHTML = '';
 
                 if (state.records.length === 0) {
-                    console.log('[Gallery] No records — showing empty state');
                     if (empty) empty.classList.remove('hidden');
                     return;
                 }
 
-                let visibleCount = 0;
-
                 state.records.forEach((record, index) => {
                     const filterId = record.generation_id || `filter-${index}`;
-
-                    // Admin page shows ALL cards — visibility toggles control public page
-
-                    visibleCount++;
-
                     const safeTitle = escapeHtml(record.title || record.prompt || 'Untitled');
-                    const displayTags = Array.isArray(record.tags) && record.tags.length > 0
-                        ? record.tags.join(', ')
-                        : '';
-                    const tagsAttr = displayTags ? displayTags.toLowerCase() : '';
-                    const safeTags = escapeHtml(displayTags);
-                    const tagsHtml = safeTags
-                        ? `<p class="text-[10px] text-text-secondary/70 mt-1 truncate">${safeTags}</p>`
-                        : '';
-                    const card = document.createElement('div');
-                    card.className = 'grid-card bg-surface-card border border-border-subtle rounded-2xl overflow-hidden cursor-pointer group';
-                    card.setAttribute('data-tags', tagsAttr);
-                    card.setAttribute('data-lighting', (record.lighting || '').toLowerCase());
-                    card.setAttribute('data-id', filterId);
-                    card.setAttribute('data-filter-id', filterId);
-                    card.innerHTML = `
-                        <div class="w-full ${getAspectClass(record)} overflow-hidden relative rounded-2xl">
-                            <img src="${record.cover_image_path || record.image_url}"
-                                 alt="${safeTitle}"
-                                 class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                                 loading="lazy"
-                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22><rect fill=%22%23161B22%22 width=%22200%22 height=%22150%22/><text fill=%22%238B949E%22 x=%22100%22 y=%2275%22 text-anchor=%22middle%22 font-size=%2212%22>No Preview</text></svg>'">
+                    const coverUrl = record.cover_image_path || record.image_url || '';
+                    const dims = record.dimensions || '—';
+                    const isActive = getActiveState(filterId);
+                    const active = (record.isActive !== false); // null/undefined = active
 
-                            <!-- Floating ON/OFF toggle — top-left, hover reveal -->
-                            <div class="absolute top-3 left-3 z-10 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 ease-out">
-                                <label class="relative inline-flex items-center cursor-pointer bg-slate-900/80 backdrop-blur-md px-1.5 py-1.5 rounded-xl border border-slate-700/60" onclick="event.stopPropagation()">
-                                    <input type="checkbox" class="sr-only peer filter-visibility-toggle" data-filter-id="${filterId}" checked>
-                                    <div class="capsule-toggle w-10 h-5 bg-rose-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 peer-checked:bg-emerald-500 peer-checked:shadow-[0_0_10px_rgba(34,197,94,0.35)]"></div>
-                                </label>
-                            </div>
+                    const row = document.createElement('div');
+                    row.className = 'list-row flex items-center gap-3 px-4 py-3';
+                    row.setAttribute('data-tags', (Array.isArray(record.tags) ? record.tags.join(',') : '').toLowerCase());
+                    row.setAttribute('data-lighting', (record.lighting || '').toLowerCase());
+                    row.setAttribute('data-id', filterId);
+                    row.setAttribute('data-filter-id', filterId);
 
-                            <!-- Floating delete button — top-right, hover reveal -->
-                            <button class="filter-delete-btn absolute top-3 right-3 z-10 p-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700/60 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 ease-out" data-delete-id="${filterId}" title="Hapus filter" onclick="event.stopPropagation()">
-                                <i class="fa-solid fa-trash-can text-[12px]"></i>
-                            </button>
-                        </div>
-                        <div class="p-3 space-y-1">
-                            <h3 class="filter-title text-xs text-text-primary font-semibold truncate">${safeTitle}</h3>
-                            ${tagsHtml}
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
+                    row.innerHTML =
+                        // Cover thumbnail
+                        '<div class="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-surface-background border border-border-subtle cursor-pointer" onclick="event.stopPropagation();openModal(state.records['+index+'])">' +
+                          (coverUrl
+                            ? '<img src="' + coverUrl + '" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display=\'none\'">'
+                            : '<div class="w-full h-full flex items-center justify-center text-text-secondary text-[10px]">N/A</div>') +
+                        '</div>' +
+                        // Title + dimensions
+                        '<div class="flex-1 min-w-0 cursor-pointer" onclick="event.stopPropagation();openModal(state.records['+index+'])">' +
+                          '<p class="text-sm font-semibold text-white truncate">' + safeTitle + '</p>' +
+                          '<p class="text-[10px] text-text-secondary mt-0.5">' + escapeHtml(dims) + (active ? '' : ' <span class="text-amber-400 ml-1">(Hidden)</span>') + '</p>' +
+                        '</div>' +
+                        // Usage count (desktop)
+                        '<span class="w-16 text-center text-sm text-text-secondary font-mono hidden sm:block">' + (record.usageCount || 0) + '</span>' +
+                        // Actions
+                        '<div class="flex items-center gap-1.5 flex-shrink-0">' +
+                          // Preview
+                          '<button class="w-8 h-8 rounded-lg bg-surface-background border border-border-subtle flex items-center justify-center text-text-secondary hover:text-electric-cyan hover:border-electric-cyan/30 transition-all" title="Preview" onclick="event.stopPropagation();openModal(state.records['+index+'])"><i class="fa-solid fa-eye text-xs"></i></button>' +
+                          // Toggle ON/OFF
+                          '<button class="w-8 h-8 rounded-lg flex items-center justify-center transition-all ' + (active ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-slate-500/10 border border-slate-500/20 text-slate-400') + '" title="' + (active ? 'Hide from public' : 'Show to public') + '" onclick="event.stopPropagation();toggleFilterActive(\'' + filterId + '\')"><i class="fa-solid fa-' + (active ? 'toggle-on' : 'toggle-off') + ' text-xs"></i></button>' +
+                          // Delete
+                          '<button class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-all" title="Delete" onclick="event.stopPropagation();confirmDeleteFilter(\'' + filterId + '\')"><i class="fa-solid fa-trash-can text-xs"></i></button>' +
+                        '</div>';
 
-                    // Click → open execution modal (same as admin)
-                    card.addEventListener('click', () => openModal(record));
-
-                    if (grid) grid.appendChild(card);
+                    if (listBody) listBody.appendChild(row);
                 });
 
-                if (visibleCount === 0) {
-                    if (empty) empty.classList.remove('hidden');
-                }
-
             } catch (err) {
-                console.error('[Gallery] loadImages failed:', err.message || err);
+                console.error('[Admin] loadImages failed:', err.message || err);
                 if (loading) loading.classList.add('hidden');
                 if (empty) {
                     empty.classList.remove('hidden');
@@ -625,7 +624,7 @@
         const filterState = { category: 'all', lighting: '' };
 
         function applyAllFilters() {
-            const cards = document.querySelectorAll('#filters-grid .grid-card');
+            const cards = document.querySelectorAll('#filters-list-body .list-row');
             cards.forEach(card => {
                 let visible = true;
                 if (filterState.category !== 'all') {
