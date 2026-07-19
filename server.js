@@ -339,14 +339,14 @@ async function removeFromDatabase(generationId) {
  * @returns {string}
  */
 function sanitizeEmail(email) {
-    if (!email || typeof email !== 'string') return 'guest_user';
+    if (!email || typeof email !== 'string') return '';
     return email.trim().toLowerCase()
         .replace(/@/g, '_at_')
         .replace(/\./g, '_')
         .replace(/[^a-zA-Z0-9_]/g, '')
         .replace(/_+/g, '_')
         .replace(/^_|_$/g, '')
-        .slice(0, 64) || 'guest_user';
+        .slice(0, 64) || '';
 }
 
 // ------------------------------------------------------------------
@@ -475,13 +475,30 @@ async function getUserCredits(email) {
 async function ensureUserExists(email) {
     if (!db.isConnected()) return null;
     const key = email.trim().toLowerCase();
-    let user = await db.User.findOneAndUpdate(
-        { email: key },
-        { $setOnInsert: { email: key, credits_balance: 0, created_at: new Date(), updated_at: new Date() } },
-        { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
-    );
-    if (user.__v === 0) console.log(`  [mongodb] New user created: ${key}`);
-    return user;
+    if (!key) return null;
+
+    // Check if user already exists BEFORE attempting upsert
+    const existing = await db.User.findOne({ email: key });
+    if (existing) return existing;
+
+    // Only create if truly new — $setOnInsert prevents overwrites
+    try {
+        const user = await db.User.findOneAndUpdate(
+            { email: key },
+            { $setOnInsert: { email: key, credits_balance: 0, created_at: new Date(), updated_at: new Date() } },
+            { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
+        );
+        // If created_at is within the last second, it was just created
+        const isNew = user.created_at && (Date.now() - new Date(user.created_at).getTime() < 2000);
+        if (isNew) console.log(`  [mongodb] New user created: ${key}`);
+        return user;
+    } catch (err) {
+        // Race condition: another request created the user between our findOne and findOneAndUpdate
+        if (err.code === 11000) {
+            return await db.User.findOne({ email: key });
+        }
+        throw err;
+    }
 }
 
 async function addCredits(email, amount, invoiceNumber) {
@@ -1503,7 +1520,7 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                     let ownerEmail = record._userEmail || null;
                     const isAdminType = record._adminSave || (!record._publicUser && (record.type === 'filter-swap' || record.type === 'filter-factory'));
                     if (isAdminType) ownerEmail = ADMIN_EMAIL;
-                    if (!ownerEmail && record._safeEmailPrefix && record._safeEmailPrefix !== 'guest_user') {
+                    if (!ownerEmail && record._safeEmailPrefix) {
                         ownerEmail = record._userEmail || record._safeEmailPrefix || null;
                     }
 
@@ -1693,7 +1710,7 @@ app.post('/api/generate', upload.fields([
         const leonardoGenId = await createLeonardoGeneration(payload);
 
         // --- Capture user email for file-prefix isolation ---
-        const userEmail = req.headers['x-user-email'] || req.body.email || 'guest_user';
+        const userEmail = req.headers['x-user-email'] || req.body.email || '';
         const safeEmailPrefix = sanitizeEmail(userEmail);
         console.log(`  User email: ${userEmail} → prefix: ${safeEmailPrefix}`);
 
@@ -1872,7 +1889,7 @@ app.get('/api/user-creations', async (req, res) => {
         // Filter by email if provided
         if (rawEmail) {
             const key = rawEmail.trim().toLowerCase();
-            if (key === 'guest_user') return res.json([]);
+            if (!key || key === 'guest_user') return res.json([]);
             query.email = key;
         }
 
@@ -1911,7 +1928,7 @@ app.get('/api/user-creations-files', async (req, res) => {
         if (!db.isConnected()) return res.status(503).json({ error: 'Database unavailable.' });
 
         const rawEmail = req.query.email || '';
-        if (!rawEmail || rawEmail === 'guest_user') return res.json([]);
+        if (!rawEmail) return res.json([]);
 
         const key = rawEmail.trim().toLowerCase();
 
@@ -2048,7 +2065,7 @@ async function executeBackgroundSwapPipeline(localGenId, file1, file2, w, h, loc
         // --- Step D: Update in-memory store + start polling --------------
         // Preserve email from the initial placeholder record
         const prevRecord = activeGenerations.get(localGenId);
-        const userEmail = (prevRecord && prevRecord._userEmail) || 'guest_user';
+        const userEmail = (prevRecord && prevRecord._userEmail) || '';
         const safeEmailPrefix = (prevRecord && prevRecord._safeEmailPrefix) || sanitizeEmail(userEmail);
 
         activeGenerations.set(localGenId, {
@@ -2166,7 +2183,7 @@ app.post('/api/background-swap', upload.fields([
 
         // --- Step 3: Seed in-memory store & return 202 immediately -------
         // Store initial placeholder so the frontend can begin polling right away
-        const userEmail = req.headers['x-user-email'] || req.body.email || 'guest_user';
+        const userEmail = req.headers['x-user-email'] || req.body.email || '';
         const safeEmailPrefix = sanitizeEmail(userEmail);
         console.log(`  [bg-swap] User email: ${userEmail} → prefix: ${safeEmailPrefix}`);
 
@@ -2517,7 +2534,7 @@ async function executeDressSwapPipeline(localGenId, file1, file2, w, h, localPat
         // --- Step D: Update in-memory store + start polling --------------
         // Preserve email from the initial placeholder record
         const prevRecord = activeGenerations.get(localGenId);
-        const userEmail = (prevRecord && prevRecord._userEmail) || 'guest_user';
+        const userEmail = (prevRecord && prevRecord._userEmail) || '';
         const safeEmailPrefix = (prevRecord && prevRecord._safeEmailPrefix) || sanitizeEmail(userEmail);
 
         activeGenerations.set(localGenId, {
@@ -2632,7 +2649,7 @@ app.post('/api/dress-swap/generate', upload.fields([
 
         // --- Step 3: Seed in-memory store & return 202 immediately -------
         // Store initial placeholder so the frontend can begin polling right away
-        const userEmail = req.headers['x-user-email'] || req.body.email || 'guest_user';
+        const userEmail = req.headers['x-user-email'] || req.body.email || '';
         const safeEmailPrefix = sanitizeEmail(userEmail);
         console.log(`  [dress-swap] User email: ${userEmail} → prefix: ${safeEmailPrefix}`);
 
@@ -3165,7 +3182,7 @@ app.post('/api/save-user-generation', upload.fields([
         const genId = jobId.trim();
 
         // --- Extract and sanitize user email for file prefixing ---
-        const rawEmail = req.headers['x-user-email'] || req.body.owner_email || 'guest_user';
+        const rawEmail = req.headers['x-user-email'] || req.body.owner_email || '';
         const safeEmailPrefix = sanitizeEmail(rawEmail);
         const timestamp = Date.now();
 
