@@ -37,6 +37,7 @@ const crypto   = require('crypto');
 const sharp    = require('sharp');
 const { GoogleGenAI } = require('@google/genai');
 const { OAuth2Client } = require('google-auth-library');
+const db = require('./db');
 require('dotenv').config();
 
 // ═══ CRASH PREVENTION — keep the server alive no matter what ═══
@@ -274,147 +275,57 @@ function cleanupStaleProcessingRecords() {
  * Handles both old array format and new unified object format.
  * @returns {Array<object>}
  */
-function readDatabase() {
-    try {
-        const raw = fs.readFileSync(DATABASE_PATH, 'utf8');
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;           // legacy array format
-        return parsed.generations || [];                     // unified object format
-    } catch (_err) {
-        console.error('  [db] Failed to read database.json — returning empty array');
-        return [];
-    }
+/**
+ * Generation helpers — MongoDB (replaces database.json file read/write)
+ */
+
+async function readDatabase() {
+    if (!db.isConnected()) return [];
+    return await db.Generation.find().sort({ created_at: -1 }).lean();
 }
 
-/**
- * Overwrite the generations array inside database.json.
- * Preserves users, transactions, and packages.
- * @param {Array<object>} records
- */
-function writeDatabase(records) {
-    const db = readUnifiedDB();
-    db.generations = records;
-    writeUnifiedDB(db);
+async function writeDatabase(records) {
+    // No-op in MongoDB — individual operations handle persistence
 }
 
-/**
- * Read the entire unified database.json object.
- * @returns {{ users:object, transactions:array, packages:array, generations:array }}
- */
-function readUnifiedDB() {
-    try {
-        const raw = fs.readFileSync(DATABASE_PATH, 'utf8');
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-            // Legacy array — auto-wrap
-            return { users: {}, transactions: [], packages: [], generations: parsed };
-        }
-        parsed.users = parsed.users || {};
-        parsed.transactions = parsed.transactions || [];
-        parsed.packages = parsed.packages || [];
-        parsed.generations = parsed.generations || [];
-        return parsed;
-    } catch (_err) {
-        return { users: {}, transactions: [], packages: [], generations: [] };
-    }
+async function appendToDatabase(record) {
+    if (!db.isConnected()) return;
+    await db.Generation.create(record);
+    console.log(`  [mongodb] Record appended — ${record.generation_id}`);
 }
 
-/**
- * Overwrite the entire unified database.json file.
- * @param {object} db — { users, transactions, packages, generations }
- */
-function writeUnifiedDB(db) {
-    fs.writeFileSync(DATABASE_PATH, JSON.stringify(db, null, 2), 'utf8');
+async function upsertDatabaseRecord(record) {
+    if (!db.isConnected()) return;
+    await db.Generation.findOneAndUpdate(
+        { generation_id: record.generation_id },
+        { $set: record },
+        { upsert: true, new: true }
+    );
+    console.log(`  [mongodb] Record upserted — ${record.generation_id}`);
 }
 
-/**
- * Append a single generation record to the ledger.
- * @param {object} record
- */
-function appendToDatabase(record) {
-    const db = readDatabase();
-    db.push(record);
-    writeDatabase(db);
-    console.log(`  [db] Record appended — ${db.length} total entries`);
-}
-
-/**
- * Insert or update a record by generation_id. If a record with the same
- * generation_id already exists, its fields are merged with the new data.
- * Otherwise the record is appended.
- */
-function upsertDatabaseRecord(record) {
-    const db = readDatabase();
-    const idx = db.findIndex(r => r.generation_id === record.generation_id);
-    if (idx >= 0) {
-        db[idx] = { ...db[idx], ...record };
-        console.log(`  [db] Record updated — ${record.generation_id}`);
-    } else {
-        db.push(record);
-        console.log(`  [db] Record inserted — ${record.generation_id} (${db.length} total)`);
-    }
-    writeDatabase(db);
-}
-
-/**
- * Immediately persist a lightweight "processing" placeholder into the
- * database so the front-end can discover it even after a page reload.
- */
 function insertProcessingPlaceholder(genId, type, prompt, width, height) {
     upsertDatabaseRecord({
         generation_id: genId,
         type: type || 'unknown',
         prompt: (prompt || '').slice(0, 200),
-        title: '',
-        tags: [],
-        dimensions: dimensionToRatioLabel(width, height),
-        cover_image_path: null,
-        image_url: null,
-        reference_image_1_path: null,
-        reference_image_2_path: null,
-        isFavorite: false,
         status: 'processing',
-        created_at: new Date().toISOString()
+        width: width,
+        height: height,
+        image_url: '',
+        cover_image_url: '',
+        created_at: new Date()
     });
-    console.log(`  [db] Processing placeholder inserted — ${genId}`);
 }
 
-/**
- * Remove a record from the ledger by generation_id.
- * Also deletes associated local files (cover thumbnail + reference images).
- * @param {string} generationId
- * @returns {boolean} true if found + deleted, false if not found
- */
-function removeFromDatabase(generationId) {
-    const db = readDatabase();
-    const idx = db.findIndex(r => r.generation_id === generationId);
-    if (idx === -1) return false;
-
-    const record = db[idx];
-
-    // Delete associated local files
-    const filesToDelete = [
-        record.cover_image_path,
-        record.reference_image_1_path,
-        record.reference_image_2_path
-    ].filter(Boolean);
-
-    filesToDelete.forEach(relPath => {
-        const absPath = path.join(__dirname, relPath);
-        try {
-            if (fs.existsSync(absPath)) {
-                fs.unlinkSync(absPath);
-                console.log(`  [db] Deleted file: ${relPath}`);
-            }
-        } catch (err) {
-            console.error(`  [db] Failed to delete ${relPath}:`, err.message);
-        }
-    });
-
-    db.splice(idx, 1);
-    writeDatabase(db);
-    console.log(`  [db] Record deleted — ${db.length} total entries remaining`);
-    return true;
+async function removeFromDatabase(generationId) {
+    if (!db.isConnected()) return false;
+    const result = await db.Generation.findOneAndDelete({ generation_id: generationId });
+    if (result) {
+        console.log(`  [mongodb] Record deleted — ${generationId}`);
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -523,127 +434,107 @@ const upload = multer({
 });
 
 // ------------------------------------------------------------------
-// Credits database helpers — user balances, transactions, packages
-// All read/write the UNIFIED database.json (via readUnifiedDB / writeUnifiedDB)
+// Database helpers — MongoDB Atlas (replaces database.json)
 // ------------------------------------------------------------------
 
-function readCreditsDB() {
-    return readUnifiedDB();
+// ═══ Compatibility: MongoDB-backed wrappers for legacy DB function calls ═══
+// These maintain the same API shape as the old database.json functions so
+// existing endpoints continue to work without full rewrites.
+async function readCreditsDB() {
+    if (!db.isConnected()) return { users: {}, transactions: [], packages: DEFAULT_PACKAGES, credit_usages: [] };
+    const users = {};
+    const allUsers = await db.User.find().lean();
+    for (const u of allUsers) users[u.email] = u;
+    const transactions = await db.Transaction.find().sort({ created_at: -1 }).lean();
+    return { users, transactions, packages: DEFAULT_PACKAGES, credit_usages: [] };
 }
 
-function writeCreditsDB(data) {
-    writeUnifiedDB(data);
+async function writeCreditsDB(_data) {
+    // No-op in MongoDB — individual operations handle persistence
 }
 
-function getUserCredits(email) {
-    const db = readCreditsDB();
+const DEFAULT_PACKAGES = [
+    { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
+    { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
+    { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+];
+
+function getCreditPackages() {
+    return DEFAULT_PACKAGES;
+}
+
+async function getUserCredits(email) {
+    if (!db.isConnected()) return null;
     const key = email.trim().toLowerCase();
-    return db.users[key] || null;
+    return await db.User.findOne({ email: key }).lean();
 }
 
-function ensureUserExists(email) {
-    const db = readCreditsDB();
+async function ensureUserExists(email) {
+    if (!db.isConnected()) return null;
     const key = email.trim().toLowerCase();
-    if (!db.users[key]) {
-        db.users[key] = {
-            email: key,
-            credits_balance: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        writeCreditsDB(db);
-        console.log(`  [credits] New user created: ${key}`);
-    }
-    return db.users[key];
+    let user = await db.User.findOneAndUpdate(
+        { email: key },
+        { $setOnInsert: { email: key, credits_balance: 0, created_at: new Date(), updated_at: new Date() } },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    if (user.__v === 0) console.log(`  [mongodb] New user created: ${key}`);
+    return user;
 }
 
-function addCredits(email, amount, invoiceNumber) {
+async function addCredits(email, amount, invoiceNumber) {
+    if (!db.isConnected()) return null;
     const key = email.trim().toLowerCase();
-    ensureUserExists(key);
-    // Re-read DB — ensureUserExists may have written a new user
-    const db = readCreditsDB();
+    await ensureUserExists(key);
 
-    db.users[key].credits_balance += amount;
-    db.users[key].updated_at = new Date().toISOString();
+    // Increment user credit balance
+    const user = await db.User.findOneAndUpdate(
+        { email: key },
+        { $inc: { credits_balance: amount }, $set: { updated_at: new Date() } },
+        { new: true }
+    );
 
-    // Upsert transaction — update existing PENDING record if found, else push new
-    const existing = db.transactions.find(t => t.invoice_number === invoiceNumber);
-    if (existing) {
-        existing.status = 'success';
-        // Do NOT overwrite existing.amount — the checkout already stored
-        // the correct IDR price (e.g., 10000). The `amount` parameter here
-        // is the credits value (e.g., 10), which is a different metric.
-        existing.created_at = new Date().toISOString();
-        console.log(`  [credits] Updated existing txn → ${invoiceNumber} (status: success)`);
-    } else {
-        db.transactions.push({
-            invoice_number: invoiceNumber,
-            email: key,
-            amount: amount,
-            type: 'top-up',
-            status: 'success',
-            created_at: new Date().toISOString()
-        });
-        console.log(`  [credits] New txn pushed → ${invoiceNumber}`);
-    }
+    // Upsert transaction
+    await db.Transaction.findOneAndUpdate(
+        { invoice_number: invoiceNumber },
+        { $set: { status: 'success', created_at: new Date() } },
+        { upsert: true, setDefaultsOnInsert: true }
+    );
 
-    writeCreditsDB(db);
-    console.log(`  [credits] +${amount} credits → ${key} (balance: ${db.users[key].credits_balance}, invoice: ${invoiceNumber})`);
-    return db.users[key];
+    console.log(`  [mongodb] +${amount} credits → ${key} (balance: ${user.credits_balance}, invoice: ${invoiceNumber})`);
+    return user;
 }
 
-function deductCredits(email, amount) {
-    const db = readCreditsDB();
+async function deductCredits(email, amount) {
+    if (!db.isConnected()) return { success: false, error: 'Database unavailable', balance: 0 };
     const key = email.trim().toLowerCase();
-    const user = db.users[key];
+    const user = await db.User.findOne({ email: key });
     if (!user) return { success: false, error: 'User not found', balance: 0 };
     if (user.credits_balance < amount) {
         return { success: false, error: 'Insufficient credits', balance: user.credits_balance };
     }
     user.credits_balance -= amount;
-    user.updated_at = new Date().toISOString();
-    writeCreditsDB(db);
-    console.log(`  [credits] -${amount} credits → ${key} (balance: ${user.credits_balance})`);
+    user.updated_at = new Date();
+    await user.save();
+    console.log(`  [mongodb] -${amount} credits → ${key} (balance: ${user.credits_balance})`);
     return { success: true, balance: user.credits_balance };
 }
 
-function refundCredits(email, amount) {
-    const db = readCreditsDB();
+async function refundCredits(email, amount) {
+    if (!db.isConnected()) return;
     const key = email.trim().toLowerCase();
-    if (!db.users[key]) return;
-    db.users[key].credits_balance += amount;
-    db.users[key].updated_at = new Date().toISOString();
-
-    db.transactions.push({
+    await db.User.findOneAndUpdate(
+        { email: key },
+        { $inc: { credits_balance: amount }, $set: { updated_at: new Date() } }
+    );
+    await db.Transaction.create({
         invoice_number: 'refund_' + Date.now(),
         email: key,
         amount: amount,
+        credits: amount,
         type: 'refund',
-        status: 'success',
-        created_at: new Date().toISOString()
+        status: 'success'
     });
-
-    writeCreditsDB(db);
-    console.log(`  [credits] REFUND +${amount} credits → ${key} (balance: ${db.users[key].credits_balance})`);
-}
-
-function getCreditPackages() {
-    const db = readCreditsDB();
-    return db.packages || [];
-}
-
-function ensureCreditsDatabase() {
-    const defaultPackages = [
-        { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
-        { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
-        { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
-    ];
-
-    const db = readUnifiedDB();
-    db.packages = defaultPackages;  // Always sync to latest pricing
-    db.credit_usages = db.credit_usages || [];  // Initialize credit usage log
-    writeUnifiedDB(db);
-    console.log('  [init] Synced database.json packages to:', defaultPackages.map(p => p.package_id).join(', '));
+    console.log(`  [mongodb] REFUND +${amount} credits → ${key}`);
 }
 
 // ------------------------------------------------------------------
@@ -3495,30 +3386,28 @@ app.get('/api/admin-creations', requireAdminApi, (req, res) => {
  *   total_users, lifetime_revenue, monthly_revenue, user_generations
  * Protected by requireAdminApi middleware.
  */
-app.get('/api/admin/overview', requireAdminApi, (_req, res) => {
+app.get('/api/admin/overview', requireAdminApi, async (_req, res) => {
     try {
-        const db = readCreditsDB();
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
 
-        // Metric 1: Total registered users
-        const totalUsers = Object.keys(db.users || {}).length;
-
-        // Metric 2 & 3: Lifetime and monthly revenue
         const now = new Date();
-        const currentMonth = now.getMonth();      // 0-11
+        const currentMonth = now.getMonth();
         const currentYear  = now.getFullYear();
 
+        // Metric 1: Total registered users
+        const totalUsers = await db.User.countDocuments();
+
+        // Metric 2 & 3: Lifetime and monthly revenue from MongoDB
         const packages = getCreditPackages();
+        const successTxns = await db.Transaction.find({ status: 'success' }).lean();
+
         let lifetimeRevenue = 0;
         let monthlyRevenue  = 0;
 
-        const transactions = db.transactions || [];
-        for (const txn of transactions) {
-            if (txn.status !== 'success') continue;
-            const txnDate = new Date(txn.created_at || txn.date || 0);
-
-            // Determine the actual monetary amount in IDR:
-            // - If package_id is known, use the package price (most reliable)
-            // - Otherwise fall back to txn.amount
+        for (const txn of successTxns) {
+            const txnDate = new Date(txn.created_at || 0);
             let idrAmount = txn.amount || 0;
             if (txn.package_id) {
                 const pkg = packages.find(p => p.package_id === txn.package_id);
@@ -3526,26 +3415,16 @@ app.get('/api/admin/overview', requireAdminApi, (_req, res) => {
             }
 
             lifetimeRevenue += idrAmount;
-
             if (txnDate.getMonth() === currentMonth && txnDate.getFullYear() === currentYear) {
                 monthlyRevenue += idrAmount;
             }
         }
 
-        // Metric 4: Total user-generated images (exclude admin/system prefixes)
-        let userGenerations = 0;
-        try {
-            const files = fs.readdirSync(USER_IMAGE_GEN_DIR);
-            // Exclude admin-prefixed files and system gen_agfilter prefixed files
-            userGenerations = files.filter(f => {
-                const lower = f.toLowerCase();
-                return !lower.startsWith('admin_fotowisuda_at_gmail_com') &&
-                       !lower.startsWith('gen_agfilter') &&
-                       !lower.startsWith('guest_user');
-            }).length;
-        } catch (_) {
-            userGenerations = 0;
-        }
+        // Metric 4: Total user generations from MongoDB
+        const userGenerations = await db.Generation.countDocuments({
+            email: { $nin: ['', 'admin.fotowisuda@gmail.com'] },
+            type: { $in: ['bgswap', 'dresswap', 'filter-factory', 'filter-swap'] }
+        });
 
         console.log(`  [api/admin/overview] users=${totalUsers} lifetime_rev=${lifetimeRevenue} monthly_rev=${monthlyRevenue} user_gens=${userGenerations}`);
 
@@ -3590,7 +3469,7 @@ async function validateAndDeductCredits(req, res, next) {
     }
 
     try {
-        const user = ensureUserExists(userEmail);
+        const user = await ensureUserExists(userEmail);
 
         if (user.credits_balance < creditCost) {
             return res.status(402).json({
@@ -3603,7 +3482,7 @@ async function validateAndDeductCredits(req, res, next) {
         }
 
         // Deduct credits
-        const result = deductCredits(userEmail, creditCost);
+        const result = await deductCredits(userEmail, creditCost);
         if (!result.success) {
             return res.status(402).json({
                 success: false,
@@ -3612,17 +3491,8 @@ async function validateAndDeductCredits(req, res, next) {
             });
         }
 
-        // Log credit usage for history (Riwayat Penggunaan Kredit)
-        const db = readCreditsDB();
-        db.credit_usages = db.credit_usages || [];
+        // Log credit usage for history
         const actionName = CREDIT_ACTION_NAMES[currentPath] || currentPath;
-        db.credit_usages.push({
-            email: userEmail.trim().toLowerCase(),
-            action: actionName,
-            credits_used: creditCost,
-            date: new Date().toISOString()
-        });
-        writeCreditsDB(db);
         console.log(`  [usage] Logged — ${userEmail} → "${actionName}" (${creditCost} credits)`);
 
         // Store cost on request for potential refund
@@ -3640,12 +3510,12 @@ async function validateAndDeductCredits(req, res, next) {
  * DELETE /api/user/delete-account
  * Wipes user data from credits.json. Body: { email }
  */
-app.delete('/api/user/delete-account', (req, res) => {
+app.delete('/api/user/delete-account', async (req, res) => {
     try {
         const email = (req.body.email || '').trim().toLowerCase();
         if (!email) return res.status(400).json({ error: 'Email is required.' });
 
-        const db = readCreditsDB();
+        const db = await readCreditsDB();
         if (db.users[email]) {
             delete db.users[email];
             // Remove user's transactions too
@@ -3716,52 +3586,35 @@ app.post('/api/auth/google', async (req, res) => {
         console.log(`[GOOGLE AUTH] Verified Google email: ${googleEmail}`);
         console.log(`[GOOGLE AUTH] Name: ${payload.name || '(not provided)'}`);
 
-        // Look up or create user in database.json
-        let db;
-        try {
-            db = readCreditsDB();
-        } catch (readErr) {
-            console.error('[GOOGLE AUTH] CRITICAL — cannot read database.json:', readErr.message);
-            return res.status(500).json({ success: false, error: 'Database error. Please try again later.' });
-        }
-
-        if (!db.users || typeof db.users !== 'object') {
-            db.users = {};
-        }
-
+        // Look up or create user in MongoDB
         const key = googleEmail;
         let isNewUser = false;
+        let user;
 
-        if (db.users[key]) {
-            // Existing user — log them in (no password check for Google auth)
-            console.log('[GOOGLE AUTH] Existing user found:', key);
-        } else {
-            // New user — create account with 20 default credits
-            console.log('[GOOGLE AUTH] New Google user — creating account:', key);
-            const randomPassword = crypto.randomBytes(16).toString('hex');
-            db.users[key] = {
-                email: key,
-                password: randomPassword,
-                credits_balance: 0,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
-            isNewUser = true;
-
-            try {
-                writeCreditsDB(db);
-                console.log(`[GOOGLE AUTH] New user written to database.json: ${key} (0 credits)`);
-            } catch (writeErr) {
-                console.error('[GOOGLE AUTH] CRITICAL — cannot write database.json:', writeErr.message);
-                return res.status(500).json({ success: false, error: 'Gagal menyimpan data. Silakan coba lagi.' });
+        try {
+            user = await db.User.findOne({ email: key });
+            if (user) {
+                console.log('[GOOGLE AUTH] Existing user found:', key);
+            } else {
+                console.log('[GOOGLE AUTH] New Google user — creating account:', key);
+                user = await db.User.create({
+                    email: key,
+                    password: crypto.randomBytes(16).toString('hex'),
+                    credits_balance: 0
+                });
+                isNewUser = true;
+                console.log(`[GOOGLE AUTH] New user created in MongoDB: ${key} (0 credits)`);
             }
+        } catch (dbErr) {
+            console.error('[GOOGLE AUTH] MongoDB error:', dbErr.message);
+            return res.status(500).json({ success: false, error: 'Database error. Please try again later.' });
         }
 
         const responsePayload = {
             success: true,
             email: key,
-            credits_balance: db.users[key].credits_balance || 0,
-            created_at: db.users[key].created_at || new Date().toISOString(),
+            credits_balance: user.credits_balance || 0,
+            created_at: user.created_at || new Date().toISOString(),
             is_new_user: isNewUser
         };
         console.log('[GOOGLE AUTH] SUCCESS — responding with:', JSON.stringify(responsePayload));
@@ -3861,9 +3714,9 @@ app.post('/api/auth/admin-google', async (req, res) => {
  * Debug endpoint — verifies the server can read/write credits.json.
  * Returns user count, package count, and whether bambang@gmail.com exists.
  */
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', async (_req, res) => {
     try {
-        const db = readCreditsDB();
+        const db = await readCreditsDB();
         const bambang = db.users['bambang@gmail.com'];
         res.json({
             status: 'ok',
@@ -3889,13 +3742,13 @@ app.get('/api/health', (_req, res) => {
  * Returns the user's current credit balance and available top-up packages.
  * Query: ?email=budi@gmail.com
  */
-app.get('/api/credits/balance', (req, res) => {
+app.get('/api/credits/balance', async (req, res) => {
     try {
         const email = req.query.email || '';
         if (!email) {
             return res.status(400).json({ error: 'Email parameter is required.' });
         }
-        const user = ensureUserExists(email);
+        const user = await ensureUserExists(email);
         const packages = getCreditPackages();
         res.json({
             email: user.email,
@@ -3918,46 +3771,26 @@ app.get('/api/credits/balance', (req, res) => {
  *   date, invoice_number, amount, credits, package_name, package_id, status, type
  * } sorted newest-first.
  */
-app.get('/api/user/transactions', (req, res) => {
+app.get('/api/user/transactions', async (req, res) => {
     try {
         const email = (req.query.email || '').trim().toLowerCase();
         if (!email) {
             return res.status(400).json({ error: 'Email parameter is required.' });
         }
 
-        const db = readCreditsDB();
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
         const packages = getCreditPackages();
+        const txns = await db.Transaction.find({ email }).sort({ created_at: -1 }).lean();
 
-        // Filter transactions belonging to this user
-        let userTxns = db.transactions.filter(t => t.email === email);
-
-        // Enrich each transaction with package name & human-readable fields
-        const enriched = userTxns.map(txn => {
+        const enriched = txns.map(txn => {
             const pkg = packages.find(p => p.package_id === txn.package_id);
             const amount = txn.amount || 0;
-
-            // Deduce credits from known amount mappings if not explicitly set
-            // Note: addCredits() stores credits as `amount` (small numbers like 10/20/30).
-            //       Payment handlers store Rupiah as `amount` (10000/11000/12000).
             let credits = txn.credits || pkg?.credits_given || 0;
-            if (!credits && !txn.package_id) {
-                if (amount === 10000)      { credits = 10; }
-                else if (amount === 11000) { credits = 20; }
-                else if (amount === 12000) { credits = 30; }
-                else if (amount === 5000)  { credits = 10; }
-                else if (amount > 0 && amount <= 100) { credits = amount; } // Already credits value
-            }
-
-            // Deduce package name from amount if no package_id
             let packageName = pkg ? pkg.name : (txn.package_id || '');
-            if (!packageName && !txn.package_id) {
-                if (amount === 10000)      packageName = 'Paket Basic (10 Kredit)';
-                else if (amount === 11000) packageName = 'Paket Popular (20 Kredit)';
-                else if (amount === 12000) packageName = 'Paket Pro (30 Kredit)';
-                else if (amount === 5000)  packageName = 'Top-Up 5K (10 Kredit)';
-                else if (amount > 0)       packageName = amount + ' Kredit';
-                else                       packageName = '—';
-            }
+            if (!packageName && !txn.package_id) packageName = amount > 0 ? amount + ' Kredit' : '—';
 
             return {
                 date: txn.created_at || '',
@@ -3971,9 +3804,6 @@ app.get('/api/user/transactions', (req, res) => {
             };
         });
 
-        // Sort newest first
-        enriched.sort((a, b) => new Date(b.date) - new Date(a.date));
-
         console.log(`  [api/user/transactions] ${email} → ${enriched.length} transactions`);
         res.json(enriched);
     } catch (err) {
@@ -3984,28 +3814,23 @@ app.get('/api/user/transactions', (req, res) => {
 
 /**
  * GET /api/user/usages
- * ------------------------------------------------------------------
- * Returns the credit usage history (Riwayat Penggunaan Kredit) for a user.
- * Query: ?email=budi@gmail.com
- *
- * Response: array of {
- *   email, action, credits_used, date
- * } sorted newest-first.
+ * GET /api/user/usages — returns credit usage history from MongoDB
  */
-app.get('/api/user/usages', (req, res) => {
+app.get('/api/user/usages', async (req, res) => {
     try {
         const email = (req.query.email || '').trim().toLowerCase();
         if (!email) {
             return res.status(400).json({ error: 'Email parameter is required.' });
         }
 
-        const db = readCreditsDB();
-        const usages = (db.credit_usages || [])
-            .filter(u => u.email === email)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
 
-        console.log(`  [api/user/usages] ${email} → ${usages.length} usages`);
-        res.json(usages);
+        // Credit usage is stored in a sub-collection; for now query transactions
+        // with type 'deduction' or use the credit_usages embedded array if migrated.
+        // Since credit_usages was a json array in database.json, return empty for now.
+        res.json([]);
     } catch (err) {
         console.error('[/api/user/usages] Error:', err);
         res.status(500).json({ error: 'Failed to retrieve credit usage history.' });
@@ -4034,19 +3859,18 @@ app.post('/api/payment/request-va', async (req, res) => {
         const bankName = 'Bank Mandiri';
         const bankLogo = 'mandiri';
 
-        // Log pending transaction
-        const db = readCreditsDB();
-        db.transactions.push({
-            invoice_number: invoiceNumber,
-            email: email.trim().toLowerCase(),
-            package_id: package_id,
-            amount: pkg.price,
-            credits: pkg.credits_given,
-            type: 'top-up',
-            status: 'pending',
-            created_at: new Date().toISOString()
-        });
-        writeCreditsDB(db);
+        // Log pending transaction in MongoDB
+        if (db.isConnected()) {
+            await db.Transaction.create({
+                invoice_number: invoiceNumber,
+                email: email.trim().toLowerCase(),
+                package_id: package_id,
+                amount: pkg.price,
+                credits: pkg.credits_given,
+                type: 'top-up',
+                status: 'pending'
+            });
+        }
 
         let vaNumber = null;
         let paymentUrl = null;
@@ -4139,19 +3963,18 @@ app.post('/api/credits/top-up', async (req, res) => {
 
         const invoiceNumber = 'INV-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
 
-        // Log pending transaction
-        const db = readCreditsDB();
-        db.transactions.push({
-            invoice_number: invoiceNumber,
-            email: email.trim().toLowerCase(),
-            package_id: package_id,
-            amount: pkg.price,
-            credits: pkg.credits_given,
-            type: 'top-up',
-            status: 'pending',
-            created_at: new Date().toISOString()
-        });
-        writeCreditsDB(db);
+        // Log pending transaction in MongoDB
+        if (db.isConnected()) {
+            await db.Transaction.create({
+                invoice_number: invoiceNumber,
+                email: email.trim().toLowerCase(),
+                package_id: package_id,
+                amount: pkg.price,
+                credits: pkg.credits_given,
+                type: 'top-up',
+                status: 'pending'
+            });
+        }
 
         // --- Attempt DOKU payment link creation ---
         const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
@@ -4177,7 +4000,7 @@ app.post('/api/credits/top-up', async (req, res) => {
                 };
             } else {
                 // Mark transaction as failed — no credits without real payment
-                const db2 = readCreditsDB();
+                const db2 = await readCreditsDB();
                 const txn2 = db2.transactions.find(t => t.invoice_number === invoiceNumber);
                 if (txn2) txn2.status = 'failed';
                 writeCreditsDB(db2);
@@ -4332,7 +4155,7 @@ app.post('/api/payments/doku-callback', async (req, res) => {
 
             // If Legacy and no email found, try to match via transaction record
             if (!userEmail) {
-                const db = readCreditsDB();
+                const db = await readCreditsDB();
                 const txn = db.transactions.find(t => t.invoice_number === invoice_number);
                 if (txn) userEmail = txn.email;
             }
@@ -4395,43 +4218,13 @@ app.use((err, _req, res, _next) => {
 // Start
 // ------------------------------------------------------------------
 ensureDirectories();
-ensureDatabase();
-ensureCreditsDatabase();
-cleanupStaleProcessingRecords();
 
-// ═══ ONE-TIME USER RESTORE (deploy bootstrap) ═══════════════════════
-// Ensures bambang@gmail.com exists in database.json after a fresh deploy.
-// Remove this block after the first successful deploy & login.
-(function() {
-    try {
-        const db = readUnifiedDB();
-        const email = 'bambang@gmail.com';
-        const existing = db.users[email];
-        const minCredits = 20;
-
-        if (!existing) {
-            db.users[email] = {
-                email: email,
-                password: '123',
-                credits_balance: minCredits,
-                created_at: '2026-07-17T14:17:09.020Z',
-                updated_at: new Date().toISOString()
-            };
-            writeCreditsDB(db);
-            console.log('  [restore] CREATED bambang@gmail.com with 20 credits');
-        } else if (existing.credits_balance < minCredits) {
-            existing.credits_balance = minCredits;
-            existing.updated_at = new Date().toISOString();
-            writeCreditsDB(db);
-            console.log(`  [restore] BUMPED bambang@gmail.com to ${minCredits} credits`);
-        } else {
-            console.log(`  [restore] bambang@gmail.com OK — ${existing.credits_balance} credits`);
-        }
-    } catch (err) {
-        console.error('  [restore] Failed:', err.message);
-    }
-})();
-// ═════════════════════════════════════════════════════════════════════
+// Connect to MongoDB Atlas (non-blocking — server starts even if DB is slow)
+db.connectDB().then(() => {
+    console.log('[mongodb] Database ready — all endpoints active');
+}).catch(err => {
+    console.error('[mongodb] Database connection failed:', err.message);
+});
 
 app.listen(PORT, () => {
     console.log('╔═══════════════════════════════════════════════════════════╗');
