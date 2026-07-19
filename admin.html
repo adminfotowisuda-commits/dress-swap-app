@@ -39,8 +39,10 @@
 
         html, body {
             width: 100%;
+            max-width: 100%;
             height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
         }
 
@@ -329,7 +331,7 @@
         // ═══ Admin Overview Dashboard ═══
         function formatRupiah(amount) {
             if (!amount && amount !== 0) return '...';
-            return 'Rp ' + Number(amount).toLocaleString('id-ID');
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
         }
 
         async function fetchOverview() {

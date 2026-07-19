@@ -570,7 +570,9 @@ function addCredits(email, amount, invoiceNumber) {
     const existing = db.transactions.find(t => t.invoice_number === invoiceNumber);
     if (existing) {
         existing.status = 'success';
-        existing.amount = amount;        // keep unified amount field
+        // Do NOT overwrite existing.amount — the checkout already stored
+        // the correct IDR price (e.g., 10000). The `amount` parameter here
+        // is the credits value (e.g., 10), which is a different metric.
         existing.created_at = new Date().toISOString();
         console.log(`  [credits] Updated existing txn → ${invoiceNumber} (status: success)`);
     } else {
@@ -3505,6 +3507,7 @@ app.get('/api/admin/overview', requireAdminApi, (_req, res) => {
         const currentMonth = now.getMonth();      // 0-11
         const currentYear  = now.getFullYear();
 
+        const packages = getCreditPackages();
         let lifetimeRevenue = 0;
         let monthlyRevenue  = 0;
 
@@ -3512,12 +3515,20 @@ app.get('/api/admin/overview', requireAdminApi, (_req, res) => {
         for (const txn of transactions) {
             if (txn.status !== 'success') continue;
             const txnDate = new Date(txn.created_at || txn.date || 0);
-            const amount  = txn.amount || 0;
 
-            lifetimeRevenue += amount;
+            // Determine the actual monetary amount in IDR:
+            // - If package_id is known, use the package price (most reliable)
+            // - Otherwise fall back to txn.amount
+            let idrAmount = txn.amount || 0;
+            if (txn.package_id) {
+                const pkg = packages.find(p => p.package_id === txn.package_id);
+                if (pkg) idrAmount = pkg.price;
+            }
+
+            lifetimeRevenue += idrAmount;
 
             if (txnDate.getMonth() === currentMonth && txnDate.getFullYear() === currentYear) {
-                monthlyRevenue += amount;
+                monthlyRevenue += idrAmount;
             }
         }
 
