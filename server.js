@@ -1894,7 +1894,7 @@ app.get('/api/gallery', async (req, res) => {
         // Keep filter-factory records + processing placeholders
         const query = {
             owner_email: { $ne: ADMIN_EMAIL },
-            type: { $nin: ['bgswap', 'dresswap', 'filter-swap'] }
+            type: { $nin: ['bgswap', 'dress-swap', 'filter-swap'] }
         };
         // Also include processing records regardless of owner
         const processingRecords = await db.Generation.find({ status: 'processing' }).lean();
@@ -1951,7 +1951,7 @@ app.get('/api/user-creations', async (req, res) => {
         // the user email in one field but not the other depending on the code path.
         const query = {
             owner_email: { $ne: ADMIN_EMAIL },
-            type: { $in: ['bgswap', 'dresswap', 'filter-swap', 'filter-factory'] },
+            type: { $in: ['bgswap', 'dress-swap', 'filter-swap', 'filter-factory'] },
             status: 'COMPLETE'
         };
 
@@ -2777,11 +2777,24 @@ app.post('/api/dress-swap/generate', upload.fields([
  * Returns the current status of a dress-swap generation.
  * Reuses the same in-memory activeGenerations store.
  */
-app.get('/api/dress-swap/status/:generationId', (req, res) => {
+app.get('/api/dress-swap/status/:generationId', async (req, res) => {
     const { generationId } = req.params;
     const record = activeGenerations.get(generationId);
 
     if (!record) {
+        // Fallback: check MongoDB for a completed/failed record (survives server restart)
+        if (db.isConnected()) {
+            const dbRecord = await db.Generation.findOne({ generation_id: generationId }).lean();
+            if (dbRecord && (dbRecord.status === 'FAILED' || dbRecord.status === 'failed'
+                          || dbRecord.status === 'COMPLETE' || dbRecord.status === 'complete')) {
+                const isFailed = dbRecord.status === 'FAILED' || dbRecord.status === 'failed';
+                return res.json({
+                    status: isFailed ? 'FAILED' : 'COMPLETE',
+                    imageUrl: dbRecord.image_url || undefined,
+                    error: dbRecord.error || undefined
+                });
+            }
+        }
         return res.status(404).json({
             status: 'UNKNOWN',
             error: 'Generation ID not found. It may have expired or never existed.'
@@ -3544,7 +3557,9 @@ app.get('/api/admin/overview', requireAdminApi, async (_req, res) => {
 
         // Metric 2 & 3: Lifetime and monthly revenue from MongoDB
         const packages = getCreditPackages();
-        const successTxns = await db.Transaction.find({ status: 'success' }).lean();
+        // Only sum actual purchases (top-up) — exclude usage/deduction/refund records
+        // that would subtract from revenue with their negative amounts
+        const successTxns = await db.Transaction.find({ status: 'success', type: { $nin: ['usage', 'deduction'] } }).lean();
 
         let lifetimeRevenue = 0;
         let monthlyRevenue  = 0;
@@ -3954,7 +3969,8 @@ app.get('/api/user/transactions', async (req, res) => {
         }
 
         const packages = getCreditPackages();
-        const txns = await db.Transaction.find({ email }).sort({ created_at: -1 }).lean();
+        // Only return actual purchases (top-up) — exclude usage/deduction/refund records
+        const txns = await db.Transaction.find({ email, type: { $nin: ['usage', 'deduction'] } }).sort({ created_at: -1 }).lean();
 
         const enriched = txns.map(txn => {
             const pkg = packages.find(p => p.package_id === txn.package_id);

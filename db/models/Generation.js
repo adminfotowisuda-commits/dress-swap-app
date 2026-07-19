@@ -9,7 +9,7 @@ const generationSchema = new mongoose.Schema({
     generation_id:   { type: String, required: true, unique: true, index: true },
     email:           { type: String, default: '', lowercase: true, trim: true, index: true },
     owner_email:     { type: String, default: '', lowercase: true, trim: true },
-    type:            { type: String, enum: ['bgswap', 'dresswap', 'filter-factory', 'filter-swap', 'admin-swap'], default: 'filter-factory' },
+    type:            { type: String, enum: ['bgswap', 'dress-swap', 'filter-factory', 'filter-swap', 'admin-swap'], default: 'filter-factory' },
     status:          { type: String, enum: ['processing', 'COMPLETE', 'FAILED', 'PENDING'], default: 'processing' },
     prompt:          { type: String, default: '' },
     negative_prompt: { type: String, default: '' },
