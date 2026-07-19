@@ -1,4 +1,6 @@
 require('dotenv').config();
+console.log('[env] MONGODB_URI exists:', !!process.env.MONGODB_URI);
+console.log('[env] CLOUDINARY configured:', !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET));
 
 /**
  * server.js — Express backend for fotowisuda.ai

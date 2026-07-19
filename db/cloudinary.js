@@ -34,7 +34,13 @@ async function uploadToCloudinary(source, folder, publicId) {
         return null;
     }
     try {
-        const result = await cloudinary.uploader.upload(source, {
+        // Convert Buffer to base64 data URI if needed (Cloudinary SDK expects string)
+        let uploadSource = source;
+        if (Buffer.isBuffer(source)) {
+            const base64 = source.toString('base64');
+            uploadSource = 'data:image/jpeg;base64,' + base64;
+        }
+        const result = await cloudinary.uploader.upload(uploadSource, {
             folder: `fotowisuda/${folder}`,
             public_id: publicId || undefined,
             overwrite: true,
