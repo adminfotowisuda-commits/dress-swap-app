@@ -17,6 +17,16 @@ public/uploads/references/*
 # Unified runtime database (users, credits, transactions, generations — NEVER commit)
 database.json
 
+# User data directories (runtime generated images, references, prompts — NEVER commit)
+user_data_image_generate/
+user_data_image_reference/
+user_data_prompt/
+
+# Admin data directories (runtime generated images, references, prompts — NEVER commit)
+admin_data_image_generate/
+admin_data_image_reference/
+admin_data_prompt/
+
 # IDE
 .vscode/
 .idea/
