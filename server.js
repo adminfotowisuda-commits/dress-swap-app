@@ -236,35 +236,26 @@ function ensureDatabase() {
  * that will never complete (crashed server, lost in-memory state, etc.).
  */
 async function cleanupStaleProcessingRecords() {
-    const db = await readDatabase();
-    const cutoff = Date.now() - 5 * 60 * 1000; // 5 minutes ago
+    if (!db.isConnected()) return;
+
+    const cutoff = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
     let cleaned = 0;
 
-    for (const record of db) {
-        // --- Stale processing records (>5 min old) ---
-        if (record.status === 'processing' && record.created_at) {
-            const age = new Date(record.created_at).getTime();
-            if (age < cutoff) {
-                record.status = 'failed';
-                record.error = 'Auto-recovered: job was stuck in processing (server restart or crash)';
-                cleaned++;
-            }
-        }
+    // --- Stale processing records (>5 min old) ---
+    const staleResult = await db.Generation.updateMany(
+        { status: 'processing', created_at: { $lt: cutoff } },
+        { $set: { status: 'failed', error: 'Auto-recovered: job was stuck in processing (server restart or crash)' } }
+    );
+    cleaned += staleResult.modifiedCount || 0;
 
-        // --- Zombie bgswapc_ records (Background Change by Claude removed) ---
-        // These records reference a decommissioned endpoint — they will never
-        // complete.  Flip them to failed so they don't haunt Creations.
-        if (record.generation_id && record.generation_id.startsWith('bgswapc_')) {
-            if (record.status === 'processing' || record.status === 'complete') {
-                record.status = 'failed';
-                record.error = 'Auto-recovered: Background Change by Claude has been decommissioned';
-                cleaned++;
-            }
-        }
-    }
+    // --- Zombie bgswapc_ records (decommissioned endpoint) ---
+    const zombieResult = await db.Generation.updateMany(
+        { generation_id: { $regex: /^bgswapc_/ }, status: { $in: ['processing', 'complete'] } },
+        { $set: { status: 'failed', error: 'Auto-recovered: Background Change by Claude has been decommissioned' } }
+    );
+    cleaned += zombieResult.modifiedCount || 0;
 
     if (cleaned > 0) {
-        writeDatabase(db);
         console.log(`  [cleanup] Flipped ${cleaned} stale/zombie record(s) → failed`);
     } else {
         console.log('  [cleanup] No stale processing records found');
@@ -3172,47 +3163,54 @@ app.delete('/api/user-creations/:filename', async (req, res) => {
 
         // 2. Extract generation ID (filename without extension) and clean up DB record
         const genId = filename.replace(/\.[^/.]+$/, '');
-        const db = await readDatabase();
-        const idx = db.findIndex(r => r.generation_id === genId);
 
-        if (idx !== -1) {
-            const record = db[idx];
+        if (db.isConnected()) {
+            const record = await db.Generation.findOne({ generation_id: genId }).lean();
 
-            // Delete all associated local files for this record
-            const filesToDelete = [
-                record.user_gen_path,
-                record.user_ref_path,
-                record.user_prompt_path,
-                record.admin_gen_path,
-                record.admin_ref_path,
-                record.admin_prompt_path,
-                record.cover_image_path,
-                record.reference_image_1_path,
-                record.reference_image_2_path
-            ].filter(Boolean);
+            if (record) {
+                // Delete all associated local files for this record
+                const filesToDelete = [
+                    record.user_gen_path,
+                    record.user_ref_path,
+                    record.user_prompt_path,
+                    record.admin_gen_path,
+                    record.admin_ref_path,
+                    record.admin_prompt_path,
+                    record.cover_image_path,
+                    record.reference_image_1_path,
+                    record.reference_image_2_path
+                ].filter(Boolean);
 
-            filesToDelete.forEach(relPath => {
-                // Handle both absolute and relative paths
-                const absPath = path.isAbsolute(relPath) ? relPath : path.join(__dirname, relPath);
-                try {
-                    if (fs.existsSync(absPath)) {
-                        fs.unlinkSync(absPath);
-                        console.log(`  [user-creations:delete] Removed associated file: ${relPath}`);
+                filesToDelete.forEach(relPath => {
+                    // Handle both absolute and relative paths
+                    const absPath = path.isAbsolute(relPath) ? relPath : path.join(__dirname, relPath);
+                    try {
+                        if (fs.existsSync(absPath)) {
+                            fs.unlinkSync(absPath);
+                            console.log(`  [user-creations:delete] Removed associated file: ${relPath}`);
+                        }
+                    } catch (err) {
+                        console.error(`  [user-creations:delete] Failed to remove ${relPath}:`, err.message);
                     }
-                } catch (err) {
-                    console.error(`  [user-creations:delete] Failed to remove ${relPath}:`, err.message);
-                }
-            });
+                });
 
-            db.splice(idx, 1);
-            writeDatabase(db);
-            console.log(`  [user-creations:delete] Database record deleted: ${genId} (${db.length} remaining)`);
-        }
+                // Actually delete from MongoDB
+                await db.Generation.deleteOne({ generation_id: genId });
+                console.log(`  [user-creations:delete] Database record deleted: ${genId}`);
+            }
 
-        if (fileDeleted || idx !== -1) {
-            res.json({ deleted: true, filename, generation_id: genId });
+            if (fileDeleted || record) {
+                res.json({ deleted: true, filename, generation_id: genId });
+            } else {
+                res.status(404).json({ error: 'File not found on disk or in database.', filename });
+            }
         } else {
-            res.status(404).json({ error: 'File not found on disk or in database.', filename });
+            // Fallback: DB unavailable but file was deleted
+            if (fileDeleted) {
+                res.json({ deleted: true, filename, generation_id: genId });
+            } else {
+                res.status(404).json({ error: 'File not found.', filename });
+            }
         }
     } catch (err) {
         console.error('[/api/user-creations/:filename] Error:', err);
@@ -3232,21 +3230,24 @@ app.delete('/api/user-creations/:filename', async (req, res) => {
 app.delete('/api/filter-gallery/:id', requireAdminApi, async (req, res) => {
     try {
         const { id } = req.params;
-        const db = await readDatabase();
-        const idx = db.findIndex(r => r.generation_id === id);
 
-        if (idx === -1) {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
+        // Find the record first so we can clean up associated local files
+        const record = await db.Generation.findOne({ generation_id: id }).lean();
+
+        if (!record) {
             return res.status(404).json({ error: 'Record not found.', generation_id: id });
         }
 
-        const record = db[idx];
-
-        // Delete associated local files
+        // Delete associated local files (Cloudinary URLs are skipped)
         const filesToDelete = [
             record.cover_image_path,
             record.reference_image_1_path,
             record.reference_image_2_path
-        ].filter(Boolean);
+        ].filter(p => p && !/^https?:\/\//i.test(p));
 
         filesToDelete.forEach(relPath => {
             const absPath = path.join(__dirname, relPath);
@@ -3260,9 +3261,15 @@ app.delete('/api/filter-gallery/:id', requireAdminApi, async (req, res) => {
             }
         });
 
-        db.splice(idx, 1);
-        writeDatabase(db);
-        console.log(`  [filter-gallery:delete] Record deleted: ${id} (${db.length} remaining)`);
+        // Actually delete from MongoDB (the old writeDatabase was a no-op!)
+        const result = await db.Generation.deleteOne({ generation_id: id });
+        const remaining = await db.Generation.countDocuments({ type: 'filter-factory' });
+
+        console.log(`  [filter-gallery:delete] Record deleted: ${id} (${remaining} remaining)`);
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Record not found.', generation_id: id });
+        }
 
         res.json({ deleted: true, generation_id: id });
     } catch (err) {
