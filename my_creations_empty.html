@@ -222,10 +222,23 @@
   <div class="grid" id="creations-grid"></div>
 </main>
 
-<!-- PREVIEW OVERLAY -->
+<!-- PREVIEW OVERLAY — carousel track for real-time swipe -->
 <div class="preview-overlay" id="preview-overlay" onclick="closePreview()">
-  <!-- Image stays outside chrome wrapper — always 100% opaque -->
-  <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:0;z-index:1;">
+  <!-- Carousel viewport: clips to one slide at a time -->
+  <div id="preview-viewport" style="overflow:hidden;width:100%;display:flex;align-items:center;justify-content:center;z-index:1;">
+    <!-- Track: holds 3 slides side-by-side; offset -100% shows center slide -->
+    <div id="preview-track" style="display:flex;width:300%;transform:translateX(-100%);will-change:transform;">
+      <div class="preview-slide" style="flex:0 0 33.333%;display:flex;align-items:center;justify-content:center;">
+        <img id="preview-img-0" src="" style="max-width:90vw;max-height:75vh;object-fit:contain;border-radius:0;pointer-events:none;">
+      </div>
+      <div class="preview-slide" style="flex:0 0 33.333%;display:flex;align-items:center;justify-content:center;">
+        <img id="preview-img-1" src="" style="max-width:90vw;max-height:75vh;object-fit:contain;border-radius:0;">
+      </div>
+      <div class="preview-slide" style="flex:0 0 33.333%;display:flex;align-items:center;justify-content:center;">
+        <img id="preview-img-2" src="" style="max-width:90vw;max-height:75vh;object-fit:contain;border-radius:0;pointer-events:none;">
+      </div>
+    </div>
+  </div>
   <!-- Chrome: UI elements only — fades in/out independently -->
   <div class="preview-chrome" id="preview-chrome" style="z-index:2;">
     <button class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
@@ -745,6 +758,37 @@ var _flipAnimating = false;  // guard against concurrent animations
 var _flipThumbImg = null;    // the img inside the source card
 var _flipRect = null;        // cached bounding rect of the source card
 
+// ── Carousel helpers ────────────────────────────────────────────
+// Track: 3 slides [0=prev, 1=curr, 2=next] at translateX(-100%)
+var _carouselIdx = -1;  // which _creations index is in the center slot
+
+function getCenterImg() { return document.getElementById('preview-img-1'); }
+function getTrack()     { return document.getElementById('preview-track'); }
+function getViewport()  { return document.getElementById('preview-viewport'); }
+
+// Load images into the 3 carousel slots around the given index
+function loadCarouselSlots(idx) {
+  var imgs = [
+    document.getElementById('preview-img-0'),
+    document.getElementById('preview-img-1'),
+    document.getElementById('preview-img-2')
+  ];
+  if (!imgs[0] || !imgs[1] || !imgs[2]) return;
+  var prev = idx > 0 ? idx - 1 : (_creations.length > 1 ? _creations.length - 1 : -1);
+  var next = idx < _creations.length - 1 ? idx + 1 : (_creations.length > 1 ? 0 : -1);
+  imgs[0].src = prev >= 0 ? (_creations[prev].url || '') : '';
+  imgs[1].src = _creations[idx].url || '';
+  imgs[2].src = next >= 0 ? (_creations[next].url || '') : '';
+  _carouselIdx = idx;
+}
+
+// Reset track to center position and reload slots
+function resetTrack(idx) {
+  var track = getTrack();
+  if (track) { track.style.transition = 'none'; track.style.transform = 'translateX(-100%)'; }
+  loadCarouselSlots(idx);
+}
+
 function showChrome() {
   var chrome = document.getElementById('preview-chrome');
   if (chrome) chrome.classList.add('visible');
@@ -796,37 +840,31 @@ function openPreview(idx) {
 
   _previewIdx = idx;
   var ov = document.getElementById('preview-overlay');
-  var img = document.getElementById('preview-img');
   var cnt = document.getElementById('preview-counter');
-  if (!ov || !img) return;
+  if (!ov) return;
 
-  // Set the image source
-  img.src = _creations[idx].url;
+  // Load carousel slots (center = current, left = prev, right = next)
+  resetTrack(idx);
+  var img = getCenterImg();
   if (cnt) cnt.textContent = (idx + 1) + ' / ' + _creations.length;
 
   var fromRect = captureThumbRect(idx);
 
-  // Show overlay (transparent, no flex centering interference during animation)
+  // Show overlay
   ov.style.background = 'rgba(0,0,0,0)';
-  ov.style.alignItems = 'center';
-  ov.style.justifyContent = 'center';
   ov.style.display = 'flex';
-  // Force layout so getBoundingClientRect reads the natural modal position
   ov.offsetHeight;
 
-  if (fromRect) {
-    // Hide the thumbnail during animation
+  if (fromRect && img) {
     if (_flipThumbImg) _flipThumbImg.style.opacity = '0';
 
-    // Measure the image's natural position in the modal
     var toRect = img.getBoundingClientRect();
 
-    // FLIP Invert: translate + uniform scale (cover mode, no distortion)
     var dX = fromRect.left + fromRect.width / 2 - (toRect.left + toRect.width / 2);
     var dY = fromRect.top + fromRect.height / 2 - (toRect.top + toRect.height / 2);
     var sX = fromRect.width / toRect.width;
     var sY = fromRect.height / toRect.height;
-    var s  = Math.max(sX, sY);  // cover: fill target area, crop excess
+    var s  = Math.max(sX, sY);
 
     ov.style.overflow = 'hidden';
     img.style.objectFit = 'cover';
@@ -834,15 +872,12 @@ function openPreview(idx) {
     img.style.transform = 'translate(' + dX + 'px, ' + dY + 'px) scale(' + s + ', ' + s + ')';
     img.style.borderRadius = '0px';
     img.style.willChange = 'transform, border-radius';
-
-    // Force layout
     img.offsetHeight;
 
-    // Animate to final state
     _flipAnimating = true;
     ov.style.transition = 'background ' + (DURATION_OPEN / 1000) + 's ease';
     ov.style.background = 'rgba(0,0,0,0.92)';
-    showChrome();  // fade in counter, arrows, buttons
+    showChrome();
 
     img.style.transition = 'transform ' + (DURATION_OPEN / 1000) + 's ' + EASING
                          + ', border-radius ' + (DURATION_OPEN / 1000) + 's ease';
@@ -862,12 +897,10 @@ function openPreview(idx) {
     };
     img.addEventListener('transitionend', onDone);
 
-    // Safety: force cleanup if transitionend never fires
     setTimeout(function() {
       if (_flipAnimating) { onDone(); }
     }, DURATION_OPEN + 100);
   } else {
-    // No card found — instant show
     ov.style.background = 'rgba(0,0,0,0.92)';
     showChrome();
   }
@@ -877,7 +910,7 @@ function closePreview() {
   if (_flipAnimating) return;
 
   var ov = document.getElementById('preview-overlay');
-  var img = document.getElementById('preview-img');
+  var img = getCenterImg();
   if (!ov || !img) { _previewIdx = -1; return; }
 
   // Try to find the card for the current preview item
@@ -988,55 +1021,48 @@ async function forceDownload(imageUrl, filename) {
 }
 
 var _navSliding = false;
+var SWIPE_THRESHOLD = 60;  // px to commit a swipe
+
+// Animate the carousel track to a new center index, then reset slots
+function slideToIndex(newIdx, dir, duration) {
+  var track = getTrack();
+  var cnt = document.getElementById('preview-counter');
+  if (!track) return;
+
+  _navSliding = true;
+  var targetX = dir > 0 ? '-200%' : '0%';  // slide to next (left) or prev (right)
+  track.style.transition = 'transform ' + (duration / 1000) + 's ease';
+  track.style.transform = 'translateX(' + targetX + ')';
+
+  track.addEventListener('transitionend', function finish() {
+    track.removeEventListener('transitionend', finish);
+    track.style.transition = 'none';
+    _previewIdx = newIdx;
+    if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
+    resetTrack(newIdx);
+    _navSliding = false;
+  });
+
+  // Safety
+  setTimeout(function() {
+    if (_navSliding) {
+      track.style.transition = 'none';
+      _previewIdx = newIdx;
+      if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
+      resetTrack(newIdx);
+      _navSliding = false;
+    }
+  }, duration + 100);
+}
 
 function navPreview(dir) {
   if (_creations.length === 0 || _flipAnimating || _navSliding) return;
-  var newIdx = (_previewIdx + dir + _creations.length) % _creations.length;
+  // Edge guard: don't navigate past bounds
+  if (dir < 0 && _previewIdx <= 0) return;
+  if (dir > 0 && _previewIdx >= _creations.length - 1) return;
 
-  var img = document.getElementById('preview-img');
-  var ov = document.getElementById('preview-overlay');
-  var cnt = document.getElementById('preview-counter');
-  if (!img || !ov) return;
-
-  _navSliding = true;
-
-  // Direction: dir>0 = next (slides left), dir<0 = prev (slides right)
-  var slideOutX = dir > 0 ? '-25%' : '25%';
-  var slideInX  = dir > 0 ? '25%' : '-25%';
-
-  // 1. Slide current image out (transform only, no opacity fade)
-  img.style.transition = 'transform 0.22s ease';
-  img.style.transform = 'translateX(' + slideOutX + ')';
-
-  setTimeout(function() {
-    // 2. Swap source and position off-screen
-    img.src = _creations[newIdx].url;
-    img.style.transition = 'none';
-    img.style.transform = 'translateX(' + slideInX + ')';
-    img.offsetHeight; // force reflow
-
-    _previewIdx = newIdx;
-    if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
-
-    // 3. Slide new image in (transform only)
-    requestAnimationFrame(function() {
-      img.style.transition = 'transform 0.22s ease';
-      img.style.transform = 'translateX(0)';
-      img.addEventListener('transitionend', function cleanup() {
-        img.style.transition = '';
-        img.style.transform = '';
-        _navSliding = false;
-        img.removeEventListener('transitionend', cleanup);
-      });
-      setTimeout(function() {
-        if (_navSliding) {
-          img.style.transition = '';
-          img.style.transform = '';
-          _navSliding = false;
-        }
-      }, 300);
-    });
-  }, 220);
+  var newIdx = _previewIdx + dir;
+  slideToIndex(newIdx, dir, 250);
 }
 
 var _deleteTarget = null;
@@ -1111,26 +1137,32 @@ var _touchDragging = false;
 
 document.addEventListener('touchstart', function(e) {
   if (e.touches.length !== 1) return;
+  var ov = document.getElementById('preview-overlay');
+  if (!ov || ov.style.display !== 'flex') return;
   _touchX = e.touches[0].clientX;
   _touchY = e.touches[0].clientY;
   _touchDragging = false;
+  var track = getTrack();
+  if (track) track.style.transition = 'none';
 }, {passive:true});
 
 document.addEventListener('touchmove', function(e) {
   var ov = document.getElementById('preview-overlay');
   if (!ov || ov.style.display !== 'flex') return;
-  if (_navSliding) return;
+  if (_navSliding || _flipAnimating) return;
   var dx = e.touches[0].clientX - _touchX;
   var dy = e.touches[0].clientY - _touchY;
-  // Only track horizontal drags (ignore vertical scrolls)
-  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
     _touchDragging = true;
-    var img = document.getElementById('preview-img');
-    if (img) {
-      // Real-time drag: image follows finger with resistance
-      var dragX = dx * 0.6;
-      img.style.transition = 'none';
-      img.style.transform = 'translateX(' + dragX + 'px)';
+    var track = getTrack();
+    if (track) {
+      var resistance = 1;
+      if ((_previewIdx <= 0 && dx > 0) || (_previewIdx >= _creations.length - 1 && dx < 0)) {
+        resistance = 0.2;
+      }
+      var vpW = ov.offsetWidth;
+      var deltaPct = (dx / vpW) * 100 * resistance;
+      track.style.transform = 'translateX(' + (-100 + deltaPct) + '%)';
     }
   }
 }, {passive:true});
@@ -1138,39 +1170,39 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('touchend', function(e) {
   var ov = document.getElementById('preview-overlay');
   if (!ov || ov.style.display !== 'flex') return;
-  if (_navSliding) return;
+  if (_navSliding || _flipAnimating) { _touchDragging = false; return; }
   var dx = e.changedTouches[0].clientX - _touchX;
-  var img = document.getElementById('preview-img');
+  var track = getTrack();
+  var dir = dx < 0 ? 1 : -1;
 
-  if (_touchDragging && Math.abs(dx) > 60) {
-    // Swipe detected — snap to direction
-    var dir = dx < 0 ? 1 : -1;
-    if (img) {
-      // Animate the snap before calling navPreview
-      var snapX = dx < 0 ? '-25%' : '25%';
-      img.style.transition = 'transform 0.15s ease';
-      img.style.transform = 'translateX(' + snapX + ')';
-      setTimeout(function() {
-        img.style.transition = '';
-        img.style.transform = '';
-        navPreview(dir);
-      }, 150);
+  if (_touchDragging && Math.abs(dx) > SWIPE_THRESHOLD) {
+    if ((dir < 0 && _previewIdx <= 0) || (dir > 0 && _previewIdx >= _creations.length - 1)) {
+      // At boundary — spring back
+      if (track) {
+        track.style.transition = 'transform 0.25s ease';
+        track.style.transform = 'translateX(-100%)';
+      }
     } else {
-      navPreview(dir);
-    }
-  } else if (_touchDragging) {
-    // Small drag — spring back
-    if (img) {
-      img.style.transition = 'transform 0.2s ease';
-      img.style.transform = 'translateX(0)';
+      // Snap to adjacent slide
+      var newIdx = _previewIdx + dir;
+      var targetX = dir > 0 ? '-200%' : '0%';
+      if (track) {
+        track.style.transition = 'transform 0.2s ease';
+        track.style.transform = 'translateX(' + targetX + ')';
+      }
       setTimeout(function() {
-        img.style.transition = '';
-        img.style.transform = '';
+        _previewIdx = newIdx;
+        var cnt = document.getElementById('preview-counter');
+        if (cnt) cnt.textContent = (newIdx + 1) + ' / ' + _creations.length;
+        resetTrack(newIdx);
       }, 200);
     }
-  } else {
-    // Tap (not a drag) — check if it was a click-to-close
-    // Only navigate if it was clearly a swipe, not a tap
+  } else if (_touchDragging) {
+    // Small drag — spring back to center
+    if (track) {
+      track.style.transition = 'transform 0.25s ease';
+      track.style.transform = 'translateX(-100%)';
+    }
   }
   _touchDragging = false;
 });
