@@ -261,6 +261,38 @@ function getEmail() {
   return e;
 }
 
+// Build a single completed card for in-place DOM swap (no full grid re-render)
+function buildCompletedCard(item, idx) {
+  var imgUrl = item.url || '';
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.setAttribute('onclick', 'openPreview(' + idx + ')');
+
+  if (imgUrl) {
+    var wrap = document.createElement('div');
+    wrap.className = 'card-img-wrap';
+    var img = document.createElement('img');
+    img.src = imgUrl;
+    img.alt = item.name || '';
+    img.onerror = function() {
+      wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#5c6370;font-size:40px;">?</div>';
+    };
+    wrap.appendChild(img);
+    card.appendChild(wrap);
+  } else {
+    var wrap = document.createElement('div');
+    wrap.className = 'card-img-wrap';
+    wrap.style.cssText = 'display:flex;align-items:center;justify-content:center;';
+    var spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    wrap.appendChild(spinner);
+    card.appendChild(wrap);
+    card.style.pointerEvents = 'none';
+    card.style.cursor = 'default';
+  }
+  return card;
+}
+
 function renderAuth() {
   var c = document.getElementById('auth-container');
   if (!c) return;
@@ -414,25 +446,13 @@ function getStatusMessage(elapsedMs) {
 
 function buildProcessingCardHtml(item) {
   var genId = item.generation_id || item.id;
-  var typeLabel = item.title || getJobTypeLabel(genId);
   return '<div class="processing-card" data-generation-id="'+genId+'" data-type="'+item.type+'">'+
-    '<div class="processing-placeholder">'+
-      '<div class="grid-bg"></div>'+
-      '<div class="shimmer-overlay"></div>'+
-      '<div class="processing-indicator">'+
-        '<div class="processing-icon-wrap" id="spinner-'+genId+'">'+
-          '<div class="processing-icon-inner">'+
-            '<i class="fa-solid fa-wand-magic-sparkles"></i>'+
-          '</div>'+
-        '</div>'+
-        '<span class="processing-label" id="status-'+genId+'">Menganalisa struktur wajah kamu…</span>'+
-        '<span class="processing-sub" id="sub-'+genId+'">AI sedang mendeteksi fitur wajah dari foto referensi</span>'+
-      '</div>'+
+    '<div class="processing-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">'+
+      '<div class="spinner" style="width:36px;height:36px;border-width:2px;"></div>'+
+      '<span class="processing-label" id="status-'+genId+'" style="font-size:11px;color:#8B949E;text-align:center;max-width:140px;">Memproses AI...</span>'+
     '</div>'+
-    '<div class="card-status-bar">'+
-      '<span class="dot" id="dot-'+genId+'"></span>'+
-      '<span class="type-label">'+typeLabel+'</span>'+
-      '<span class="timer" id="timer-'+genId+'">00:00.00</span>'+
+    '<div style="padding:6px 10px;display:flex;align-items:center;justify-content:flex-end;border-top:1px solid rgba(48,54,61,0.3);">'+
+      '<span style="font-size:10px;color:rgba(0,209,255,0.4);font-family:monospace;" id="timer-'+genId+'">00:00.00</span>'+
     '</div>'+
   '</div>';
 }
@@ -529,11 +549,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
   var cardEl = document.querySelector('[data-generation-id="'+generationId+'"]');
   if (!cardEl) return;
 
-  var barEl     = cardEl.querySelector('.processing-placeholder'); // we use the whole placeholder for progress visual
   var statusEl  = document.getElementById('status-'+generationId);
-  var subEl     = document.getElementById('sub-'+generationId);
-  var spinnerEl = document.getElementById('spinner-'+generationId);
-  var dotEl     = document.getElementById('dot-'+generationId);
   var timerEl   = document.getElementById('timer-'+generationId);
 
   var startHr = performance.now();
@@ -560,9 +576,6 @@ function startProcessingPoll(generationId, serverCreatedAt) {
     if (elapsed > MAX_TIME) {
       clearTimers(generationId);
       if (statusEl) { statusEl.textContent = 'Waktu Habis'; statusEl.style.color = '#ffb4ab'; }
-      if (subEl)    { subEl.textContent = 'Proses melebihi batas 6 menit. Silakan coba lagi.'; }
-      if (dotEl)    { dotEl.classList.add('error-dot'); }
-      if (spinnerEl) spinnerEl.style.display = 'none';
       markProcessingFailed(generationId);
       setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); }, 8000);
       return;
@@ -571,11 +584,8 @@ function startProcessingPoll(generationId, serverCreatedAt) {
     // â”€â”€ Stale check (5 min based on server time) â”€â”€
     if (serverCreatedAt && (Date.now() - serverCreatedAt) > 300000) {
       clearTimers(generationId);
-      if (statusEl) { statusEl.textContent = 'Gagal Memproses'; statusEl.style.color = '#fbbf24'; }
-      if (subEl)    { subEl.textContent = 'Klik untuk hapus'; }
-      if (dotEl)    { dotEl.classList.add('error-dot'); dotEl.style.background = '#fbbf24'; }
+      if (statusEl) { statusEl.textContent = 'Gagal'; statusEl.style.color = '#fbbf24'; }
       if (timerEl)  timerEl.textContent = '--:--.--';
-      if (spinnerEl) spinnerEl.style.display = 'none';
       cardEl.classList.add('stale');
       cardEl.style.cursor = 'pointer';
       cardEl.addEventListener('click', function() {
@@ -588,10 +598,6 @@ function startProcessingPoll(generationId, serverCreatedAt) {
     }
 
     // â”€â”€ Progressive status messages â”€â”€
-    var msg = getStatusMessage(elapsed);
-    if (statusEl) statusEl.textContent = msg.status;
-    if (subEl)    subEl.textContent    = msg.sub;
-
     // â”€â”€ Fetch real status â”€â”€
     var endpoint = getStatusEndpoint(generationId) + generationId;
     fetch(endpoint).then(function(r) { return r.json(); }).then(function(data) {
@@ -601,9 +607,6 @@ function startProcessingPoll(generationId, serverCreatedAt) {
       if (status === 'COMPLETE') {
         clearTimers(generationId);
         if (statusEl) statusEl.textContent = 'Selesai!';
-        if (subEl)    subEl.textContent    = 'Memuat hasil akhir…';
-        if (spinnerEl) spinnerEl.style.display = 'none';
-        if (dotEl)    { dotEl.style.background = '#22c55e'; dotEl.style.animation = 'none'; }
 
         // Remove from localStorage FIRST so mergeProcessingCards() doesn't re-create it
         removeProcessingItem(generationId);
@@ -614,49 +617,59 @@ function startProcessingPoll(generationId, serverCreatedAt) {
           window.history.replaceState({}, '', u.toString());
         }
 
-        // ── Auto-refresh with retry ──────────────────────────────
-        // The MongoDB write may still be in-flight (Cloudinary upload).
-        // Retry up to 3 times (every 1.5s) until the new record appears,
-        // then swap the placeholder card for the real one.
+        // ── Single-card swap — no full grid re-render ──────────
+        // Instead of calling loadGallery() which flashes the entire grid,
+        // fetch only the completed record and swap the placeholder in-place.
         cardEl.classList.add('resolving');
         var retries = 0;
-        var MAX_RETRIES = 4;
+        var MAX_RETRIES = 5;
 
-        function tryLoadUntilFound() {
-          loadGallery().then(function() {
-            // Check if the completed generation is now in the gallery
-            var found = false;
-            for (var c = 0; c < _creations.length; c++) {
-              var cid = _creations[c].id || _creations[c].generation_id;
-              if (cid === generationId || _creations[c].name === generationId) {
-                found = true;
-                break;
+        function tryFetchAndSwap() {
+          var email = getEmail();
+          fetch('/api/user-creations?email=' + encodeURIComponent(email))
+            .then(function(r) { return r.json(); })
+            .then(function(creations) {
+              // Find the completed record
+              var foundRecord = null;
+              for (var c = 0; c < creations.length; c++) {
+                var cid = creations[c].id || creations[c].generation_id;
+                if (cid === generationId) { foundRecord = creations[c]; break; }
               }
-            }
 
-            if (found || retries >= MAX_RETRIES) {
-              // Success or exhausted retries — remove placeholder
-              setTimeout(function() {
+              if (foundRecord && foundRecord.url) {
+                // Build the real card and swap it in
+                var cardIdx = _creations.length; // will be inserted at end
+                _creations.push(foundRecord);
+                var newCard = buildCompletedCard(foundRecord, cardIdx);
+                if (cardEl.parentNode) {
+                  cardEl.parentNode.replaceChild(newCard, cardEl);
+                }
+                updateGalleryCount();
+                if (statusEl) statusEl.textContent = '';
+              } else if (retries < MAX_RETRIES) {
+                retries++;
+                if (statusEl) statusEl.textContent = 'Menyelaraskan… (' + retries + '/' + MAX_RETRIES + ')';
+                setTimeout(tryFetchAndSwap, 1500);
+              } else {
+                // Exhausted retries — fall back to full loadGallery
                 if (cardEl.parentNode) cardEl.remove();
                 updateGalleryCount();
-              }, 300);
-            } else {
-              // Not yet — retry after delay
-              retries++;
-              if (subEl) subEl.textContent = 'Menyelaraskan data… (' + retries + '/' + MAX_RETRIES + ')';
-              setTimeout(tryLoadUntilFound, 1500);
-            }
-          });
+                loadGallery();
+              }
+            })
+            .catch(function() {
+              if (retries < MAX_RETRIES) {
+                retries++;
+                setTimeout(tryFetchAndSwap, 1500);
+              }
+            });
         }
 
-        setTimeout(tryLoadUntilFound, 1000);
+        setTimeout(tryFetchAndSwap, 1000);
       } else if (status === 'FAILED') {
         clearTimers(generationId);
-        if (statusEl) { statusEl.textContent = 'Gagal — Error Server'; statusEl.style.color = '#ffb4ab'; }
-        if (subEl)    { subEl.textContent = data.error || 'Terjadi kesalahan di server'; }
-        if (dotEl)    { dotEl.classList.add('error-dot'); }
+        if (statusEl) { statusEl.textContent = 'Gagal'; statusEl.style.color = '#ffb4ab'; }
         if (timerEl)  timerEl.textContent = '--:--.--';
-        if (spinnerEl) spinnerEl.style.display = 'none';
         cardEl.classList.add('error');
         markProcessingFailed(generationId);
         setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); updateGalleryCount(); }, 10000);
