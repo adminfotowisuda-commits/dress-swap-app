@@ -116,14 +116,16 @@ const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virt
 const CREDIT_COSTS = {
     '/api/background-swap':         2,
     '/api/dress-swap/generate':     2,
-    '/api/admin-gallery-filter/swap': 1
+    '/api/admin-gallery-filter/swap': 1,
+    '/api/filter-gallery/swap':     1
 };
 
 // Human-readable action names for credit usage history
 const CREDIT_ACTION_NAMES = {
     '/api/background-swap':         'Background Swap',
     '/api/dress-swap/generate':     'Dress Swap',
-    '/api/admin-gallery-filter/swap': 'Filter Gallery Swap'
+    '/api/admin-gallery-filter/swap': 'Filter Gallery Swap',
+    '/api/filter-gallery/swap':     'Filter Gallery Swap'
 };
 
 // Admin data directories — absolute local file saving for admin panel
@@ -359,8 +361,33 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
+// ═══ Charset middleware — ensure UTF-8 encoding on all HTML responses ═══
+// Prevents corrupted text like "Menganalisa…" from being rendered as mojibake
+// when the browser falls back to a non-UTF-8 default encoding.
+app.use((_req, res, next) => {
+    const origSend = res.send.bind(res);
+    res.send = function (body) {
+        const ct = res.get('Content-Type') || '';
+        if ((ct.includes('text/html') || ct === '') && !ct.includes('charset')) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        }
+        return origSend(body);
+    };
+    next();
+});
+
 // Serve the frontend + static assets from the project root
-app.use(express.static(__dirname));
+// HTML files get no-cache headers so JS fixes reach users immediately
+app.use(express.static(__dirname, {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
+            res.set('Surrogate-Control', 'no-store');
+        }
+    }
+}));
 // Also serve /public/uploads explicitly so thumbnails + refs are reachable
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 // Serve localized Before-After demo images for the comparison sliders
@@ -370,32 +397,41 @@ app.use('/Image_display_dress_replicate', express.static(path.join(__dirname, 'I
 app.use('/user_data_image_generate', express.static(USER_IMAGE_GEN_DIR));
 
 // Main dashboard
-app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'code.html')));
+app.get('/', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'code.html')));
 
 // Background Change
-app.get('/swap-bg', (_req, res) => res.sendFile(path.join(__dirname, 'swap_bg.html')));
+app.get('/swap-bg', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'swap_bg.html')));
 
 
 // Dress Replicate
-app.get('/dress-swap', (_req, res) => res.sendFile(path.join(__dirname, 'dress_swap.html')));
+app.get('/dress-swap', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'dress_swap.html')));
 
 // Filter Image Factory
-app.get('/generate', (_req, res) => res.sendFile(path.join(__dirname, 'generate.html')));
+app.get('/generate', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'generate.html')));
 
 // My Creations — user creations hub
-app.get('/my-creations', (_req, res) => res.sendFile(path.join(__dirname, 'my_creations_empty.html')));
+app.get('/my-creations', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'my_creations_empty.html')));
 
 // My Creations — underscore variant + .html extension
-app.get(['/my_creations', '/my_creations.html'], (_req, res) => res.sendFile(path.join(__dirname, 'my_creations_empty.html')));
+app.get(['/my_creations', '/my_creations.html'], (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'my_creations_empty.html')));
+
+// Helper: prevent browser from caching HTML pages (so JS fixes reach users immediately)
+function sendHtmlNoCache(res, filePath) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.set('Surrogate-Control', 'no-store');
+    res.sendFile(filePath);
+}
 
 // Filter Gallery (Public)
-app.get('/filter-gallery', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery.html')));
-app.get('/pricing', (_req, res) => res.sendFile(path.join(__dirname, 'pricing.html')));
-app.get('/profile', (_req, res) => res.sendFile(path.join(__dirname, 'profile.html')));
-app.get('/filter_gallery', (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery.html')));
+app.get('/filter-gallery', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery.html')));
+app.get('/pricing', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'pricing.html')));
+app.get('/profile', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'profile.html')));
+app.get('/filter_gallery', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery.html')));
 
 // Admin Login page (public — no guard)
-app.get('/admin-login', (_req, res) => res.sendFile(path.join(__dirname, 'admin-login.html')));
+app.get('/admin-login', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin-login.html')));
 
 // Admin Logout (GET) — clears cookie and redirects to login page
 app.get('/admin-logout', (_req, res) => {
@@ -411,20 +447,20 @@ app.post('/api/auth/admin-logout', (_req, res) => {
 });
 
 // Filter Gallery Admin (PROTECTED)
-app.get('/admin-gallery-filter', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin_gallery_filter.html')));
-app.get('/filter-gallery-admin', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_admin.html')));
-app.get('/filter_gallery_admin', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_admin.html')));
+app.get('/admin-gallery-filter', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_gallery_filter.html')));
+app.get('/filter-gallery-admin', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_admin.html')));
+app.get('/filter_gallery_admin', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_admin.html')));
 
 // Filter Gallery Factory (PROTECTED)
-app.get('/filter-gallery-factory', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_factory.html')));
-app.get('/filter_gallery_factory', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'filter_gallery_factory.html')));
+app.get('/filter-gallery-factory', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_factory.html')));
+app.get('/filter_gallery_factory', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_factory.html')));
 
 // Admin Creations (PROTECTED)
-app.get('/admin-creations', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin_creations.html')));
-app.get('/admin_creations', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin_creations.html')));
+app.get('/admin-creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_creations.html')));
+app.get('/admin_creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_creations.html')));
 
 // Admin Portal — central hub landing page (PROTECTED)
-app.get('/admin', requireAdminPage, (_req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
+app.get('/admin', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin.html')));
 
 // ------------------------------------------------------------------
 // Multer — accept up to 2 reference images in memory
@@ -552,6 +588,24 @@ async function deductCredits(email, amount, description) {
         const exists = await db.User.findOne({ email: key });
         if (!exists) return { success: false, error: 'User not found', balance: 0 };
         return { success: false, error: 'Insufficient credits', balance: exists.credits_balance };
+    }
+
+    // Also create a Transaction document so GET /api/user/transactions finds it.
+    // The embedded User.transactions array records history inside the User doc;
+    // the separate Transaction collection powers the frontend credit history modal.
+    try {
+        await db.Transaction.create({
+            invoice_number: 'usage_' + Date.now(),
+            email: key,
+            amount: -amount,
+            credits: -amount,
+            type: 'usage',
+            description: description || 'Credit Usage',
+            status: 'success',
+            created_at: new Date()
+        });
+    } catch (txnErr) {
+        console.error(`  [mongodb] Failed to create Transaction doc for deduction:`, txnErr.message);
     }
 
     console.log(`  [mongodb] -${amount} credits → ${key} (balance: ${user.credits_balance})`);
@@ -1678,6 +1732,9 @@ app.post('/api/generate', upload.fields([
         console.log(`  Filter title: "${filterTitle || '(none)'}"`);
         console.log(`  Lighting: "${lighting || 'none'}"`);
 
+        // --- Capture user email early (needed for placeholder + file naming) ---
+        const userEmail = req.headers['x-user-email'] || req.body.email || '';
+
         // --- Generate local tracking ID early (needed for file naming) --
         const localGenId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -1725,8 +1782,7 @@ app.post('/api/generate', upload.fields([
         const payload = buildGenerationPayload(finalPrompt, w, h, imageIds);
         const leonardoGenId = await createLeonardoGeneration(payload);
 
-        // --- Capture user email for file-prefix isolation ---
-        const userEmail = req.headers['x-user-email'] || req.body.email || '';
+        // --- Capture safe email prefix for file-prefix isolation ---
         const safeEmailPrefix = sanitizeEmail(userEmail);
         console.log(`  User email: ${userEmail} → prefix: ${safeEmailPrefix}`);
 
@@ -1896,17 +1952,23 @@ app.get('/api/user-creations', async (req, res) => {
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
-        // Build MongoDB query: user-generated types, exclude admin
+        // Build MongoDB query: user-generated types, exclude admin-owned records.
+        // For user-specific queries, match on EITHER the 'email' field OR the
+        // 'owner_email' field — records created via the filter gallery may have
+        // the user email in one field but not the other depending on the code path.
         const query = {
             owner_email: { $ne: ADMIN_EMAIL },
             type: { $in: ['bgswap', 'dresswap', 'filter-swap', 'filter-factory'] }
         };
 
-        // Filter by email if provided
         if (rawEmail) {
             const key = rawEmail.trim().toLowerCase();
             if (!key || key === 'guest_user') return res.json([]);
-            query.email = key;
+            // Match on both email and owner_email so no records are missed
+            query.$or = [
+                { email: key },
+                { owner_email: key }
+            ];
         }
 
         const records = await db.Generation.find(query)
@@ -1915,9 +1977,17 @@ app.get('/api/user-creations', async (req, res) => {
             .limit(limit)
             .lean();
 
-        const total = await db.Generation.countDocuments(query);
+        // Map to the exact shape the frontend expects:
+        // raw array of { id, url, name, createdAt }
+        const creations = records.map(r => ({
+            id: r.generation_id,
+            url: r.image_url || r.cover_image_url || '',
+            name: (r.title || r.prompt || r.generation_id || '').slice(0, 60),
+            createdAt: r.created_at
+        }));
 
-        res.json({ total, limit, offset, records });
+        console.log(`  [api/user-creations] ${rawEmail || '(all users)'} → ${creations.length} records`);
+        res.json(creations);
     } catch (err) {
         console.error('[/api/user-creations] Error:', err);
         res.status(500).json({ error: 'Failed to read user creation records' });
@@ -2801,7 +2871,7 @@ app.get('/api/admin-gallery-filter/images', async (req, res) => {
  *   width             (text, required)
  *   height            (text, required)
  */
-app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
+app.post('/api/admin-gallery-filter/swap', upload.fields([
     { name: 'referenceImage1', maxCount: 1 }
 ]), validateAndDeductCredits, async (req, res) => {
     let localGenId;
@@ -2825,17 +2895,26 @@ app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
             return res.status(400).json({ error: 'Subject image (Image Reference 1) is required.' });
         }
 
+        // ── Capture user email — admin or public user ──────────────
+        // Public users pass email via X-User-Email header (set by filter_gallery.html).
+        // Admin users already have a session cookie and may not send the header.
+        const isAdmin = verifyAdminCookie(req);
+        const ownerEmail = isAdmin
+            ? ADMIN_EMAIL
+            : (req.headers['x-user-email'] || req.body.email || '');
+
         const prompt = backgroundPrompt.trim();
 
         console.log(`\n=== Filter Gallery Swap ===`);
         console.log(`  Subject: ${subjectFile.originalname} (${(subjectFile.size / 1024).toFixed(1)} KB)`);
         console.log(`  Preset prompt: ${prompt.slice(0, 80)}…`);
         console.log(`  Dimensions: ${w}×${h} (${aspectRatio || 'N/A'})`);
+        console.log(`  User: ${ownerEmail || '(guest)'}  |  Admin: ${isAdmin}`);
 
         localGenId = `agfilter_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-        // Immediately persist a processing placeholder
-        insertProcessingPlaceholder(localGenId, 'filter-swap', prompt, w, h, ADMIN_EMAIL);
+        // Immediately persist a processing placeholder with the CORRECT owner email
+        insertProcessingPlaceholder(localGenId, 'filter-swap', prompt, w, h, ownerEmail);
 
         // Save subject locally
         const localPath1 = await saveReferenceImageLocally(subjectFile.buffer, localGenId, 1, subjectFile.mimetype);
@@ -2868,7 +2947,8 @@ app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
 
         const leonardoGenId = await createLeonardoGeneration(payload);
 
-        // Register for async background polling
+        // Register for async background polling — tag public users so the
+        // poll-completion handler stamps the correct owner_email at finish.
         activeGenerations.set(localGenId, {
             leonardoGenId,
             status: 'PENDING',
@@ -2879,7 +2959,11 @@ app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
             type: 'filter-swap',
             width: w,
             height: h,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            _userEmail: ownerEmail,
+            _safeEmailPrefix: sanitizeEmail(ownerEmail),
+            _publicUser: !isAdmin,
+            _adminSave: isAdmin
         });
 
         const persistedRefs = { ref1: localPath1, ref2: null };
@@ -2903,11 +2987,135 @@ app.post('/api/admin-gallery-filter/swap', requireAdminApi, upload.fields([
 });
 
 /**
+ * POST /api/filter-gallery/swap
+ * ------------------------------------------------------------------
+ * PUBLIC endpoint for the Filter Gallery.  Regular logged-in users
+ * (not admins) call this from filter_gallery.html.  It is identical
+ * to the admin-gallery-filter/swap pipeline but NEVER stamps records
+ * with the admin email and has NO admin middleware.
+ *
+ * Accepts multipart/form-data:
+ *   referenceImage1   (file, required) — new subject photo
+ *   backgroundPrompt  (text, required) — saved preset prompt
+ *   filterTitle       (text, optional) — preset name from the gallery card
+ *   aspectRatio       (text, required) — "2:3" | "4:5" | "4:3"
+ *   width             (text, required)
+ *   height            (text, required)
+ */
+app.post('/api/filter-gallery/swap', upload.fields([
+    { name: 'referenceImage1', maxCount: 1 }
+]), validateAndDeductCredits, async (req, res) => {
+    let localGenId;
+    try {
+        if (!LEONARDO_API_KEY) {
+            return res.status(500).json({ error: 'Server not configured. Set LEONARDO_API_KEY in .env' });
+        }
+
+        const { backgroundPrompt, filterTitle, aspectRatio, width, height } = req.body;
+        const w = parseInt(width, 10);
+        const h = parseInt(height, 10);
+        if (!w || !h || w < 64 || h < 64) {
+            return res.status(400).json({ error: 'Valid width and height are required.' });
+        }
+        if (!backgroundPrompt || !backgroundPrompt.trim()) {
+            return res.status(400).json({ error: 'Background prompt is required.' });
+        }
+
+        const subjectFile = req.files?.referenceImage1?.[0];
+        if (!subjectFile) {
+            return res.status(400).json({ error: 'Subject image (Image Reference 1) is required.' });
+        }
+
+        // This is a PUBLIC endpoint — always use the header/body email, NEVER admin.
+        const ownerEmail = req.headers['x-user-email'] || req.body.email || '';
+
+        const prompt = backgroundPrompt.trim();
+
+        console.log(`\n=== PUBLIC Filter Gallery Swap ===`);
+        console.log(`  Subject: ${subjectFile.originalname} (${(subjectFile.size / 1024).toFixed(1)} KB)`);
+        console.log(`  Preset prompt: ${prompt.slice(0, 80)}…`);
+        console.log(`  Dimensions: ${w}×${h} (${aspectRatio || 'N/A'})`);
+        console.log(`  User: ${ownerEmail || '(guest)'}`);
+
+        localGenId = `filterswap_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+        // Persist a processing placeholder with the USER's email
+        insertProcessingPlaceholder(localGenId, 'filter-swap', prompt, w, h, ownerEmail);
+
+        // Save subject locally
+        const localPath1 = await saveReferenceImageLocally(subjectFile.buffer, localGenId, 1, subjectFile.mimetype);
+
+        // Upload subject to Leonardo
+        const subjectImageId = await uploadImageToLeonardo(subjectFile.buffer, subjectFile.originalname, subjectFile.mimetype);
+        console.log(`  [filter-gallery] Subject Leonardo ID: ${subjectImageId}`);
+
+        // Build Leonardo payload
+        const payload = {
+            model: 'nano-banana-2',
+            public: false,
+            parameters: {
+                height: h,
+                width: w,
+                prompt_enhance: 'OFF',
+                quantity: 1,
+                style_ids: ['111dc692-d470-4eec-b791-3475abac4c46'],
+                prompt: prompt,
+                guidances: {
+                    image_reference: [{
+                        image: { id: subjectImageId, type: 'UPLOADED' },
+                        strength: 'HIGH'
+                    }]
+                }
+            }
+        };
+
+        console.log(`  [filter-gallery] prompt: ${prompt.slice(0, 120)}…`);
+
+        const leonardoGenId = await createLeonardoGeneration(payload);
+
+        // Register for async background polling — ALWAYS a public user
+        activeGenerations.set(localGenId, {
+            leonardoGenId,
+            status: 'PENDING',
+            imageUrl: null,
+            error: null,
+            prompt: prompt,
+            filterTitle: filterTitle || '',
+            type: 'filter-swap',
+            width: w,
+            height: h,
+            createdAt: Date.now(),
+            _userEmail: ownerEmail,
+            _safeEmailPrefix: sanitizeEmail(ownerEmail),
+            _publicUser: true,
+            _adminSave: false
+        });
+
+        const persistedRefs = { ref1: localPath1, ref2: null };
+        startBackgroundPoll(localGenId, leonardoGenId, persistedRefs);
+
+        console.log(`  [filter-gallery] → 202 Accepted — jobId: ${localGenId}\n`);
+        res.status(202).json({ jobId: localGenId });
+
+    } catch (err) {
+        console.error('[/api/filter-gallery/swap] Error:', err);
+        if (localGenId && activeGenerations.has(localGenId)) {
+            activeGenerations.get(localGenId).status = 'FAILED';
+            activeGenerations.get(localGenId).error = err.message || 'Internal server error';
+        }
+        if (req.creditCost && req.creditEmail) {
+            await refundCredits(req.creditEmail, req.creditCost);
+        }
+        res.status(500).json({ error: err.message || 'Internal server error' });
+    }
+});
+
+/**
  * GET /api/admin-gallery-filter/status/:generationId
  * ------------------------------------------------------------------
  * Returns the current status of an admin-gallery-filter swap generation.
  */
-app.get('/api/admin-gallery-filter/status/:generationId', requireAdminApi, (req, res) => {
+app.get('/api/admin-gallery-filter/status/:generationId', (req, res) => {
     const { generationId } = req.params;
     const record = activeGenerations.get(generationId);
     if (!record) {
@@ -3381,17 +3589,39 @@ async function validateAndDeductCredits(req, res, next) {
         return next();
     }
 
-    const userEmail = req.headers['x-user-email'] || req.body.email || '';
+    // Defensively capture user email from EVERY possible source.
+    // Public filter gallery sends X-User-Email header; other pages may use
+    // body.email or the alternate user-email header.  Log clearly so we can
+    // trace which source matched (or why none did).
+    const userEmail = req.body.email
+                   || req.headers['x-user-email']
+                   || req.headers['user-email']
+                   || '';
     if (!userEmail) {
+        console.warn('  [credits] ⚠ Email MISSING — checked body.email, x-user-email header, user-email header');
+        console.warn('  [credits]    Request path:', currentPath);
+        console.warn('  [credits]    Headers:', JSON.stringify(req.headers));
         return res.status(400).json({
             success: false,
             error: 'Email diperlukan',
-            message: 'Header X-User-Email diperlukan untuk validasi kredit.'
+            message: 'Email tidak ditemukan. Pastikan Anda sudah login atau kirim header X-User-Email.'
         });
+    } else {
+        console.log(`  [credits] Email resolved: "${userEmail}" (source: ${req.body.email ? 'body' : req.headers['x-user-email'] ? 'x-user-email header' : req.headers['user-email'] ? 'user-email header' : 'unknown'})`);
     }
 
     try {
         const user = await ensureUserExists(userEmail);
+
+        // Guard: if MongoDB is down, ensureUserExists returns null.
+        // Don't crash — return a clean 503 so the frontend can show a retry message.
+        if (!user) {
+            return res.status(503).json({
+                success: false,
+                error: 'Layanan sementara tidak tersedia',
+                message: 'Tidak dapat memverifikasi akun Anda. Silakan coba lagi dalam beberapa saat.'
+            });
+        }
 
         if (user.credits_balance < creditCost) {
             return res.status(402).json({
@@ -4179,6 +4409,7 @@ app.listen(PORT, () => {
     console.log('║    GET  /api/admin-gallery-filter/images  Filtered images  ║');
     console.log('║    POST /api/admin-gallery-filter/swap   Start agf-swap    ║');
     console.log('║    GET  /api/admin-gallery-filter/status/:id  Poll agf     ║');
+    console.log('║    POST /api/filter-gallery/swap         PUBLIC swap       ║');
     console.log('║    GET  /api/admin-creations  Admin-only creations          ║');
     console.log('║    POST /api/save-admin-generation  Save admin files       ║');
     console.log('║    POST /api/save-user-generation   Save user files         ║');

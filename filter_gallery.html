@@ -366,9 +366,14 @@
                     card.setAttribute('data-lighting', (record.lighting || '').toLowerCase());
                     card.setAttribute('data-id', filterId);
                     card.setAttribute('data-filter-id', filterId);
+                    var imgSrc = record.cover_image_path || record.image_url || '';
+                    // If it's a relative path (not a full URL), prefix with API_BASE
+                    if (imgSrc && !/^https?:\/\//i.test(imgSrc)) {
+                        imgSrc = API_BASE + '/' + imgSrc.replace(/^\//, '');
+                    }
                     card.innerHTML = `
                         <div class="w-full ${getAspectClass(record)} overflow-hidden">
-                            <img src="${record.cover_image_path || record.image_url}"
+                            <img src="${imgSrc}"
                                  alt="${safeTitle}"
                                  class="w-full h-full object-cover object-top"
                                  loading="lazy"
@@ -557,12 +562,21 @@
                 modalTitle.textContent = record.title || 'Background Filter';
             }
 
-            // AFTER â€” filter cover preview
+            // AFTER — filter cover preview (may be Cloudinary URL or local relative path)
             const coverPreview = document.getElementById('modal-cover-preview');
             const coverPlaceholder = document.getElementById('modal-cover-placeholder');
             const coverUrl = record.cover_image_path || record.image_url;
             if (coverPreview && coverUrl) {
-                coverPreview.src = coverUrl;
+                var resolvedCoverUrl = coverUrl;
+                if (!/^https?:\/\//i.test(resolvedCoverUrl)) {
+                    resolvedCoverUrl = API_BASE + '/' + coverUrl.replace(/^\//, '');
+                }
+                coverPreview.onerror = function() {
+                    coverPreview.classList.add('hidden');
+                    coverPreview.src = '';
+                    if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
+                };
+                coverPreview.src = resolvedCoverUrl;
                 coverPreview.classList.remove('hidden');
                 if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
             } else {
@@ -570,12 +584,26 @@
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
             }
 
-            // BEFORE â€” reference image or generic placeholder
+            // BEFORE — reference image or generic placeholder.
+            // reference_image_1_path may be a relative local path OR a full Cloudinary URL.
+            // Guard against broken images with an onerror fallback.
             const beforePreview = document.getElementById('modal-before-preview');
             const beforePlaceholder = document.getElementById('modal-before-placeholder');
             const beforeUrl = record.reference_image_1_path || record.reference_image_2_path || null;
             if (beforePreview && beforeUrl) {
-                beforePreview.src = `${API_BASE}/${beforeUrl}`;
+                // If the path is already a full URL (Cloudinary), use it directly;
+                // otherwise prefix with API_BASE for local relative paths.
+                var resolvedBeforeUrl = beforeUrl;
+                if (!/^https?:\/\//i.test(resolvedBeforeUrl)) {
+                    resolvedBeforeUrl = API_BASE + '/' + beforeUrl.replace(/^\//, '');
+                }
+                beforePreview.onerror = function() {
+                    // Image failed to load — fall back to placeholder silently
+                    beforePreview.classList.add('hidden');
+                    beforePreview.src = '';
+                    if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
+                };
+                beforePreview.src = resolvedBeforeUrl;
                 beforePreview.classList.remove('hidden');
                 if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
             } else {
@@ -607,28 +635,52 @@
             if (zone) { zone.classList.remove('upload-zone-filled', 'border-electric-cyan/50'); zone.classList.add('border-dashed', 'border-border-subtle'); }
             if (fileInput) fileInput.value = '';
             state.modalSubjectFile = null;
+            window._selectedFile = null;
         }
 
         window.handleModalFileSelect = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) { showCustomAlert('Silakan pilih file gambar yang valid (PNG, JPG, atau WEBP).'); event.target.value = ''; return; }
-            state.modalSubjectFile = file;
+            // event.target may be the <input> or could bubble — defensively get files
+            var input = event.target;
+            var file = (input.files && input.files[0]) || null;
+            if (!file) { console.warn('[FilterGallery] handleModalFileSelect: no file found on event.target'); return; }
+            if (!file.type || !file.type.startsWith('image/')) { showCustomAlert('Silakan pilih file gambar yang valid (PNG, JPG, atau WEBP).', 'File Tidak Valid'); input.value = ''; return; }
 
-            const preview = document.getElementById('modal-upload-preview');
-            const placeholder = document.getElementById('modal-upload-placeholder');
-            const removeBtn = document.getElementById('modal-upload-remove');
-            const zone = document.getElementById('modal-upload-zone');
-            if (preview && placeholder && removeBtn && zone) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result; preview.classList.remove('hidden');
-                    placeholder.classList.add('hidden'); removeBtn.classList.remove('hidden');
-                    zone.classList.add('upload-zone-filled', 'border-electric-cyan/50');
-                    zone.classList.remove('border-dashed', 'border-border-subtle');
+            // Store BOTH in state AND on window so the generate handler can never miss it
+            state.modalSubjectFile = file;
+            window._selectedFile = file;
+            console.log('[FilterGallery] File CAPTURED: ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB) | type=' + file.type + ' | state.modalSubjectFile=' + (state.modalSubjectFile ? 'SET' : 'NULL') + ' | window._selectedFile=' + (window._selectedFile ? 'SET' : 'NULL'));
+
+            var preview = document.getElementById('modal-upload-preview');
+            var placeholder = document.getElementById('modal-upload-placeholder');
+            var removeBtn = document.getElementById('modal-upload-remove');
+            var zone = document.getElementById('modal-upload-zone');
+
+            if (!preview) { console.warn('[FilterGallery] modal-upload-preview element MISSING'); return; }
+            if (!placeholder) { console.warn('[FilterGallery] modal-upload-placeholder element MISSING'); return; }
+            if (!removeBtn) { console.warn('[FilterGallery] modal-upload-remove element MISSING'); return; }
+            if (!zone) { console.warn('[FilterGallery] modal-upload-zone element MISSING'); return; }
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                preview.onerror = function() {
+                    preview.classList.add('hidden');
+                    preview.src = '';
+                    if (placeholder) placeholder.classList.remove('hidden');
                 };
-                reader.readAsDataURL(file);
-            }
+                placeholder.classList.add('hidden');
+                removeBtn.classList.remove('hidden');
+                zone.classList.add('upload-zone-filled', 'border-electric-cyan/50');
+                zone.classList.remove('border-dashed', 'border-border-subtle');
+                console.log('[FilterGallery] File preview RENDERED: ' + file.name);
+            };
+            reader.onerror = function() {
+                console.error('[FilterGallery] FileReader FAILED for: ' + file.name);
+                showCustomAlert('Gagal membaca file gambar. Pastikan file tidak rusak dan coba lagi.', 'File Error');
+                resetModalUpload();
+            };
+            reader.readAsDataURL(file);
         };
 
         window.removeModalSubject = function() { resetModalUpload(); };
@@ -667,59 +719,102 @@
         // =====================================================
 
         async function handleModalGenerate() {
-            // --- Login Gate ---
-            var activeEmail = localStorage.getItem('active_user_email') || '';
-            if (!activeEmail) {
-                showCustomAlert('Silakan masuk sesi (login) terlebih dahulu menggunakan email Anda sebelum memulai proses generate.');
-                if (typeof openMockLoginModal === 'function') openMockLoginModal();
-                return;
-            }
+            console.log('[FilterGallery] ======== GENERATE CLICKED ========');
 
-            if (!state.selectedRecord) { showCustomAlert('Silakan pilih background terlebih dahulu.'); return; }
-            if (!state.modalSubjectFile) { showCustomAlert('Silakan unggah foto <strong>THE GRADUATE (Image Reference 1)</strong> terlebih dahulu sebelum memproses.'); return; }
-
-            const genBtn = document.getElementById('modal-generate-btn');
-            if (genBtn) { genBtn.disabled = true; genBtn.classList.add('opacity-50'); }
-
+            // --- Guard: entire function wrapped in try/catch so NO crash goes silent ---
             try {
-                const formData = new FormData();
-                formData.append('referenceImage1', state.modalSubjectFile, state.modalSubjectFile.name);
+                // --- Login Gate ---
+                var activeEmail = localStorage.getItem('active_user_email') || '';
+                console.log('[FilterGallery] activeEmail:', activeEmail || '(empty)');
+                if (!activeEmail) {
+                    showCustomAlert('Silakan masuk sesi (login) terlebih dahulu menggunakan email Anda sebelum memulai proses generate.', 'Login Diperlukan');
+                    if (typeof openMockLoginModal === 'function') openMockLoginModal();
+                    return;
+                }
+
+                // ── Resolve the subject file from EVERY possible source ──
+                // window._selectedFile is set by handleModalFileSelect (in addition to state.modalSubjectFile).
+                // Use it as the primary reference so a scoping bug in `state` can't lose the file.
+                var subjectFile = window._selectedFile || state.modalSubjectFile || null;
+
+                console.log('[FilterGallery] state.selectedRecord:', state.selectedRecord ? 'present' : 'NULL');
+                console.log('[FilterGallery] window._selectedFile:', window._selectedFile ? (window._selectedFile.name + ' (' + (window._selectedFile.size/1024).toFixed(1) + ' KB)') : 'NULL');
+                console.log('[FilterGallery] state.modalSubjectFile:', state.modalSubjectFile ? (state.modalSubjectFile.name + ' (' + (state.modalSubjectFile.size/1024).toFixed(1) + ' KB)') : 'NULL');
+                console.log('[FilterGallery] resolved subjectFile:', subjectFile ? subjectFile.name : 'NULL');
+                console.log('[FilterGallery] state.modalRatio:', state.modalRatio);
+                console.log('[FilterGallery] state.modalDimensions:', JSON.stringify(state.modalDimensions));
+
+                if (!state.selectedRecord) { showCustomAlert('Silakan pilih background terlebih dahulu.', 'Pilih Background'); return; }
+                if (!subjectFile) {
+                    console.error('[FilterGallery] BLOCKED: subjectFile is NULL — both window._selectedFile and state.modalSubjectFile are empty');
+                    // Try to recover: grab the file directly from the DOM input as a last resort
+                    var fileInput = document.getElementById('modal-file-input');
+                    if (fileInput && fileInput.files && fileInput.files[0]) {
+                        subjectFile = fileInput.files[0];
+                        state.modalSubjectFile = subjectFile;
+                        window._selectedFile = subjectFile;
+                        console.log('[FilterGallery] RECOVERED file from DOM input:', subjectFile.name);
+                    } else {
+                        showCustomAlert('Silakan unggah foto <strong>THE GRADUATE (Image Reference 1)</strong> terlebih dahulu sebelum memproses.', 'Unggah Foto');
+                        return;
+                    }
+                }
+
+                // Guard: ensure modalDimensions is valid before calling .toString()
+                if (!state.modalDimensions || !state.modalDimensions.width || !state.modalDimensions.height) {
+                    console.warn('[FilterGallery] modalDimensions missing, falling back to default 2:3');
+                    state.modalDimensions = ASPECT_RATIO_DIMENSIONS['2:3'];
+                    state.modalRatio = '2:3';
+                }
+
+                var genBtn = document.getElementById('modal-generate-btn');
+                if (genBtn) { genBtn.disabled = true; genBtn.classList.add('opacity-50'); }
+
+                var formData = new FormData();
+                formData.append('referenceImage1', subjectFile, subjectFile.name);
                 formData.append('backgroundPrompt', state.selectedRecord.prompt || '');
                 formData.append('filterTitle', state.selectedRecord.title || '');
-                formData.append('aspectRatio', state.modalRatio);
-                formData.append('width', state.modalDimensions.width.toString());
-                formData.append('height', state.modalDimensions.height.toString());
+                formData.append('aspectRatio', state.modalRatio || '2:3');
+                formData.append('width', String(state.modalDimensions.width));
+                formData.append('height', String(state.modalDimensions.height));
 
-                const resp = await fetch(`${API_BASE}/api/admin-gallery-filter/swap`, { method: 'POST', headers: { 'X-User-Email': activeEmail }, body: formData });
+                // Log every FormData entry so we can verify the payload
+                console.log('[FilterGallery] FormData entries:');
+                var fdEntries = {};
+                formData.forEach(function(v, k) { fdEntries[k] = typeof v === 'object' ? ('[File: ' + v.name + ']') : v; });
+                console.log(JSON.stringify(fdEntries, null, 2));
+                console.log('[FilterGallery] → FETCH ' + API_BASE + '/api/filter-gallery/swap with X-User-Email: ' + activeEmail);
+
+                const resp = await fetch(API_BASE + '/api/filter-gallery/swap', {
+                    method: 'POST',
+                    headers: { 'X-User-Email': activeEmail },
+                    body: formData
+                });
+                console.log('[FilterGallery] ← RESPONSE status:', resp.status);
 
                 if (resp.status === 202) {
                     const { jobId } = await resp.json();
-                    console.log('Job accepted:', jobId);
+                    console.log('[FilterGallery] Job accepted:', jobId);
 
-                    // --- Save user generation data to backend (local file persistence) ---
+                    // --- Save user generation data to backend ---
                     try {
                         const userSaveForm = new FormData();
-                        userSaveForm.append('referenceImage', state.modalSubjectFile, state.modalSubjectFile.name);
+                        userSaveForm.append('referenceImage', subjectFile, subjectFile.name);
                         userSaveForm.append('prompt', state.selectedRecord.prompt || '');
                         userSaveForm.append('filterTitle', state.selectedRecord.title || '');
                         userSaveForm.append('jobId', jobId);
 
-                        const saveResp = await fetch(`${API_BASE}/api/save-user-generation`, {
+                        const saveResp = await fetch(API_BASE + '/api/save-user-generation', {
                             method: 'POST',
                             headers: { 'X-User-Email': activeEmail },
                             body: userSaveForm
                         });
-
-                        if (saveResp.ok) {
-                            console.log('[UserSave] Reference + prompt saved to local user directories.');
-                        } else {
-                            console.warn('[UserSave] Backend save returned:', saveResp.status);
-                        }
+                        console.log('[UserSave] status:', saveResp.status);
                     } catch (saveErr) {
-                        console.warn('[UserSave] Non-fatal: backend save failed:', saveErr.message);
+                        console.warn('[UserSave] Non-fatal:', saveErr.message);
                     }
 
-                    // --- Save to localStorage as a NORMAL user creation (NO admin email) ---
+                    // --- Save to localStorage ---
                     try {
                         var allCreations = JSON.parse(localStorage.getItem('all_creations') || '[]');
                         allCreations.push({
@@ -730,43 +825,46 @@
                             title: state.selectedRecord.title || 'Filter Gallery Creation',
                             prompt: state.selectedRecord.prompt || '',
                             tags: Array.isArray(state.selectedRecord.tags) ? state.selectedRecord.tags : ['Studio'],
-                            dimensions: state.modalDimensions.width + ' Ã— ' + state.modalDimensions.height,
+                            dimensions: state.modalDimensions.width + ' x ' + state.modalDimensions.height,
                             image_url: state.selectedRecord.cover_image_path || state.selectedRecord.image_url || '',
                             createdAt: Date.now(),
                             created_at: new Date().toISOString()
-                            // NOTE: owner_email intentionally omitted â€” this is a public user creation
                         });
                         localStorage.setItem('all_creations', JSON.stringify(allCreations));
-                        console.log('[UserSave] Creation saved to localStorage (public user).');
+                        console.log('[UserSave] localStorage saved.');
                     } catch (lsErr) {
-                        console.warn('[UserSave] localStorage save failed:', lsErr.message);
+                        console.warn('[UserSave] localStorage failed:', lsErr.message);
                     }
 
-                    // --- Redirect strictly to /gallery (public Creations), NEVER /admin-creations ---
-                    window.location.href = `/my-creations?pending=${encodeURIComponent(jobId)}`;
+                    window.location.href = '/my-creations?pending=' + encodeURIComponent(jobId);
                     return;
                 }
 
                 if (!resp.ok) {
-                    // 402 Payment Required â€” insufficient credits
                     if (resp.status === 402) {
                         const errData = await resp.json().catch(() => ({}));
-                        showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
+                        showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.', 'Kredit Tidak Mencukupi');
                         if (genBtn) { genBtn.disabled = false; genBtn.classList.remove('opacity-50'); }
                         return;
                     }
                     const errData = await resp.json().catch(() => ({}));
-                    throw new Error(errData.error || `Server returned ${resp.status}`);
+                    console.error('[FilterGallery] Server error ' + resp.status + ':', JSON.stringify(errData));
+                    const err = new Error(errData.error || 'Server returned ' + resp.status);
+                    err.httpStatus = resp.status;
+                    throw err;
                 }
 
                 const data = await resp.json();
-                const pendingId = data.jobId || data.generationId;
-                console.log('Job accepted (fallback):', pendingId);
-                window.location.href = `/my-creations?pending=${encodeURIComponent(pendingId)}`;
+                var pendingId = data.jobId || data.generationId;
+                console.log('[FilterGallery] Job accepted (fallback):', pendingId);
+                window.location.href = '/my-creations?pending=' + encodeURIComponent(pendingId);
 
             } catch (error) {
-                console.error('Filter swap failed:', error);
-                showCustomAlert('Generasi gagal: ' + (error.message || 'Unknown error'));
+                console.error('[FilterGallery] ======== CRASH in handleModalGenerate ========');
+                console.error('[FilterGallery] Error:', error.message);
+                console.error('[FilterGallery] Stack:', error.stack);
+                showCustomAlert('Generasi gagal: ' + (error.message || 'Unknown error'), 'Generasi Gagal');
+                var genBtn = document.getElementById('modal-generate-btn');
                 if (genBtn) { genBtn.disabled = false; genBtn.classList.remove('opacity-50'); }
             }
         }
@@ -793,11 +891,13 @@
         // INIT
         // =====================================================
 
-        window.showCustomAlert = function(message) {
+        window.showCustomAlert = function(message, title) {
             var modal = document.getElementById('custom-alert-modal');
             var messageEl = document.getElementById('custom-alert-message');
+            var titleEl = document.getElementById('custom-alert-title');
             if (!modal || !messageEl) return;
             messageEl.innerHTML = message;
+            if (titleEl && title) titleEl.textContent = title;
             modal.classList.remove('hidden');
             var card = modal.querySelector('div');
             if (card) {
@@ -829,6 +929,17 @@
             const genBtn = document.getElementById('modal-generate-btn');
             if (genBtn) genBtn.addEventListener('click', handleModalGenerate);
 
+            // Wire file input via addEventListener as BACKUP for the inline onchange
+            const fileInput = document.getElementById('modal-file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(evt) {
+                    if (!state.modalSubjectFile && !window._selectedFile) {
+                        console.warn('[FilterGallery] Backup change listener: inline onchange did NOT set file — capturing now');
+                        handleModalFileSelect(evt);
+                    }
+                });
+            }
+
             console.log('Filter Gallery (Public) initialized.');
         }
 
@@ -841,9 +952,9 @@
 <div id="custom-alert-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
     <div class="bg-slate-900 border border-cyan-500/30 shadow-2xl shadow-cyan-500/10 rounded-3xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-5 transition-all transform scale-95 duration-300">
         <div class="h-16 w-16 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20 text-cyan-400 text-2xl animate-pulse">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+            <i id="custom-alert-icon" class="fa-solid fa-triangle-exclamation"></i>
         </div>
-        <h3 class="text-xl font-bold text-white tracking-wide">Unggah Foto Terlebih Dahulu</h3>
+        <h3 id="custom-alert-title" class="text-xl font-bold text-white tracking-wide">Pemberitahuan</h3>
         <p id="custom-alert-message" class="text-slate-400 text-sm leading-relaxed px-2">Please upload a subject image first.</p>
         <button id="custom-alert-close" onclick="closeCustomAlert()" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 text-xs tracking-wider uppercase">
             Mengerti

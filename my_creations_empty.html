@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>My Creations â€” fotowisuda.ai</title>
+<title>My Creations — fotowisuda.ai</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -196,7 +196,7 @@
     </button>
     <span style="font-size:20px;font-weight:700;color:#fff;">fotowisuda.ai</span>
   </div>
-  <span style="font-size:11px;color:#8B949E;" id="user-badge">â€”</span>
+  <span style=”font-size:11px;color:#8B949E;” id=”user-badge”>—</span>
 </header>
 
 <!-- MAIN -->
@@ -204,7 +204,7 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
     <div>
       <h2 style="font-size:24px;font-weight:700;margin:0;">My Creations</h2>
-      <p style="color:#8B949E;font-size:13px;margin:4px 0 0 0;"><span id="gallery-count" style="color:#00D1FF;font-weight:700;">â€”</span> Generations stored</p>
+      <p style="color:#8B949E;font-size:13px;margin:4px 0 0 0;"><span id="gallery-count" style="color:#00D1FF;font-weight:700;">—</span> Generations stored</p>
     </div>
     <button onclick="loadGallery()" style="background:#161B22;border:1px solid #30363D;color:#8B949E;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;">Refresh</button>
   </div>
@@ -220,7 +220,7 @@
   <button class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
   <button class="preview-nav prev" onclick="event.stopPropagation();navPreview(-1)"><i class="fa-solid fa-chevron-left"></i></button>
   <button class="preview-nav next" onclick="event.stopPropagation();navPreview(1)"><i class="fa-solid fa-chevron-right"></i></button>
-  <span class="preview-counter" id="preview-counter">â€”</span>
+  <span class="preview-counter" id="preview-counter">—</span>
   <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:100%;max-height:100%;" onclick="event.stopPropagation()">
     <img id="preview-img" src="" alt="Preview" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:16px;">
     <div style="display:flex;gap:12px;">
@@ -248,7 +248,7 @@
 
 <script>
 // ============================================================
-// SIMPLE, DIRECT GALLERY â€” no IIFE closures, no Tailwind tricks
+// SIMPLE, DIRECT GALLERY — no IIFE closures, no Tailwind tricks
 // ============================================================
 var _creations = [];
 var _previewIdx = -1;
@@ -364,6 +364,7 @@ function getJobTypeLabel(genId) {
   if (genId.indexOf('bgswap_')===0)   return 'Background Change';
   if (genId.indexOf('dresswap_')===0) return 'Dress Replicate';
   if (genId.indexOf('agfilter_')===0) return 'Filter Gallery';
+  if (genId.indexOf('filterswap_')===0) return 'Filter Gallery';
   if (genId.indexOf('gen_')===0)      return 'Filter Gallery Factory';
   return 'Processing';
 }
@@ -373,6 +374,7 @@ function getStatusEndpoint(genId) {
   if (genId.indexOf('bgswapc_')===0)  return '/api/background-swap/status/';
   if (genId.indexOf('dresswap_')===0) return '/api/dress-swap/status/';
   if (genId.indexOf('agfilter_')===0) return '/api/admin-gallery-filter/status/';
+  if (genId.indexOf('filterswap_')===0) return '/api/status/';
   return '/api/status/';
 }
 
@@ -385,10 +387,10 @@ function formatTimer(ms) {
 }
 
 var _statusMessages = [
-  { atSec:0,   status:'Menganalisa struktur wajah kamuâ€¦', sub:'AI sedang mendeteksi fitur wajah dari foto referensi' },
-  { atSec:20,  status:'Menyelaraskan kebaya/toga wisudaâ€¦', sub:'Menyesuaikan pose & busana dengan latar tujuan' },
-  { atSec:60,  status:'Menata pencahayaan latar studioâ€¦', sub:'Mengomposisikan tata cahaya & bayangan natural' },
-  { atSec:120, status:'Sentuhan akhir â€” siap meluncur!', sub:'Merender hasil akhir dalam kualitas HD penuh' }
+  { atSec:0,   status:'Menganalisa struktur wajah kamu…', sub:'AI sedang mendeteksi fitur wajah dari foto referensi' },
+  { atSec:20,  status:'Menyelaraskan kebaya/toga wisuda…', sub:'Menyesuaikan pose & busana dengan latar tujuan' },
+  { atSec:60,  status:'Menata pencahayaan latar studio…', sub:'Mengomposisikan tata cahaya & bayangan natural' },
+  { atSec:120, status:'Sentuhan akhir — siap meluncur!', sub:'Merender hasil akhir dalam kualitas HD penuh' }
 ];
 
 function getStatusMessage(elapsedMs) {
@@ -413,7 +415,7 @@ function buildProcessingCardHtml(item) {
             '<i class="fa-solid fa-wand-magic-sparkles"></i>'+
           '</div>'+
         '</div>'+
-        '<span class="processing-label" id="status-'+genId+'">Menganalisa struktur wajah kamuâ€¦</span>'+
+        '<span class="processing-label" id="status-'+genId+'">Menganalisa struktur wajah kamu…</span>'+
         '<span class="processing-sub" id="sub-'+genId+'">AI sedang mendeteksi fitur wajah dari foto referensi</span>'+
       '</div>'+
     '</div>'+
@@ -589,7 +591,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
       if (status === 'COMPLETE') {
         clearTimers(generationId);
         if (statusEl) statusEl.textContent = 'Selesai!';
-        if (subEl)    subEl.textContent    = 'Memuat hasil akhirâ€¦';
+        if (subEl)    subEl.textContent    = 'Memuat hasil akhir…';
         if (spinnerEl) spinnerEl.style.display = 'none';
         if (dotEl)    { dotEl.style.background = '#22c55e'; dotEl.style.animation = 'none'; }
 
@@ -611,7 +613,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
         }, 800);
       } else if (status === 'FAILED') {
         clearTimers(generationId);
-        if (statusEl) { statusEl.textContent = 'Gagal â€” Error Server'; statusEl.style.color = '#ffb4ab'; }
+        if (statusEl) { statusEl.textContent = 'Gagal — Error Server'; statusEl.style.color = '#ffb4ab'; }
         if (subEl)    { subEl.textContent = data.error || 'Terjadi kesalahan di server'; }
         if (dotEl)    { dotEl.classList.add('error-dot'); }
         if (timerEl)  timerEl.textContent = '--:--.--';
@@ -621,7 +623,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
         setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); updateGalleryCount(); }, 10000);
       }
     }).catch(function() {
-      // Network glitch â€” retry next interval
+      // Network glitch — retry next interval
     });
   }, POLL_INTERVAL);
 }
