@@ -853,11 +853,8 @@
             state.isGenerating = true;
             disableGenerateButton(true);
 
-            // Transition UI to processing
-            showProcessing();
-            updateStatus('PENDING');
-            updateProgress(2, 'Building request payload...', 'Initializing pipeline...');
-
+            // ── Show full-screen loading overlay ──
+            showGeneratingOverlay();
             try {
                 // --- Build FormData ---------------------------------
                 const formData = new FormData();
@@ -867,33 +864,27 @@
                 formData.append('width',  state.selectedDimensions.width.toString());
                 formData.append('height', state.selectedDimensions.height.toString());
 
-                // --- Fire the Dress Swap orchestral POST -------------
-                updateProgress(5, 'Uploading to orchestration engine...', 'Sending to server...');
-
-                const genResp = await fetch(`${API_BASE}/api/dress-swap/generate`, {
+                // --- Fire API + minimum 3.5s display timer ----------
+                const MIN_DISPLAY_MS = 3500;
+                const apiPromise = fetch(`${API_BASE}/api/dress-swap/generate`, {
                     method: 'POST',
                     headers: { 'X-User-Email': activeEmail },
                     body: formData
                 });
+                const timerPromise = new Promise(function(r) { setTimeout(r, MIN_DISPLAY_MS); });
+                const [genResp] = await Promise.all([apiPromise, timerPromise]);
 
                 if (!genResp.ok) {
+                    await hideGeneratingOverlay();
                     // 402 Payment Required â€” insufficient credits
                     if (genResp.status === 402) {
                         const errData = await genResp.json().catch(() => ({}));
                         showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
-                        showPlaceholder();
-                        updateStatus('IDLE');
-                        updateProgress(0, '', '');
-                        disableDownload();
                         return;
                     }
                     // 503 Service Unavailable â€” show friendly Indonesian modal, block redirect
                     if (genResp.status === 503) {
                         showErrorModal503();
-                        showPlaceholder();
-                        updateStatus('IDLE');
-                        updateProgress(0, '', '');
-                        disableDownload();
                         return; // stop â€” no polling, user can retry
                     }
                     const errData = await genResp.json().catch(() => ({}));
@@ -919,15 +910,14 @@
                     localStorage.setItem('all_creations', JSON.stringify(queue));
                 } catch (_) {}
 
-                // Show success toast then redirect to Creations
-                showToast('Permintaan diterima! Foto wisudamu sedang dimasak, halaman akan dialihkan ke Creations...');
-                setTimeout(() => {
-                    window.location.href = '/my-creations?pending=' + generationId;
-                }, 1800);
+                // Navigate to Creations after overlay fade-out
+                await hideGeneratingOverlay();
+                window.location.href = '/my-creations?pending=' + generationId;
                 return;
 
             } catch (error) {
                 console.error('Dress swap failed:', error);
+                await hideGeneratingOverlay();
                 handleError(error.message || 'An unexpected error occurred.');
             } finally {
                 state.isGenerating = false;
@@ -1458,5 +1448,93 @@
 
 </div>
 <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('dress-swap');});</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     GENERATING LOADING OVERLAY
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+    @keyframes genOverlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes genOverlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes genPulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+    @keyframes genRingPulse {
+        0% { transform: scale(0.9); opacity: 0.4; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.4; }
+    }
+    @keyframes genSpin { to { transform: rotate(360deg); } }
+    .gen-overlay-enter { animation: genOverlayFadeIn 0.35s ease-out forwards; }
+    .gen-overlay-exit  { animation: genOverlayFadeOut 0.3s ease-in forwards; }
+    .gen-text-pulse { animation: genPulse 2s ease-in-out infinite; }
+</style>
+
+<div id="generating-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(10,12,16,0.94); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); flex-direction:column; align-items:center; justify-content:center; gap:24px;">
+    <div style="position:relative; width:80px; height:80px;">
+        <div style="position:absolute; inset:0; border-radius:50%; border:3px solid rgba(0,209,255,0.12);"></div>
+        <div style="position:absolute; inset:0; border-radius:50%; border:3px solid transparent; border-top-color:#00D1FF; animation:genSpin 0.8s linear infinite;"></div>
+        <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid rgba(157,91,255,0.12);"></div>
+        <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid transparent; border-bottom-color:#9D5BFF; animation:genSpin 1.2s linear infinite reverse;"></div>
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+            <span style="font-size:22px;">✨</span>
+        </div>
+    </div>
+    <div style="text-align:center; max-width:320px;">
+        <p id="generating-main-text" style="font-size:18px; font-weight:700; color:#F0F6FC; margin:0 0 8px 0;" class="gen-text-pulse">AI sedang bekerja sihirnya...</p>
+        <p style="font-size:13px; color:#8B949E; margin:0; line-height:1.5;">Mohon tunggu sebentar, mahakarya Anda sedang diproses oleh AI</p>
+    </div>
+    <div id="generating-dots" style="display:flex; gap:6px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#00D1FF;animation:genRingPulse 1.4s ease-in-out infinite;"></div>
+        <div style="width:6px;height:6px;border-radius:50%;background:#9D5BFF;animation:genRingPulse 1.4s ease-in-out 0.2s infinite;"></div>
+        <div style="width:6px;height:6px;border-radius:50%;background:#00D1FF;animation:genRingPulse 1.4s ease-in-out 0.4s infinite;"></div>
+    </div>
+</div>
+
+<script>
+var _genOverlayVisible = false;
+var _genOverlayMessages = [
+    'AI sedang bekerja sihirnya...',
+    'Menyiapkan mahakarya Anda...',
+    'Mengomposisikan pencahayaan...',
+    'Sentuhan akhir — hampir selesai!'
+];
+var _genOverlayMsgIdx = 0;
+var _genOverlayMsgTimer = null;
+
+function showGeneratingOverlay() {
+    if (_genOverlayVisible) return;
+    _genOverlayVisible = true;
+    var overlay = document.getElementById('generating-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    overlay.classList.remove('gen-overlay-exit');
+    overlay.classList.add('gen-overlay-enter');
+    _genOverlayMsgIdx = 0;
+    var mainText = document.getElementById('generating-main-text');
+    if (mainText) mainText.textContent = _genOverlayMessages[0];
+    _genOverlayMsgTimer = setInterval(function() {
+        _genOverlayMsgIdx = (_genOverlayMsgIdx + 1) % _genOverlayMessages.length;
+        if (mainText) mainText.textContent = _genOverlayMessages[_genOverlayMsgIdx];
+    }, 3000);
+    document.body.style.overflow = 'hidden';
+}
+
+function hideGeneratingOverlay() {
+    return new Promise(function(resolve) {
+        if (!_genOverlayVisible) { resolve(); return; }
+        _genOverlayVisible = false;
+        if (_genOverlayMsgTimer) { clearInterval(_genOverlayMsgTimer); _genOverlayMsgTimer = null; }
+        var overlay = document.getElementById('generating-overlay');
+        if (!overlay) { resolve(); return; }
+        overlay.classList.remove('gen-overlay-enter');
+        overlay.classList.add('gen-overlay-exit');
+        setTimeout(function() {
+            overlay.style.display = 'none';
+            overlay.classList.remove('gen-overlay-exit');
+            document.body.style.overflow = '';
+            resolve();
+        }, 300);
+    });
+}
+</script>
 </body>
 </html>
