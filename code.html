@@ -13,6 +13,9 @@
     <!-- Tailwind CSS CDN with Forms + Container Queries plugins -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <!-- Tailwind Configuration: DESIGN.md colors, typography, spacing, radii -->
     <script id="tailwind-config">
         try {
@@ -487,13 +490,13 @@
                             '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
                         '</div>' +
                     '</div>' +
-                    '<button onclick="handleMockLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
+                    '<button onclick="doLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +
                         '<i class="fa-solid fa-right-from-bracket"></i>' +
                         '<span>Keluar Sesi</span>' +
                     '</button>' +
                 '</div>';
             } else {
-                container.innerHTML = '<button onclick="openMockLoginModal()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
+                container.innerHTML = '<button onclick="triggerGoogleSignIn()" class="flex items-center justify-center gap-3 w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all shadow-md active:scale-95">' +
                     '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
                         '<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>' +
                         '<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>' +
@@ -505,12 +508,74 @@
             }
         }
 
+        // ═══ Google Identity Services — Sign in with Google ═══
+        var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
+
+        function initGoogleSignIn() {
+            if (window.google && google.accounts && google.accounts.id) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse,
+                    context: 'signin',
+                    ux_mode: 'popup'
+                });
+                console.log('[GSI] Google Sign-In initialized on dashboard');
+            } else {
+                setTimeout(initGoogleSignIn, 500);
+            }
+        }
+
+        function triggerGoogleSignIn() {
+            if (window.google && google.accounts && google.accounts.id) {
+                google.accounts.id.prompt();
+            } else {
+                alert('⚠️ Google Sign-In sedang dimuat. Silakan coba lagi dalam beberapa detik.');
+            }
+        }
+
+        async function handleCredentialResponse(response) {
+            console.log('[GSI] Credential received, verifying with server...');
+            try {
+                var resp = await fetch(API_BASE + '/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken: response.credential })
+                });
+                var data = await resp.json();
+
+                if (!data.success) {
+                    alert('❌ Google Sign-In gagal: ' + (data.error || 'Unknown error'));
+                    return;
+                }
+
+                safeStorage.setItem('active_user_email', data.email);
+                alert('✅ Login Berhasil! Selamat datang, ' + (data.email || ''));
+
+                // Update the UI
+                renderAuthContainer();
+                fetchCreditBalance();
+                if (window._refreshCredits) window._refreshCredits();
+                if (window._renderUserProfile) window._renderUserProfile();
+            } catch (err) {
+                console.error('[GSI] Error:', err.message);
+                alert('❌ Kesalahan jaringan: ' + err.message);
+            }
+        }
+
+        function doLogout() {
+            safeStorage.removeItem('active_user_email');
+            renderAuthContainer();
+            fetchCreditBalance();
+            if (window._renderUserProfile) window._renderUserProfile();
+        }
+
         function initSession() {
             renderAuthContainer();
         }
 
         function init() {
             initSession();
+            initGoogleSignIn();
             cacheDomReferences();
             initSidebarToggle();
             checkBackendHealth();
@@ -549,7 +614,7 @@
         // â•â•â• Package Selection Modal â•â•â•
         window.openTopUpModal = function() {
             var email = getActiveEmail();
-            if (!email) { if (typeof openMockLoginModal === 'function') openMockLoginModal(); return; }
+            if (!email) { triggerGoogleSignIn(); return; }
             var modal = document.getElementById('top-up-modal');
             var inner = document.getElementById('top-up-modal-inner');
             var packagesEl = document.getElementById('top-up-packages');

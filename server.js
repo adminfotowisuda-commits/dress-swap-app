@@ -35,6 +35,7 @@ const fs       = require('fs');
 const crypto   = require('crypto');
 const sharp    = require('sharp');
 const { GoogleGenAI } = require('@google/genai');
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
 // ═══ CRASH PREVENTION — keep the server alive no matter what ═══
@@ -99,6 +100,9 @@ const DOKU_API_KEY              = process.env.DOKU_API_KEY || '';
 const DOKU_SECRET_KEY           = process.env.DOKU_SECRET_KEY || process.env.DOKU_ACTIVE_SECRET_KEY || '';
 const DOKU_MERCHANT_PRIVATE_KEY_PATH = process.env.DOKU_MERCHANT_PRIVATE_KEY_PATH || './keys/merchant-private.pem';
 const DOKU_PUBLIC_KEY_PATH      = process.env.DOKU_PUBLIC_KEY_PATH || './keys/doku-public.pem';
+const GOOGLE_CLIENT_ID          = process.env.GOOGLE_CLIENT_ID || '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
+const googleAuthClient          = new OAuth2Client(GOOGLE_CLIENT_ID);
+
 const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api.doku.com';
 const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authorization/v1/access-token/b2b';
 const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
@@ -3643,6 +3647,123 @@ app.post('/api/auth/login', (req, res) => {
         return res.status(500).json({
             success: false,
             error: 'Server crashed during login.',
+            details: err.message || 'Unknown error'
+        });
+    }
+});
+
+/**
+ * POST /api/auth/google
+ * ------------------------------------------------------------------
+ * Authenticates (or auto-registers) a user via Google Identity Services.
+ * Body: { idToken: "<Google ID token>" }
+ *
+ * On success returns the same shape as /api/auth/login:
+ *   { success: true, email, credits_balance, created_at }
+ *
+ * New Google users receive 20 default credits and a random password.
+ */
+app.post('/api/auth/google', async (req, res) => {
+    console.log('[GOOGLE AUTH] ======== INCOMING GOOGLE AUTH REQUEST ========');
+
+    try {
+        // Guard: req.body might be undefined if JSON parse failed
+        if (!req.body || typeof req.body !== 'object') {
+            console.log('[GOOGLE AUTH] FAIL — req.body is not an object');
+            return res.status(400).json({ success: false, error: 'Invalid request body. Expected JSON.' });
+        }
+
+        const { idToken } = req.body;
+        if (!idToken || typeof idToken !== 'string') {
+            console.log('[GOOGLE AUTH] FAIL — missing or invalid idToken');
+            return res.status(400).json({ success: false, error: 'Google ID token is required.' });
+        }
+
+        // Verify the Google ID token
+        console.log('[GOOGLE AUTH] Verifying ID token with Google...');
+        let payload;
+        try {
+            const ticket = await googleAuthClient.verifyIdToken({
+                idToken: idToken,
+                audience: GOOGLE_CLIENT_ID
+            });
+            payload = ticket.getPayload();
+        } catch (verifyErr) {
+            console.error('[GOOGLE AUTH] Token verification failed:', verifyErr.message);
+            return res.status(401).json({ success: false, error: 'Google authentication failed. Token tidak valid.' });
+        }
+
+        const googleEmail = (payload.email || '').trim().toLowerCase();
+        if (!googleEmail) {
+            console.log('[GOOGLE AUTH] FAIL — no email in Google payload');
+            return res.status(400).json({ success: false, error: 'Google account does not have a verified email.' });
+        }
+
+        console.log(`[GOOGLE AUTH] Verified Google email: ${googleEmail}`);
+        console.log(`[GOOGLE AUTH] Name: ${payload.name || '(not provided)'}`);
+
+        // Look up or create user in database.json
+        let db;
+        try {
+            db = readCreditsDB();
+        } catch (readErr) {
+            console.error('[GOOGLE AUTH] CRITICAL — cannot read database.json:', readErr.message);
+            return res.status(500).json({ success: false, error: 'Database error. Please try again later.' });
+        }
+
+        if (!db.users || typeof db.users !== 'object') {
+            db.users = {};
+        }
+
+        const key = googleEmail;
+        let isNewUser = false;
+
+        if (db.users[key]) {
+            // Existing user — log them in (no password check for Google auth)
+            console.log('[GOOGLE AUTH] Existing user found:', key);
+        } else {
+            // New user — create account with 20 default credits
+            console.log('[GOOGLE AUTH] New Google user — creating account:', key);
+            const randomPassword = crypto.randomBytes(16).toString('hex');
+            db.users[key] = {
+                email: key,
+                password: randomPassword,
+                credits_balance: 20,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            isNewUser = true;
+
+            try {
+                writeCreditsDB(db);
+                console.log(`[GOOGLE AUTH] New user written to database.json: ${key} (20 credits)`);
+            } catch (writeErr) {
+                console.error('[GOOGLE AUTH] CRITICAL — cannot write database.json:', writeErr.message);
+                return res.status(500).json({ success: false, error: 'Gagal menyimpan data. Silakan coba lagi.' });
+            }
+        }
+
+        const responsePayload = {
+            success: true,
+            email: key,
+            credits_balance: db.users[key].credits_balance || 0,
+            created_at: db.users[key].created_at || new Date().toISOString(),
+            is_new_user: isNewUser
+        };
+        console.log('[GOOGLE AUTH] SUCCESS — responding with:', JSON.stringify(responsePayload));
+        return res.json(responsePayload);
+
+    } catch (err) {
+        console.error('');
+        console.error('╔══════════════════════════════════════════════════════╗');
+        console.error('║  [GOOGLE AUTH CRASH DETECTED]                        ║');
+        console.error('╚══════════════════════════════════════════════════════╝');
+        console.error('[GOOGLE AUTH CRASH] Message:', err.message);
+        console.error('[GOOGLE AUTH CRASH] Stack:', err.stack);
+        console.error('');
+        return res.status(500).json({
+            success: false,
+            error: 'Server crashed during Google authentication.',
             details: err.message || 'Unknown error'
         });
     }

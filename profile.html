@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-background":"#0A0C10","surface-card":"#161B22","border-subtle":"#30363D","text-primary":"#F0F6FC","text-secondary":"#8B949E","electric-cyan":"#00D1FF","vivid-purple":"#9D5BFF"}}}}</script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         html,body{background:#0A0C10;color:#F0F6FC;font-family:Inter,system-ui,sans-serif;margin:0}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -53,6 +54,15 @@
                 <p id="login-error" style="font-size:11px;color:#ffb4ab;display:none;text-align:center;"></p>
                 <button type="submit" id="login-submit-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,#00D1FF,#9D5BFF);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(0,209,255,0.2);" onmouseover="this.style.boxShadow='0 6px 24px rgba(157,91,255,0.3)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 16px rgba(0,209,255,0.2)';this.style.transform='translateY(0)'">Masuk</button>
             </form>
+
+            <!-- Google Sign-In divider + button -->
+            <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+                <div style="flex:1;height:1px;background:#30363D;"></div>
+                <span style="font-size:10px;color:#5c6370;font-weight:600;text-transform:uppercase;white-space:nowrap;">atau lanjutkan dengan</span>
+                <div style="flex:1;height:1px;background:#30363D;"></div>
+            </div>
+            <div id="g_id_signin_wrapper" style="display:flex;justify-content:center;margin-top:12px;min-height:40px;"></div>
+
             <p style="font-size:10px;color:#8B949E;text-align:center;margin-top:16px;">Belum punya akun? Masukkan email dan password baru untuk mendaftar otomatis.</p>
         </div>
 
@@ -228,6 +238,58 @@ var API_BASE = window.location.origin;
 function getEmail() { try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; } }
 function setEmail(e) { try { localStorage.setItem('active_user_email', e); } catch(_) {} }
 function clearEmail() { try { localStorage.removeItem('active_user_email'); } catch(_) {} }
+
+// ═══ Google Identity Services — Sign in with Google ═══
+var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
+
+function initGoogleSignIn() {
+    if (window.google && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleCredentialResponse,
+            context: 'signin',
+            ux_mode: 'popup'
+        });
+        google.accounts.id.renderButton(
+            document.getElementById('g_id_signin_wrapper'),
+            { type: 'standard', theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'rectangular', width: '300' }
+        );
+        console.log('[GSI] Google Sign-In initialized on profile page');
+    } else {
+        // Retry after GSI script loads
+        setTimeout(initGoogleSignIn, 500);
+    }
+}
+
+async function handleCredentialResponse(response) {
+    console.log('[GSI] Credential received, verifying with server...');
+    try {
+        var resp = await fetch(API_BASE + '/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken: response.credential })
+        });
+        var data = await resp.json();
+
+        if (!data.success) {
+            alert('❌ Google Sign-In gagal: ' + (data.error || 'Unknown error'));
+            return;
+        }
+
+        setEmail(data.email);
+        alert('✅ Login Berhasil! Selamat datang, ' + (data.email || ''));
+
+        // Update sidebar dynamically
+        if (window._refreshCredits) window._refreshCredits();
+        if (window._renderUserProfile) window._renderUserProfile();
+
+        // Transition to profile view
+        loadProfile();
+    } catch (err) {
+        console.error('[GSI] Error:', err.message);
+        alert('❌ Kesalahan jaringan: ' + err.message + '\n\nSilakan muat ulang halaman dan coba lagi.');
+    }
+}
 
 function showLoginState() {
     document.getElementById('login-state').style.display = 'block';
@@ -577,6 +639,9 @@ document.head.appendChild(style);
     } else {
         console.error('[profile] FATAL — #login-form not found in DOM');
     }
+
+    // Initialize Google Sign-In
+    initGoogleSignIn();
 })();
 </script>
 </body>
