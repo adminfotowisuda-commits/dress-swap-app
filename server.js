@@ -2834,11 +2834,14 @@ app.get('/api/admin-gallery-filter/images', async (req, res) => {
 
         const total = await db.Generation.countDocuments(query);
 
-        // Enrich with fallback title + tags
+        // Enrich with fallback title, tags, and dimensions for records saved
+        // before these fields were added to the Mongoose schema (strict mode
+        // was silently dropping them).
         const enriched = records.map(r => ({
             ...r,
-            title: r.title || (r.prompt ? r.prompt.substring(0, 30).replace(/\n/g, ' ').trim() + '…' : 'Untitled'),
-            tags: (Array.isArray(r.tags) && r.tags.length > 0) ? r.tags : ['Studio', 'Indoor']
+            title: r.title || r.filterTitle || (r.prompt ? r.prompt.substring(0, 30).replace(/\n/g, ' ').trim() + '…' : 'Untitled'),
+            tags: (Array.isArray(r.tags) && r.tags.length > 0) ? r.tags : ['Studio', 'Indoor'],
+            dimensions: r.dimensions || r.ratio || (r.width && r.height ? r.width + ' × ' + r.height : '')
         }));
 
         res.json({ total, limit, offset, records: enriched });

@@ -13,9 +13,13 @@ const generationSchema = new mongoose.Schema({
     status:          { type: String, enum: ['processing', 'COMPLETE', 'FAILED', 'PENDING'], default: 'processing' },
     prompt:          { type: String, default: '' },
     negative_prompt: { type: String, default: '' },
+    title:           { type: String, default: '' },
     filterTitle:     { type: String, default: '' },
+    tags:            { type: [String], default: [] },
     selected_tag:    { type: String, default: 'Studio' },
     lighting:        { type: String, default: '' },
+    dimensions:      { type: String, default: '' },
+    ratio:           { type: String, default: '' },
     width:           { type: Number, default: 1024 },
     height:          { type: Number, default: 1024 },
 
