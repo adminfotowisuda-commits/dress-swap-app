@@ -3986,10 +3986,18 @@ app.get('/api/user/usages', async (req, res) => {
             return res.status(503).json({ error: 'Database unavailable.' });
         }
 
-        // Credit usage is stored in a sub-collection; for now query transactions
-        // with type 'deduction' or use the credit_usages embedded array if migrated.
-        // Since credit_usages was a json array in database.json, return empty for now.
-        res.json([]);
+        // Query transactions with type 'usage' (credit deductions from generations)
+        const txns = await db.Transaction.find({ email, type: 'usage' })
+            .sort({ created_at: -1 })
+            .lean();
+
+        const usages = txns.map(txn => ({
+            date: txn.created_at || '',
+            action: txn.description || txn.package_id || 'Penggunaan Kredit',
+            credits_used: Math.abs(txn.credits) || 1
+        }));
+
+        res.json(usages);
     } catch (err) {
         console.error('[/api/user/usages] Error:', err);
         res.status(500).json({ error: 'Failed to retrieve credit usage history.' });

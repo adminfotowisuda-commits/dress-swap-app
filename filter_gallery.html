@@ -597,7 +597,8 @@
             // Guard against broken images with an onerror fallback.
             const beforePreview = document.getElementById('modal-before-preview');
             const beforePlaceholder = document.getElementById('modal-before-placeholder');
-            const beforeUrl = record.reference_image_1_path || record.reference_image_2_path || null;
+            const beforeUrl = record.reference_image_1_path || record.reference_image_2_path
+                           || record.reference_image_1_url || record.reference_image_2_url || null;
             if (beforePreview && beforeUrl) {
                 // If the path is already a full URL (Cloudinary), use it directly;
                 // otherwise prefix with API_BASE for local relative paths.
