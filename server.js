@@ -309,7 +309,7 @@ function insertProcessingPlaceholder(genId, type, prompt, width, height, ownerEm
     upsertDatabaseRecord({
         generation_id: genId,
         type: type || 'unknown',
-        prompt: (prompt || '').slice(0, 200),
+        prompt: (prompt || ''),  // FULL prompt — never truncate; AI needs the complete instruction
         status: 'processing',
         width: width,
         height: height,
@@ -1594,6 +1594,7 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         status: 'COMPLETE',
                         image_url: cloudinaryUrl,
                         cover_image_url: cloudinaryUrl,
+                        prompt: record.prompt || '',  // full prompt — overwrites any truncated placeholder
                         title: title,
                         filterTitle: record.filterTitle || '',
                         tags: tags,
