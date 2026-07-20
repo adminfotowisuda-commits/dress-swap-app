@@ -112,7 +112,6 @@ const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api.doku
 const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authorization/v1/access-token/b2b';
 const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
 const DOKU_CHECKOUT_PATH        = process.env.DOKU_CHECKOUT_PATH || '/checkout/v1/payment';
-const DOKU_QRIS_PATH            = process.env.DOKU_QRIS_PATH || '/orders/v1/qris';
 
 // Credit cost mapping — per-generation pricing (trial phase)
 const CREDIT_COSTS = {
@@ -785,31 +784,43 @@ async function requestDokuB2BToken() {
 }
 
 /**
- * Create a DOKU QRIS order for a credit top-up.
- * Uses DOKU Direct QRIS API (POST /orders/v1/qris) — HMAC-SHA256 signed.
- * Returns the QR string (QRIS payload) for frontend rendering.
+ * Create a DOKU Hosted Checkout session restricted to QRIS only.
+ * Uses DOKU Checkout API (POST /checkout/v1/payment) — HMAC-SHA256 signed.
+ * Returns the checkout payment URL for frontend redirect.
  */
-async function createDokuQrisOrder(orderData) {
+async function createDokuCheckout(orderData) {
     const { email, package_id, invoice_number, amount } = orderData;
+    const customerName = (email.split('@')[0] || 'customer').replace(/[^a-zA-Z0-9 ]/g, ' ').trim() || 'Customer';
 
-    const endpointPath = DOKU_QRIS_PATH; // /orders/v1/qris
-    const requestId = 'QRIS-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    const endpointPath = DOKU_CHECKOUT_PATH; // /checkout/v1/payment
+    const requestId = 'CHK-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
 
-    // ── Minimal QRIS payload — only order.invoice_number + order.amount ──
+    // ── Checkout payload — restrict payment_method_types to QRIS only ──
     const requestBody = JSON.stringify({
         order: {
             invoice_number: invoice_number,
-            amount: Math.round(Number(amount))
+            amount: Math.round(Number(amount)),
+            callback_url: 'https://fotowisuda.ai/api/payments/doku-callback',
+            line_items: [{ name: 'Credit Top-Up', price: amount, quantity: 1 }]
+        },
+        payment: {
+            payment_due_date: 60,
+            payment_method_types: ['QRIS']
+        },
+        customer: {
+            name: customerName,
+            email: email,
+            phone: '081234567890'
         }
     });
 
-    // ── HMAC-SHA256 signature (same as DOKU Checkout / SNAP BI) ──
-    const qrisTimestamp = new Date().toISOString(); // 2026-07-18T10:30:00.000Z
+    // ── HMAC-SHA256 signature (DOKU Checkout spec) ──
+    const checkoutTimestamp = new Date().toISOString();
     const digestBase64 = crypto.createHash('sha256').update(requestBody).digest('base64');
     const stringToSign =
         'Client-Id:' + DOKU_CLIENT_ID + '\n' +
         'Request-Id:' + requestId + '\n' +
-        'Request-Timestamp:' + qrisTimestamp + '\n' +
+        'Request-Timestamp:' + checkoutTimestamp + '\n' +
         'Request-Target:' + endpointPath + '\n' +
         'Digest:' + digestBase64;
     const hmac = crypto.createHmac('sha256', DOKU_SECRET_KEY);
@@ -820,13 +831,13 @@ async function createDokuQrisOrder(orderData) {
         'Content-Type': 'application/json',
         'Client-Id': DOKU_CLIENT_ID,
         'Request-Id': requestId,
-        'Request-Timestamp': qrisTimestamp,
+        'Request-Timestamp': checkoutTimestamp,
         'Signature': signatureValue
     };
 
-    console.log(`  [doku-qris] Creating QRIS order for ${email} (${invoice_number})…`);
-    console.log(`  [doku-qris] Request body:`, requestBody);
-    console.log(`  [doku-qris] stringToSign:\n${stringToSign}`);
+    console.log(`  [doku-checkout] Creating QRIS checkout for ${email} (${invoice_number})…`);
+    console.log(`  [doku-checkout] Request body:`, requestBody);
+    console.log(`  [doku-checkout] stringToSign:\n${stringToSign}`);
 
     const resp = await fetch(`${DOKU_BASE_URL}${endpointPath}`, {
         method: 'POST',
@@ -837,37 +848,35 @@ async function createDokuQrisOrder(orderData) {
     if (!resp.ok) {
         let errorBody = '';
         try { errorBody = await resp.text(); } catch (_) { errorBody = '(unable to read response body)'; }
-        console.error(`  [doku-qris] DOKU returned ${resp.status}: ${errorBody.slice(0, 500)}`);
+        console.error(`  [doku-checkout] DOKU returned ${resp.status}: ${errorBody.slice(0, 500)}`);
 
-        // Build a structured error with DOKU's own message if available
-        let dokusg = `DOKU API error (${resp.status})`;
+        let dokuMsg = `DOKU API error (${resp.status})`;
         try {
             const parsed = JSON.parse(errorBody);
-            if (parsed.error)  dokusg = parsed.error;
-            if (parsed.message) dokusg = parsed.message;
-        } catch (_) { /* not JSON — use raw body */ }
+            if (parsed.error)   dokuMsg = parsed.error;
+            if (parsed.message) dokuMsg = parsed.message;
+        } catch (_) { /* not JSON */ }
 
-        const err = new Error(dokusg);
+        const err = new Error(dokuMsg);
         err.statusCode = resp.status;
         err.dokuRaw = errorBody.slice(0, 1000);
         throw err;
     }
 
     const data = await resp.json();
-    console.log(`  [doku-qris] QRIS response: ${JSON.stringify(data)}`);
+    console.log(`  [doku-checkout] Checkout response: ${JSON.stringify(data)}`);
 
-    // ── Extract QR string from DOKU QRIS response ──
-    // Jokul V1 /orders/v1/qris returns: { qr_string: "...", ... }
-    // Also covers SNAP-style: { qris: { qr_string: "..." } }
-    const qrString = data.qr_string
-                  || data.qris?.qr_string
-                  || data.response?.qris?.qr_string
-                  || null;
+    // ── Extract payment URL from DOKU Checkout response ──
+    const paymentUrl = data.response?.payment?.url
+                    || data.payment?.url
+                    || data.paymentUrl
+                    || data.redirectUrl
+                    || null;
 
-    console.log(`  [doku-qris] QRIS order — invoice: ${invoice_number} | qr: ${qrString ? qrString.slice(0, 30) + '…' : 'N/A'}`);
+    console.log(`  [doku-checkout] Checkout — invoice: ${invoice_number} | url: ${paymentUrl || 'N/A'}`);
     return {
         invoice_number: invoice_number,
-        qr_string: qrString,
+        payment_url: paymentUrl,
         raw: data
     };
 }
@@ -4095,7 +4104,7 @@ app.get('/api/user/usages', async (req, res) => {
  * POST /api/payment/request-qris
  * Generates a QRIS code for credit top-up via DOKU Direct QRIS API.
  * Body: { email, package_id }
- * Returns: { invoice_number, qr_string, amount, expires_at, instructions[] }
+ * Returns: { invoice_number, payment_url, amount, expires_at, instructions[] }
  */
 app.post('/api/payment/request-qris', async (req, res) => {
     try {
@@ -4123,31 +4132,30 @@ app.post('/api/payment/request-qris', async (req, res) => {
             });
         }
 
-        let qrString = null;
+        let paymentUrl = null;
 
-        // --- Attempt DOKU QRIS order creation ---
+        // --- Attempt DOKU Checkout creation (QRIS-restricted) ---
         try {
-            const dokuResult = await createDokuQrisOrder({
+            const dokuResult = await createDokuCheckout({
                 email, package_id,
                 invoice_number: invoiceNumber,
                 amount: pkg.price
             });
-            qrString = dokuResult.qr_string || null;
-            console.log(`  [payment] DOKU QRIS — invoice: ${invoiceNumber} | qr: ${qrString ? qrString.slice(0, 30) + '…' : 'N/A'}`);
+            paymentUrl = dokuResult.payment_url || null;
+            console.log(`  [payment] DOKU Checkout — invoice: ${invoiceNumber} | url: ${paymentUrl || 'N/A'}`);
         } catch (dokuErr) {
-            console.error('  [payment] DOKU QRIS API call FAILED:', dokuErr.message);
-            // Use DOKU's status code if available (404→400, 401→401), else 502 Bad Gateway
+            console.error('  [payment] DOKU Checkout API call FAILED:', dokuErr.message);
             const httpStatus = dokuErr.statusCode || 502;
             return res.status(httpStatus).json({
                 success: false,
-                error: 'Gagal membuat QRIS — gateway pembayaran error',
+                error: 'Gagal membuat sesi pembayaran — gateway error',
                 message: dokuErr.message || 'DOKU API tidak merespon',
                 details: dokuErr.dokuRaw || null
             });
         }
 
-        if (!qrString) {
-            console.error('  [payment] DOKU returned 200 but no qr_string — response format mismatch');
+        if (!paymentUrl) {
+            console.error('  [payment] DOKU returned 200 but no payment_url — response format mismatch');
             return res.status(502).json({
                 success: false,
                 error: 'Respon DOKU tidak dikenali',
@@ -4156,22 +4164,22 @@ app.post('/api/payment/request-qris', async (req, res) => {
         }
 
         const instructions = [
-            { step: 1, text: 'Buka aplikasi e-wallet atau mobile banking Anda' },
-            { step: 2, text: 'Pilih menu <b>Scan QRIS</b> / <b>Bayar</b>' },
-            { step: 3, text: 'Scan kode QR yang ditampilkan di layar ini' },
+            { step: 1, text: 'Anda akan diarahkan ke halaman pembayaran DOKU' },
+            { step: 2, text: 'Pilih metode <b>QRIS</b> pada halaman checkout' },
+            { step: 3, text: 'Scan kode QR yang muncul menggunakan e-wallet atau m-banking Anda' },
             { step: 4, text: `Konfirmasi pembayaran sebesar <b>Rp ${pkg.price.toLocaleString('id-ID')}</b>` },
             { step: 5, text: 'Setelah berhasil, kredit akan otomatis bertambah' }
         ];
 
         console.log(`  [payment] Invoice ${invoiceNumber} — ${email} → ${pkg.name} (Rp ${pkg.price})`);
         console.log(`  [payment] >>> RESPONSE PAYLOAD:`, JSON.stringify({
-            qr_string: qrString ? qrString.slice(0, 30) + '…' : null,
+            payment_url: paymentUrl,
             invoice_number: invoiceNumber
         }));
         res.json({
             success: true,
             invoice_number: invoiceNumber,
-            qr_string: qrString,
+            payment_url: paymentUrl,
             amount: pkg.price,
             amount_formatted: 'Rp ' + pkg.price.toLocaleString('id-ID'),
             credits_given: pkg.credits_given,
@@ -4190,7 +4198,7 @@ app.post('/api/payment/request-qris', async (req, res) => {
  * POST /api/credits/top-up
  * Initiates a DOKU QRIS payment to purchase credits.
  * Body: { email, package_id }
- * Returns: { invoice_number, qr_string, package }
+ * Returns: { invoice_number, payment_url, package }
  */
 app.post('/api/credits/top-up', async (req, res) => {
     try {
@@ -4217,24 +4225,24 @@ app.post('/api/credits/top-up', async (req, res) => {
             });
         }
 
-        // --- Attempt DOKU QRIS order creation ---
+        // --- Attempt DOKU Checkout creation (QRIS-restricted) ---
         let paymentResult = null;
         try {
-            paymentResult = await createDokuQrisOrder({
+            paymentResult = await createDokuCheckout({
                 email: email,
                 package_id: package_id,
                 invoice_number: invoiceNumber,
                 amount: pkg.price
             });
         } catch (dokuErr) {
-            console.error('  [credits] DOKU QRIS API unavailable:', dokuErr.message);
+            console.error('  [credits] DOKU Checkout API unavailable:', dokuErr.message);
 
             // If sandbox simulation is explicitly enabled, fall back to simulated payment
             if (process.env.DOKU_SANDBOX_MODE === 'true') {
-                console.warn('  [credits] DOKU_SANDBOX_MODE=true — using simulated QRIS');
+                console.warn('  [credits] DOKU_SANDBOX_MODE=true — using simulated payment URL');
                 paymentResult = {
                     invoice_number: invoiceNumber,
-                    qr_string: 'SIMULATED_QR_' + invoiceNumber
+                    payment_url: 'https://fotowisuda.ai/api/payments/doku-callback?simulate=1&invoice=' + encodeURIComponent(invoiceNumber) + '&email=' + encodeURIComponent(email) + '&package=' + encodeURIComponent(package_id)
                 };
             } else {
                 // Mark transaction as failed — no credits without real payment
@@ -4255,7 +4263,7 @@ app.post('/api/credits/top-up', async (req, res) => {
         res.json({
             success: true,
             invoice_number: invoiceNumber,
-            qr_string: paymentResult.qr_string,
+            payment_url: paymentResult.payment_url,
             package: pkg
         });
     } catch (err) {

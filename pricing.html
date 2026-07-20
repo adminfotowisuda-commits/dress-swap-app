@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
     <script id="tailwind-config">
         try { tailwind.config = { darkMode: "class", theme: { extend: {
@@ -146,21 +145,21 @@
 
         <!-- Invoice Content -->
         <div id="invoice-content">
-            <!-- QRIS Card -->
+            <!-- QRIS Checkout Card -->
             <div style="background:#0c0e12;border:1px solid #30363D;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;">
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
                     <div style="width:40px;height:40px;background:rgba(157,91,255,0.15);border:1px solid rgba(157,91,255,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#9D5BFF;">QR</div>
                     <div style="text-align:left;">
-                        <div style="font-size:12px;font-weight:700;">QRIS</div>
-                        <div style="font-size:10px;color:#8B949E;">Scan dengan e-wallet / m-banking</div>
+                        <div style="font-size:12px;font-weight:700;">QRIS Checkout</div>
+                        <div style="font-size:10px;color:#8B949E;">Anda akan diarahkan ke halaman DOKU</div>
                     </div>
                     <span style="margin-left:auto;font-size:10px;color:#8B949E;text-transform:uppercase;" id="invoice-status-badge">Menunggu</span>
                 </div>
 
-                <!-- QR Code Canvas -->
-                <div style="background:#fff;border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">
-                    <canvas id="invoice-qr-canvas" width="220" height="220" style="display:block;"></canvas>
-                </div>
+                <button onclick="openDokuCheckout()" id="checkout-pay-btn"
+                    style="width:100%;padding:14px;background:linear-gradient(135deg,#9D5BFF,#00D1FF);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+                    <i class="fa-solid fa-qrcode"></i> Buka Halaman QRIS
+                </button>
 
                 <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(48,54,61,0.4);font-size:13px;">
                     <span style="color:#8B949E;">Jumlah Tagihan</span>
@@ -197,7 +196,7 @@
 <!-- ═══ SCRIPTS ═══ -->
 <script>
 var API_BASE = window.location.origin;
-var _paymentState = { invoiceNumber:null, qrString:null, packageId:null, creditsGiven:0, countdownTimer:null, expiresAt:null };
+var _paymentState = { invoiceNumber:null, paymentUrl:null, packageId:null, creditsGiven:0, countdownTimer:null, expiresAt:null };
 
 function getEmail() {
     try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; }
@@ -227,20 +226,19 @@ async function buyPackage(packageId, packageName, price, credits) {
             body: JSON.stringify({ email: email, package_id: packageId })
         });
         var data = await resp.json();
-        if (!data.success) { alert(data.error || 'Gagal membuat QRIS'); return; }
+        if (!data.success) { alert(data.error || 'Gagal membuat sesi pembayaran'); return; }
 
         _paymentState.invoiceNumber = data.invoice_number;
-        _paymentState.qrString = data.qr_string;
+        _paymentState.paymentUrl = data.payment_url;
         _paymentState.expiresAt = new Date(data.expires_at).getTime();
 
-        // Render QR code on canvas
-        var canvas = document.getElementById('invoice-qr-canvas');
-        if (canvas && data.qr_string) {
-            QRCode.toCanvas(canvas, data.qr_string, { width: 220, margin: 1 }, function(err) {
-                if (err) console.error('QR render error:', err);
-            });
+        // If DOKU returned a payment URL, redirect immediately — no invoice modal needed
+        if (data.payment_url) {
+            window.open(data.payment_url, '_blank');
+            return;
         }
 
+        // Fallback: show invoice modal (shouldn't normally be reached with Checkout API)
         document.getElementById('invoice-amount').textContent = data.amount_formatted;
         document.getElementById('invoice-package').textContent = data.package_name + ' (+' + data.credits_given + ' kredit)';
 
@@ -262,6 +260,12 @@ async function buyPackage(packageId, packageName, price, credits) {
         modal.classList.remove('hidden');
     } catch(err) {
         alert('Error: ' + err.message);
+    }
+}
+
+function openDokuCheckout() {
+    if (_paymentState.paymentUrl) {
+        window.open(_paymentState.paymentUrl, '_blank');
     }
 }
 
