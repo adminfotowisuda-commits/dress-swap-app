@@ -451,8 +451,15 @@
 
             // 3. DELETE from server database (if it's a server-stored record)
             try {
-                const API_BASE = window.location.origin;
-                const resp = await fetch(API_BASE + '/api/filter-gallery/' + filterId, { method: 'DELETE' });
+                const resp = await fetch(API_BASE + '/api/filter-gallery/' + filterId, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if (resp.status === 401) {
+                    alert('Sesi admin telah berakhir. Silakan login ulang.');
+                    window.location.href = '/admin-login';
+                    return;
+                }
                 if (resp.ok) {
                     console.log('[Admin] Server record deleted:', filterId);
                 } else {
@@ -477,13 +484,27 @@
         }
 
         // ── Toggle isActive via admin API ──
+        // Sends credentials so the admin session cookie is attached even after
+        // a server restart rotates ADMIN_SESSION_SECRET.  On 401 the admin is
+        // redirected to re-login so the cookie and secret are aligned again.
         async function toggleFilterActive(filterId) {
             try {
-                const resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(filterId) + '/toggle', { method: 'PATCH' });
+                const resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(filterId) + '/toggle', {
+                    method: 'PATCH',
+                    credentials: 'include'
+                });
                 const data = await resp.json();
+
+                // ── Session expired → redirect to login ──
+                if (resp.status === 401) {
+                    alert('Sesi admin telah berakhir (server restart atau timeout). Silakan login ulang.');
+                    window.location.href = '/admin-login';
+                    return;
+                }
+
                 if (!resp.ok) {
                     console.error('[Toggle] Server returned ' + resp.status + ': ' + (data.error || 'Unknown error'));
-                    showCustomAlert('Gagal mengubah status filter. Server returned ' + resp.status + '.');
+                    alert('Gagal mengubah status filter. Server error ' + resp.status + '.');
                     return;
                 }
                 if (data.success) {
@@ -501,11 +522,11 @@
                     loadImages();
                 } else {
                     console.error('[Toggle] API returned success=false:', data);
-                    showCustomAlert('Gagal mengubah status filter: ' + (data.error || 'Unknown error'));
+                    alert('Gagal mengubah status filter: ' + (data.error || 'Unknown error'));
                 }
             } catch (err) {
                 console.error('[Toggle] Network/fetch error:', err.message || err);
-                showCustomAlert('Gagal terhubung ke server. Periksa koneksi Anda.');
+                alert('Gagal terhubung ke server. Periksa koneksi Anda.');
             }
         }
 

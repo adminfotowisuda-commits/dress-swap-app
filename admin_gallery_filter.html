@@ -1338,7 +1338,7 @@
                 if (!card || !genId) return;
                 hideConfirmModal();
                 try {
-                    const resp = await fetch(`${API_BASE}/api/filter-gallery/${genId}`, { method: 'DELETE' });
+                    const resp = await fetch(`${API_BASE}/api/filter-gallery/${genId}`, { method: 'DELETE', credentials: 'include' });
                     if (!resp.ok) {
                         const errData = await resp.json().catch(() => ({}));
                         throw new Error(errData.error || `Server returned ${resp.status}`);

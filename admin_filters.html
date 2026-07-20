@@ -144,7 +144,8 @@ async function loadFilters() {
     tbody.innerHTML = '';
 
     try {
-        var resp = await fetch(API_BASE + '/api/admin/filters?limit=500');
+        var resp = await fetch(API_BASE + '/api/admin/filters?limit=500', { credentials: 'include' });
+        if (resp.status === 401) { window.location.href = '/admin-login'; return; }
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var data = await resp.json();
         _filters = data.filters || [];
@@ -236,13 +237,27 @@ function closePreviewModal() {
 }
 
 // ═══ Toggle ═══
+// Sends credentials so the admin session cookie is attached even after
+// a server restart rotates ADMIN_SESSION_SECRET.  On 401 the admin is
+// redirected to re-login so the cookie and secret are aligned again.
 async function toggleFilter(genId) {
     try {
-        var resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(genId) + '/toggle', { method: 'PATCH' });
+        var resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(genId) + '/toggle', {
+            method: 'PATCH',
+            credentials: 'include'
+        });
         var data = await resp.json();
+
+        // ── Session expired → redirect to login ──
+        if (resp.status === 401) {
+            alert('Sesi admin telah berakhir (server restart atau timeout). Silakan login ulang.');
+            window.location.href = '/admin-login';
+            return;
+        }
+
         if (!resp.ok) {
             console.error('[Toggle] Server returned ' + resp.status + ': ' + (data.error || 'Unknown error'));
-            alert('Gagal mengubah status filter. Server returned ' + resp.status + '.');
+            alert('Gagal mengubah status filter. Server error ' + resp.status + '.');
             return;
         }
         if (data.success) {
@@ -291,7 +306,8 @@ async function executeDelete() {
     btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:1.5px;"></span> Menghapus...';
 
     try {
-        var resp = await fetch(API_BASE + '/api/filter-gallery/' + encodeURIComponent(genId), { method: 'DELETE' });
+        var resp = await fetch(API_BASE + '/api/filter-gallery/' + encodeURIComponent(genId), { method: 'DELETE', credentials: 'include' });
+        if (resp.status === 401) { closeDeleteModal(); window.location.href = '/admin-login'; return; }
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         closeDeleteModal();
         loadFilters();
