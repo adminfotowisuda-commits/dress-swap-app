@@ -4144,11 +4144,23 @@ app.post('/api/payment/request-qris', async (req, res) => {
             console.log(`  [payment] DOKU Checkout — invoice: ${invoiceNumber} | url: ${paymentUrl || 'N/A'}`);
         } catch (dokuErr) {
             console.error('  [payment] DOKU Checkout API call FAILED:', dokuErr.message);
+            console.error('  [payment] DOKU raw response:', dokuErr.dokuRaw || '(none)');
             const httpStatus = dokuErr.statusCode || 502;
+
+            // Build a user-friendly message based on the HTTP status
+            let userMessage = dokuErr.message || 'DOKU API tidak merespon';
+            if (dokuErr.statusCode === 500) {
+                userMessage = 'DOKU gateway mengalami internal error (500). Silakan coba lagi nanti atau hubungi support.';
+            } else if (dokuErr.statusCode === 401 || dokuErr.statusCode === 403) {
+                userMessage = 'Konfigurasi gateway pembayaran bermasalah (auth). Silakan hubungi admin.';
+            } else if (dokuErr.statusCode === 404) {
+                userMessage = 'Endpoint gateway pembayaran tidak ditemukan. Silakan hubungi admin.';
+            }
+
             return res.status(httpStatus).json({
                 success: false,
                 error: 'Gagal membuat sesi pembayaran — gateway error',
-                message: dokuErr.message || 'DOKU API tidak merespon',
+                message: userMessage,
                 details: dokuErr.dokuRaw || null
             });
         }
@@ -4235,6 +4247,7 @@ app.post('/api/credits/top-up', async (req, res) => {
             });
         } catch (dokuErr) {
             console.error('  [credits] DOKU Checkout API unavailable:', dokuErr.message);
+            console.error('  [credits] DOKU raw response:', dokuErr.dokuRaw || '(none)');
 
             // If sandbox simulation is explicitly enabled, fall back to simulated payment
             if (process.env.DOKU_SANDBOX_MODE === 'true') {
@@ -4249,11 +4262,19 @@ app.post('/api/credits/top-up', async (req, res) => {
                 const txn2 = db2.transactions.find(t => t.invoice_number === invoiceNumber);
                 if (txn2) txn2.status = 'failed';
                 writeCreditsDB(db2);
+
+                let userMessage = 'Gateway DOKU tidak dapat dijangkau: ' + (dokuErr.message || 'unknown error');
+                if (dokuErr.statusCode === 500) {
+                    userMessage = 'DOKU gateway mengalami internal error (500). Silakan coba lagi nanti atau hubungi support.';
+                } else if (dokuErr.statusCode === 401 || dokuErr.statusCode === 403) {
+                    userMessage = 'Konfigurasi gateway pembayaran bermasalah (auth). Silakan hubungi admin.';
+                }
+
                 const httpStatus = dokuErr.statusCode || 502;
                 return res.status(httpStatus).json({
                     success: false,
                     error: 'Layanan pembayaran sedang tidak tersedia',
-                    message: 'Gateway DOKU tidak dapat dijangkau: ' + (dokuErr.message || 'unknown error')
+                    message: userMessage
                 });
             }
         }

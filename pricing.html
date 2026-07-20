@@ -226,7 +226,7 @@ async function buyPackage(packageId, packageName, price, credits) {
             body: JSON.stringify({ email: email, package_id: packageId })
         });
         var data = await resp.json();
-        if (!data.success) { alert(data.error || 'Gagal membuat sesi pembayaran'); return; }
+        if (!data.success) { alert(data.message || data.error || 'Gagal membuat sesi pembayaran'); return; }
 
         _paymentState.invoiceNumber = data.invoice_number;
         _paymentState.paymentUrl = data.payment_url;
