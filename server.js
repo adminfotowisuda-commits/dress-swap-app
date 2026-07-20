@@ -3613,7 +3613,10 @@ app.get('/api/admin-creations', requireAdminApi, async (req, res) => {
         const limit  = Math.min(parseInt(req.query.limit) || 50, 200);
         const offset = parseInt(req.query.offset) || 0;
 
-        const query = { owner_email: ADMIN_EMAIL };
+        // Exclude processing placeholders — they have no image and would render
+        // as phantom "No Preview" cards in the gallery.  Processing state is
+        // tracked client-side via localStorage + active-generations polling.
+        const query = { owner_email: ADMIN_EMAIL, status: { $nin: ['processing', 'PENDING'] } };
         const records = await db.Generation.find(query)
             .sort({ created_at: -1 })
             .skip(offset)

@@ -381,10 +381,14 @@
                 console.warn('[AdminCreations] Server fetch failed (non-fatal):', err.message);
             }
 
-            // Merge: server records take priority
+            // Merge: server records take priority (skip processing placeholders —
+            // those are rendered as spinner cards, not as blank "No Preview" cards)
             serverCreations.forEach(function(sr) {
                 const id = sr.generation_id;
-                if (id) seen.set(id, sr);
+                if (!id) return;
+                // Skip processing records — they have no image and would render as phantom cards
+                if (sr.status === 'processing' || sr.status === 'PENDING') return;
+                seen.set(id, sr);
             });
 
             // Convert merged map to array, sort newest first
