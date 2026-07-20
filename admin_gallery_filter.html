@@ -675,12 +675,21 @@
                 modalTitle.textContent = record.title || 'Background Filter';
             }
 
-            // AFTER — filter cover preview
+            // AFTER — filter cover preview (may be Cloudinary URL or local path)
             const coverPreview = document.getElementById('modal-cover-preview');
             const coverPlaceholder = document.getElementById('modal-cover-placeholder');
             const coverUrl = record.cover_image_path || record.image_url;
             if (coverPreview && coverUrl) {
-                coverPreview.src = coverUrl;
+                var resolvedCoverUrl = coverUrl;
+                if (!/^https?:\/\//i.test(resolvedCoverUrl)) {
+                    resolvedCoverUrl = API_BASE + '/' + coverUrl.replace(/^\//, '');
+                }
+                coverPreview.onerror = function() {
+                    coverPreview.classList.add('hidden');
+                    coverPreview.src = '';
+                    if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
+                };
+                coverPreview.src = resolvedCoverUrl;
                 coverPreview.classList.remove('hidden');
                 if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
             } else {
@@ -688,12 +697,22 @@
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
             }
 
-            // BEFORE — reference image or generic placeholder
+            // BEFORE — reference image from Cloudinary (survives redeploys) with local-path fallback
             const beforePreview = document.getElementById('modal-before-preview');
             const beforePlaceholder = document.getElementById('modal-before-placeholder');
-            const beforeUrl = record.reference_image_1_path || record.reference_image_2_path || null;
+            const beforeUrl = record.reference_image_1_url || record.reference_image_2_url
+                           || record.reference_image_1_path || record.reference_image_2_path || null;
             if (beforePreview && beforeUrl) {
-                beforePreview.src = `${API_BASE}/${beforeUrl}`;
+                var resolvedBeforeUrl = beforeUrl;
+                if (!/^https?:\/\//i.test(resolvedBeforeUrl)) {
+                    resolvedBeforeUrl = API_BASE + '/' + beforeUrl.replace(/^\//, '');
+                }
+                beforePreview.onerror = function() {
+                    beforePreview.classList.add('hidden');
+                    beforePreview.src = '';
+                    if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
+                };
+                beforePreview.src = resolvedBeforeUrl;
                 beforePreview.classList.remove('hidden');
                 if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
             } else {

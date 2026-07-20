@@ -1343,13 +1343,20 @@
                     : 'Unknown';
             }
 
-            // Reference images
+            // Reference images — prefer Cloudinary URLs (survive redeploys), fall back to local paths
             const refsEl = document.getElementById('detail-modal-refs');
             if (refsEl) {
                 let refsHtml = '';
-                [record.reference_image_1_path, record.reference_image_2_path].forEach(refPath => {
+                const refUrls = [
+                    record.reference_image_1_url, record.reference_image_2_url,
+                    record.reference_image_1_path, record.reference_image_2_path
+                ];
+                refUrls.forEach(refPath => {
                     if (refPath) {
-                        const refUrl = `${API_BASE}/${refPath}`;
+                        var refUrl = refPath;
+                        if (!/^https?:\/\//i.test(refUrl)) {
+                            refUrl = API_BASE + '/' + refPath.replace(/^\//, '');
+                        }
                         refsHtml += `
                         <div class="w-20 h-20 rounded-lg border border-border-subtle overflow-hidden bg-surface-container-low flex-shrink-0">
                             <img src="${refUrl}" alt="Reference" class="w-full h-full object-cover" loading="lazy"

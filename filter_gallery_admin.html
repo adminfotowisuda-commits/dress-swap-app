@@ -196,24 +196,6 @@
         </div>
     </main>
 
-    <!-- ═══ ADMIN PREVIEW MODAL — simple image viewer, no generation ═══ -->
-    <div id="admin-preview-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);" onclick="closeAdminPreview()">
-        <div class="bg-surface-card border border-border-subtle rounded-3xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto animate-in" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-white" id="admin-preview-title">—</h3>
-                <button onclick="closeAdminPreview()" class="p-2 hover:bg-surface-container rounded-lg transition-colors text-text-secondary hover:text-white text-xl">&times;</button>
-            </div>
-            <img id="admin-preview-cover" src="" class="w-full rounded-xl object-contain max-h-[60vh]" alt="Preview">
-            <div class="mt-4 space-y-2 text-sm">
-                <div class="flex justify-between"><span class="text-text-secondary">Tags</span><span class="text-white" id="admin-preview-tags">—</span></div>
-                <div class="flex justify-between"><span class="text-text-secondary">Dimensions</span><span class="text-white" id="admin-preview-dims">—</span></div>
-                <div class="flex justify-between"><span class="text-text-secondary">Status</span><span id="admin-preview-status">—</span></div>
-            </div>
-            <button onclick="useFilterForGeneration()" class="mt-5 w-full bg-electric-cyan text-surface-background font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-[0.98]">
-                <i class="fa-solid fa-bolt"></i> Use This Filter
-            </button>
-        </div>
-    </div>
 
     <!-- ============================================================
          MODAL — Execution Panel
@@ -516,40 +498,10 @@
         window.toggleFilterActive = toggleFilterActive;
         window.confirmDeleteFilter = confirmDeleteFilter;
 
-        // ── Admin Preview Modal — simple image viewer + bridge to execution ──
-        var _adminPreviewRecord = null;
-
-        function openAdminPreview(record) {
-            var modal = document.getElementById('admin-preview-modal');
-            if (!modal) return;
-            _adminPreviewRecord = record;
-            document.getElementById('admin-preview-title').textContent = record.title || record.filterTitle || 'Untitled';
-            var cover = document.getElementById('admin-preview-cover');
-            cover.src = record.cover_image_path || record.image_url || '';
-            cover.onerror = function() { cover.src = ''; };
-            document.getElementById('admin-preview-tags').textContent = (Array.isArray(record.tags) && record.tags.length) ? record.tags.join(', ') : '—';
-            document.getElementById('admin-preview-dims').textContent = record.dimensions || '—';
-            document.getElementById('admin-preview-status').innerHTML = (record.isActive !== false)
-                ? '<span class="text-emerald-400 font-semibold">Active</span>'
-                : '<span class="text-slate-400 font-semibold">Hidden</span>';
-            modal.classList.remove('hidden');
-        }
-        function closeAdminPreview() {
-            var modal = document.getElementById('admin-preview-modal');
-            if (modal) modal.classList.add('hidden');
-            _adminPreviewRecord = null;
-        }
-
-        // Bridge: close preview → open execution modal with the selected filter
-        function useFilterForGeneration() {
-            if (!_adminPreviewRecord) return;
-            closeAdminPreview();
-            openModal(_adminPreviewRecord);
-        }
-
-        window.openAdminPreview = openAdminPreview;
-        window.closeAdminPreview = closeAdminPreview;
-        window.useFilterForGeneration = useFilterForGeneration;
+        // ── Admin Testing Sandbox: Eye icon opens the full execution modal directly ──
+        // openModal(record) is shared with the public filter gallery — it renders the
+        // Before/After preview, upload zone, aspect ratio, and Generate button.
+        // Admin generations hit /api/admin-gallery-filter/swap (no credit deduction).
 
         function checkEmptyGrid() {
             const visibleCards = document.querySelectorAll('#filters-list-body .list-row:not([style*="opacity: 0"])');
@@ -651,11 +603,11 @@
                     if (listBody) listBody.appendChild(row);
 
                     // Wire preview click handlers via addEventListener (IIFE-safe)
-                    // → opens simple admin preview, NOT the execution/generation modal
+                    // → opens the full execution modal for admin testing (no credit deduction)
                     row.querySelectorAll('.preview-trigger').forEach(function(el) {
                         el.addEventListener('click', function(e) {
                             e.stopPropagation();
-                            openAdminPreview(record);
+                            openModal(record);
                         });
                     });
                 });
@@ -826,12 +778,21 @@
                 modalTitle.textContent = record.title || 'Background Filter';
             }
 
-            // AFTER — filter cover preview
+            // AFTER — filter cover preview (may be Cloudinary URL or local path)
             const coverPreview = document.getElementById('modal-cover-preview');
             const coverPlaceholder = document.getElementById('modal-cover-placeholder');
             const coverUrl = record.cover_image_path || record.image_url;
             if (coverPreview && coverUrl) {
-                coverPreview.src = coverUrl;
+                var resolvedCoverUrl = coverUrl;
+                if (!/^https?:\/\//i.test(resolvedCoverUrl)) {
+                    resolvedCoverUrl = API_BASE + '/' + coverUrl.replace(/^\//, '');
+                }
+                coverPreview.onerror = function() {
+                    coverPreview.classList.add('hidden');
+                    coverPreview.src = '';
+                    if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
+                };
+                coverPreview.src = resolvedCoverUrl;
                 coverPreview.classList.remove('hidden');
                 if (coverPlaceholder) coverPlaceholder.classList.add('hidden');
             } else {
@@ -839,12 +800,24 @@
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
             }
 
-            // BEFORE — reference image or generic placeholder
+            // BEFORE — reference image from Cloudinary (survives redeploys) with local-path fallback.
+            // reference_image_1_url is the Cloudinary URL; reference_image_1_path is the legacy
+            // local path that may have been wiped by a redeploy.
             const beforePreview = document.getElementById('modal-before-preview');
             const beforePlaceholder = document.getElementById('modal-before-placeholder');
-            const beforeUrl = record.reference_image_1_path || record.reference_image_2_path || null;
+            const beforeUrl = record.reference_image_1_url || record.reference_image_2_url
+                           || record.reference_image_1_path || record.reference_image_2_path || null;
             if (beforePreview && beforeUrl) {
-                beforePreview.src = `${API_BASE}/${beforeUrl}`;
+                var resolvedBeforeUrl = beforeUrl;
+                if (!/^https?:\/\//i.test(resolvedBeforeUrl)) {
+                    resolvedBeforeUrl = API_BASE + '/' + beforeUrl.replace(/^\//, '');
+                }
+                beforePreview.onerror = function() {
+                    beforePreview.classList.add('hidden');
+                    beforePreview.src = '';
+                    if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
+                };
+                beforePreview.src = resolvedBeforeUrl;
                 beforePreview.classList.remove('hidden');
                 if (beforePlaceholder) beforePlaceholder.classList.add('hidden');
             } else {

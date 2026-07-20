@@ -3698,6 +3698,17 @@ app.get('/api/admin/overview', requireAdminApi, async (_req, res) => {
 async function validateAndDeductCredits(req, res, next) {
     const currentPath = req.path;
 
+    // ── Admin bypass: NEVER deduct credits from admin test generations ──
+    // Admin filter testing uses the same swap endpoints but MUST NOT consume
+    // user credits.  Generated images are routed to admin creations, not the
+    // public gallery, via the _adminSave flag set inside each handler.
+    if (verifyAdminCookie(req)) {
+        console.log(`  [credits] ⚡ ADMIN BYPASS — skipping credit check for ${currentPath}`);
+        req.creditCost = 0;       // → refund on failure is a no-op
+        req.creditEmail = ADMIN_EMAIL;
+        return next();
+    }
+
     // Determine credit cost from route mapping
     let creditCost = CREDIT_COSTS[currentPath] || 0;
     if (creditCost === 0) {
