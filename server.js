@@ -3723,13 +3723,15 @@ app.get('/api/admin/overview', requireAdminApi, async (_req, res) => {
 async function validateAndDeductCredits(req, res, next) {
     const currentPath = req.path;
 
-    // ── Admin bypass: NEVER deduct credits from admin test generations ──
-    // Admin filter testing uses the same swap endpoints but MUST NOT consume
-    // user credits.  Generated images are routed to admin creations, not the
-    // public gallery, via the _adminSave flag set inside each handler.
-    if (verifyAdminCookie(req)) {
-        console.log(`  [credits] ⚡ ADMIN BYPASS — skipping credit check for ${currentPath}`);
-        req.creditCost = 0;       // → refund on failure is a no-op
+    // ── Admin sandbox bypass — ONLY for the explicit admin testing endpoint ──
+    // The admin generation sandbox (/api/admin-gallery-filter/swap) is the ONE
+    // route where credit deduction is skipped.  All other routes — including the
+    // public /api/filter-gallery/swap — ALWAYS deduct credits, even if the
+    // browser happens to have a lingering admin_session cookie.
+    const isAdminSandbox = (currentPath === '/api/admin-gallery-filter/swap');
+    if (isAdminSandbox && verifyAdminCookie(req)) {
+        console.log(`  [credits] ⚡ ADMIN SANDBOX BYPASS — skipping credit check for ${currentPath}`);
+        req.creditCost = 0;
         req.creditEmail = ADMIN_EMAIL;
         return next();
     }
@@ -4059,6 +4061,9 @@ app.get('/api/credits/balance', async (req, res) => {
             return res.status(400).json({ error: 'Email parameter is required.' });
         }
         const user = await ensureUserExists(email);
+        if (!user) {
+            return res.status(503).json({ error: 'Layanan sementara tidak tersedia. Silakan coba lagi.' });
+        }
         const packages = getCreditPackages();
         res.json({
             email: user.email,
