@@ -112,7 +112,7 @@ const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api.doku
 const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authorization/v1/access-token/b2b';
 const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
 const DOKU_CHECKOUT_PATH        = process.env.DOKU_CHECKOUT_PATH || '/checkout/v1/payment';
-const DOKU_QRIS_PATH            = process.env.DOKU_QRIS_PATH || '/qris/v2/order';
+const DOKU_QRIS_PATH            = process.env.DOKU_QRIS_PATH || '/doku-qris/v2/order';
 
 // Credit cost mapping — per-generation pricing (trial phase)
 const CREDIT_COSTS = {
@@ -786,13 +786,13 @@ async function requestDokuB2BToken() {
 
 /**
  * Create a DOKU QRIS order for a credit top-up.
- * Uses DOKU Direct QRIS API (POST /qris/v2/order) — HMAC-SHA256 signed.
+ * Uses DOKU Direct QRIS API (POST /doku-qris/v2/order) — HMAC-SHA256 signed.
  * Returns the QR string (QRIS payload) for frontend rendering.
  */
 async function createDokuQrisOrder(orderData) {
     const { email, package_id, invoice_number, amount } = orderData;
 
-    const endpointPath = DOKU_QRIS_PATH; // /qris/v2/order
+    const endpointPath = DOKU_QRIS_PATH; // /doku-qris/v2/order
     const requestId = 'QRIS-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
 
     // ── Minimal QRIS payload — only order.invoice_number + order.amount ──
@@ -4076,12 +4076,12 @@ app.get('/api/user/usages', async (req, res) => {
 });
 
 /**
- * POST /api/payment/request-va
+ * POST /api/payment/request-qris
  * Generates a QRIS code for credit top-up via DOKU Direct QRIS API.
  * Body: { email, package_id }
  * Returns: { invoice_number, qr_string, amount, expires_at, instructions[] }
  */
-app.post('/api/payment/request-va', async (req, res) => {
+app.post('/api/payment/request-qris', async (req, res) => {
     try {
         const { email, package_id } = req.body;
         if (!email) return res.status(400).json({ error: 'Email is required.' });
@@ -4162,8 +4162,8 @@ app.post('/api/payment/request-va', async (req, res) => {
             instructions: instructions
         });
     } catch (err) {
-        console.error('[/api/payment/request-va] Error:', err);
-        res.status(500).json({ error: 'Failed to generate VA.' });
+        console.error('[/api/payment/request-qris] Error:', err);
+        res.status(500).json({ error: 'Failed to generate QRIS code.' });
     }
 });
 

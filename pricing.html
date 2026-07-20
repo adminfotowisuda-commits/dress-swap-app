@@ -221,7 +221,7 @@ async function buyPackage(packageId, packageName, price, credits) {
     _paymentState.creditsGiven = credits;
 
     try {
-        var resp = await fetch(API_BASE + '/api/payment/request-va', {
+        var resp = await fetch(API_BASE + '/api/payment/request-qris', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, package_id: packageId })
