@@ -301,6 +301,11 @@ async function upsertDatabaseRecord(record) {
 }
 
 function insertProcessingPlaceholder(genId, type, prompt, width, height, ownerEmail) {
+    // New filter-factory records start as DRAFTS (isActive: false).
+    // Admins must manually toggle them ON after testing in the sandbox.
+    // Other types (bgswap, dress-swap, filter-swap) are user creations
+    // and don't use the isActive flag.
+    const isFilterFactory = (type === 'filter-factory');
     upsertDatabaseRecord({
         generation_id: genId,
         type: type || 'unknown',
@@ -312,7 +317,8 @@ function insertProcessingPlaceholder(genId, type, prompt, width, height, ownerEm
         cover_image_url: '',
         email: ownerEmail || '',
         owner_email: ownerEmail || '',
-        created_at: new Date()
+        created_at: new Date(),
+        ...(isFilterFactory ? { isActive: false } : {})
     });
 }
 
