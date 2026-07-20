@@ -1132,16 +1132,12 @@
                 ? `${API_BASE}/${escapeHtml(record.cover_image_path)}`
                 : '';
 
-            // Store the full record index for the modal lookup
-            const recordIndex = state.records.indexOf(record);
-
             const lightingBadge = record.lighting
                 ? `<span class="absolute bottom-2 right-2 z-10 px-2 py-0.5 bg-black/50 backdrop-blur-sm rounded-full text-[9px] text-vivid-purple font-semibold border border-vivid-purple/20 opacity-0 group-hover:opacity-100 transition-opacity">⚡ ${escapeHtml(record.lighting)}</span>`
                 : '';
 
             return `
             <div class="pinterest-card rounded-xl overflow-hidden cursor-pointer relative group"
-                 data-record-index="${recordIndex}"
                  data-gen-id="${genId}"
                  data-image-url="${escapeHtml(record.image_url || '')}">
                 ${coverUrl ? `
@@ -1264,12 +1260,13 @@
                 });
             });
 
-            // Card click → open detail modal
+            // Card click → open detail modal — resolve by gen-id, not DOM index
             document.querySelectorAll('.pinterest-card').forEach(card => {
                 card.addEventListener('click', () => {
-                    const idx = parseInt(card.getAttribute('data-record-index'), 10);
-                    if (!isNaN(idx) && state.records[idx]) {
-                        openDetailModal(state.records[idx]);
+                    const genId = card.getAttribute('data-gen-id');
+                    if (genId) {
+                        const record = state.records.find(r => r.generation_id === genId);
+                        if (record) openDetailModal(record);
                     }
                 });
             });

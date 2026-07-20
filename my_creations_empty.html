@@ -285,11 +285,14 @@ function getEmail() {
 }
 
 // Build a single completed card for in-place DOM swap (no full grid re-render)
-function buildCompletedCard(item, idx) {
+// Uses data-creation-id + openPreviewById to survive index shifts from prepends.
+function buildCompletedCard(item) {
   var imgUrl = item.url || '';
+  var itemId = item.id || item.generation_id || '';
   var card = document.createElement('div');
   card.className = 'card';
-  card.setAttribute('onclick', 'openPreview(' + idx + ')');
+  card.setAttribute('data-creation-id', itemId);
+  card.setAttribute('onclick', "openPreviewById('" + itemId + "')");
 
   if (imgUrl) {
     var wrap = document.createElement('div');
@@ -387,7 +390,8 @@ async function loadGallery() {
       for (var i = 0; i < data.length; i++) {
         var imgUrl = data[i].url || '';
         if (imgUrl) {
-          html += '<div class="card" onclick="openPreview('+i+')">'+
+          var itemId = data[i].id || data[i].generation_id || '';
+          html += '<div class="card" data-creation-id="'+itemId+'" onclick="openPreviewById(\''+itemId+'\')">'+
             '<div class="card-img-wrap"><img src="'+imgUrl+'" alt="'+data[i].name+'" onerror="this.parentElement.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#5c6370;font-size:40px;>?</div>\'"></div>'+
           '</div>';
         } else {
@@ -673,9 +677,9 @@ function startProcessingPoll(generationId, serverCreatedAt) {
 
               if (foundRecord && foundRecord.url) {
                 // Prepend so newest creation appears first (server returns newest-first order)
+                // Existing cards use ID-based onclick handlers, so they survive the index shift.
                 _creations.unshift(foundRecord);
-                var cardIdx = 0;
-                var newCard = buildCompletedCard(foundRecord, cardIdx);
+                var newCard = buildCompletedCard(foundRecord);
                 if (cardEl.parentNode) {
                   cardEl.parentNode.replaceChild(newCard, cardEl);
                 }
@@ -812,20 +816,20 @@ function hideChrome() {
 // Captures the thumbnail's position, then animates the modal image
 // from that position to its final centered state.
 
+// Find the DOM card element for a given _creations index by resolving
+// its item ID and querying the data-creation-id attribute.  This survives
+// DOM reordering (prepends / removes) because it doesn't rely on positional
+// nth-child scanning.
 function getCardElement(idx) {
-  var cards = document.querySelectorAll('#creations-grid .card');
-  // Filter out processing cards
-  for (var i = 0, c = 0; i < cards.length; i++) {
-    if (cards[i].classList.contains('processing-card')) continue;
-    if (c === idx) return cards[i];
-    c++;
-  }
-  return null;
+  if (idx < 0 || idx >= _creations.length) return null;
+  var itemId = _creations[idx].id || _creations[idx].generation_id;
+  if (!itemId) return null;
+  return document.querySelector('#creations-grid .card[data-creation-id="' + itemId + '"]');
 }
 
 function findCardIndexById(id) {
   for (var i = 0; i < _creations.length; i++) {
-    if (_creations[i].id === id) return i;
+    if ((_creations[i].id || _creations[i].generation_id) === id) return i;
   }
   return -1;
 }
@@ -845,6 +849,20 @@ function captureThumbRect(idx) {
 var EASING = 'cubic-bezier(0.25, 1, 0.5, 1)';
 var DURATION_OPEN = 320;
 var DURATION_CLOSE = 250;
+
+// Open preview by item ID — resolves the current array index dynamically
+// so that onclick handlers survive prepends/unshifts to _creations.
+function openPreviewById(id) {
+  var idx = -1;
+  for (var i = 0; i < _creations.length; i++) {
+    if ((_creations[i].id || _creations[i].generation_id) === id) {
+      idx = i;
+      break;
+    }
+  }
+  if (idx < 0) return;
+  openPreview(idx);
+}
 
 function openPreview(idx) {
   if (idx < 0 || idx >= _creations.length) return;
@@ -1106,7 +1124,7 @@ function confirmDelete() {
       // Remove from local array
       _creations = _creations.filter(function(c){ return c.id !== item.id; });
       // Smooth-remove the current preview card from the grid
-      var card = document.querySelector('#creations-grid .card[onclick*="openPreview"]');
+      var card = document.querySelector('#creations-grid .card[data-creation-id="' + item.id + '"]');
       // Navigate preview to next/prev item without full loadGallery re-render
       if (_creations.length === 0) {
         closePreview();

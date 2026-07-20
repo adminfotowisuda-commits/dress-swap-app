@@ -467,8 +467,8 @@
                 if (grid) grid.classList.remove('hidden');
                 if (empty) empty.classList.add('hidden');
 
-                allCreations.forEach(function(record, index) {
-                    var card = buildCard(record, index);
+                allCreations.forEach(function(record) {
+                    var card = buildCard(record);
                     if (grid) grid.appendChild(card);
                 });
             }
@@ -479,10 +479,9 @@
             console.log('[AdminCreations] Rendered ' + allCreations.length + ' completed + ' + Object.keys(processingItems).length + ' processing.');
         }
 
-        function buildCard(record, index) {
+        function buildCard(record) {
             const card = document.createElement('div');
             card.className = 'bg-surface-card border border-border-subtle rounded-2xl overflow-hidden cursor-pointer group hover:shadow-[0_8px_30px_rgba(168,85,247,0.12)] transition-all relative';
-            card.setAttribute('data-index', index);
             card.setAttribute('data-gen-id', record.id || record.generation_id || '');
 
             const rawImgUrl = record.image || record.cover_image_path || record.image_url || '';
