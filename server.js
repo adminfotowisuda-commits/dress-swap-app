@@ -112,7 +112,7 @@ const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api.doku
 const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authorization/v1/access-token/b2b';
 const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
 const DOKU_CHECKOUT_PATH        = process.env.DOKU_CHECKOUT_PATH || '/checkout/v1/payment';
-const DOKU_QRIS_PATH            = process.env.DOKU_QRIS_PATH || '/doku-qris/v2/order';
+const DOKU_QRIS_PATH            = process.env.DOKU_QRIS_PATH || '/orders/v1/qris';
 
 // Credit cost mapping — per-generation pricing (trial phase)
 const CREDIT_COSTS = {
@@ -786,13 +786,13 @@ async function requestDokuB2BToken() {
 
 /**
  * Create a DOKU QRIS order for a credit top-up.
- * Uses DOKU Direct QRIS API (POST /doku-qris/v2/order) — HMAC-SHA256 signed.
+ * Uses DOKU Direct QRIS API (POST /orders/v1/qris) — HMAC-SHA256 signed.
  * Returns the QR string (QRIS payload) for frontend rendering.
  */
 async function createDokuQrisOrder(orderData) {
     const { email, package_id, invoice_number, amount } = orderData;
 
-    const endpointPath = DOKU_QRIS_PATH; // /doku-qris/v2/order
+    const endpointPath = DOKU_QRIS_PATH; // /orders/v1/qris
     const requestId = 'QRIS-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
 
     // ── Minimal QRIS payload — only order.invoice_number + order.amount ──
@@ -835,16 +835,32 @@ async function createDokuQrisOrder(orderData) {
     });
 
     if (!resp.ok) {
-        const text = await resp.text();
-        throw new Error(`DOKU QRIS order failed (${resp.status}): ${text}`);
+        let errorBody = '';
+        try { errorBody = await resp.text(); } catch (_) { errorBody = '(unable to read response body)'; }
+        console.error(`  [doku-qris] DOKU returned ${resp.status}: ${errorBody.slice(0, 500)}`);
+
+        // Build a structured error with DOKU's own message if available
+        let dokusg = `DOKU API error (${resp.status})`;
+        try {
+            const parsed = JSON.parse(errorBody);
+            if (parsed.error)  dokusg = parsed.error;
+            if (parsed.message) dokusg = parsed.message;
+        } catch (_) { /* not JSON — use raw body */ }
+
+        const err = new Error(dokusg);
+        err.statusCode = resp.status;
+        err.dokuRaw = errorBody.slice(0, 1000);
+        throw err;
     }
 
     const data = await resp.json();
     console.log(`  [doku-qris] QRIS response: ${JSON.stringify(data)}`);
 
     // ── Extract QR string from DOKU QRIS response ──
-    const qrString = data.qris?.qr_string
-                  || data.qr_string
+    // Jokul V1 /orders/v1/qris returns: { qr_string: "...", ... }
+    // Also covers SNAP-style: { qris: { qr_string: "..." } }
+    const qrString = data.qr_string
+                  || data.qris?.qr_string
                   || data.response?.qris?.qr_string
                   || null;
 
@@ -4120,10 +4136,13 @@ app.post('/api/payment/request-qris', async (req, res) => {
             console.log(`  [payment] DOKU QRIS — invoice: ${invoiceNumber} | qr: ${qrString ? qrString.slice(0, 30) + '…' : 'N/A'}`);
         } catch (dokuErr) {
             console.error('  [payment] DOKU QRIS API call FAILED:', dokuErr.message);
-            return res.status(503).json({
+            // Use DOKU's status code if available (404→400, 401→401), else 502 Bad Gateway
+            const httpStatus = dokuErr.statusCode || 502;
+            return res.status(httpStatus).json({
                 success: false,
-                error: 'Layanan pembayaran sedang tidak tersedia',
-                message: 'Gagal menghubungi DOKU: ' + dokuErr.message
+                error: 'Gagal membuat QRIS — gateway pembayaran error',
+                message: dokuErr.message || 'DOKU API tidak merespon',
+                details: dokuErr.dokuRaw || null
             });
         }
 
@@ -4223,10 +4242,11 @@ app.post('/api/credits/top-up', async (req, res) => {
                 const txn2 = db2.transactions.find(t => t.invoice_number === invoiceNumber);
                 if (txn2) txn2.status = 'failed';
                 writeCreditsDB(db2);
-                return res.status(503).json({
+                const httpStatus = dokuErr.statusCode || 502;
+                return res.status(httpStatus).json({
                     success: false,
                     error: 'Layanan pembayaran sedang tidak tersedia',
-                    message: 'Gateway DOKU tidak dapat dijangkau. Silakan coba beberapa saat lagi.'
+                    message: 'Gateway DOKU tidak dapat dijangkau: ' + (dokuErr.message || 'unknown error')
                 });
             }
         }
