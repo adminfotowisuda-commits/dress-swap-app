@@ -804,8 +804,7 @@ async function createDokuCheckout(orderData) {
             line_items: [{ name: 'Credit Top-Up', price: amount, quantity: 1 }]
         },
         payment: {
-            payment_due_date: 60,
-            payment_method_types: ['QRIS']
+            payment_due_date: 60
         },
         customer: {
             name: customerName,
