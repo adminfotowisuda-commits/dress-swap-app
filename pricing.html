@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
     <script id="tailwind-config">
         try { tailwind.config = { darkMode: "class", theme: { extend: {
@@ -145,23 +146,20 @@
 
         <!-- Invoice Content -->
         <div id="invoice-content">
-            <!-- VA Card -->
-            <div style="background:#0c0e12;border:1px solid #30363D;border-radius:16px;padding:20px;margin-bottom:16px;">
+            <!-- QRIS Card -->
+            <div style="background:#0c0e12;border:1px solid #30363D;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;">
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-                    <div style="width:40px;height:40px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#60a5fa;">M</div>
-                    <div>
-                        <div style="font-size:12px;font-weight:700;" id="invoice-bank">Bank Mandiri</div>
-                        <div style="font-size:10px;color:#8B949E;">Virtual Account</div>
+                    <div style="width:40px;height:40px;background:rgba(157,91,255,0.15);border:1px solid rgba(157,91,255,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#9D5BFF;">QR</div>
+                    <div style="text-align:left;">
+                        <div style="font-size:12px;font-weight:700;">QRIS</div>
+                        <div style="font-size:10px;color:#8B949E;">Scan dengan e-wallet / m-banking</div>
                     </div>
                     <span style="margin-left:auto;font-size:10px;color:#8B949E;text-transform:uppercase;" id="invoice-status-badge">Menunggu</span>
                 </div>
 
-                <div style="margin-bottom:12px;">
-                    <div style="font-size:9px;color:#8B949E;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Nomor Virtual Account</div>
-                    <div class="va-display" id="invoice-va">—</div>
-                    <button onclick="copyVA()" id="copy-va-btn" style="margin-top:8px;width:100%;padding:10px;background:#161B22;border:1px solid #30363D;color:#8B949E;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-                        <i class="fa-solid fa-copy"></i> <span>Salin Nomor VA</span>
-                    </button>
+                <!-- QR Code Canvas -->
+                <div style="background:#fff;border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">
+                    <canvas id="invoice-qr-canvas" width="220" height="220" style="display:block;"></canvas>
                 </div>
 
                 <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(48,54,61,0.4);font-size:13px;">
@@ -199,7 +197,7 @@
 <!-- ═══ SCRIPTS ═══ -->
 <script>
 var API_BASE = window.location.origin;
-var _paymentState = { invoiceNumber:null, vaNumber:null, packageId:null, creditsGiven:0, countdownTimer:null, expiresAt:null };
+var _paymentState = { invoiceNumber:null, qrString:null, packageId:null, creditsGiven:0, countdownTimer:null, expiresAt:null };
 
 function getEmail() {
     try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; }
@@ -229,26 +227,26 @@ async function buyPackage(packageId, packageName, price, credits) {
             body: JSON.stringify({ email: email, package_id: packageId })
         });
         var data = await resp.json();
-        if (!data.success) { alert(data.error || 'Gagal membuat VA'); return; }
+        if (!data.success) { alert(data.error || 'Gagal membuat QRIS'); return; }
 
         _paymentState.invoiceNumber = data.invoice_number;
-        _paymentState.vaNumber = data.va_number;
+        _paymentState.qrString = data.qr_string;
         _paymentState.expiresAt = new Date(data.expires_at).getTime();
 
-        // If DOKU returned a redirect payment URL, open it directly — no invoice modal needed
-        if (data.payment_url) {
-            window.open(data.payment_url, '_blank');
-            return;
+        // Render QR code on canvas
+        var canvas = document.getElementById('invoice-qr-canvas');
+        if (canvas && data.qr_string) {
+            QRCode.toCanvas(canvas, data.qr_string, { width: 220, margin: 1 }, function(err) {
+                if (err) console.error('QR render error:', err);
+            });
         }
 
-        document.getElementById('invoice-va').textContent = formatVA(data.va_number);
-        document.getElementById('invoice-bank').textContent = data.bank_name;
         document.getElementById('invoice-amount').textContent = data.amount_formatted;
         document.getElementById('invoice-package').textContent = data.package_name + ' (+' + data.credits_given + ' kredit)';
 
         var instrHtml = '';
         (data.instructions || []).forEach(function(inst) {
-            instrHtml += '<div style="display:flex;gap:10px;font-size:12px;"><span style="width:22px;height:22px;border-radius:50%;background:rgba(0,209,255,0.08);border:1px solid rgba(0,209,255,0.2);color:#00D1FF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+inst.step+'</span><span style="color:#8B949E;">'+inst.text+'</span></div>';
+            instrHtml += '<div style="display:flex;gap:10px;font-size:12px;"><span style="width:22px;height:22px;border-radius:50%;background:rgba(157,91,255,0.08);border:1px solid rgba(157,91,255,0.2);color:#9D5BFF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+inst.step+'</span><span style="color:#8B949E;">'+inst.text+'</span></div>';
         });
         document.getElementById('invoice-instructions').innerHTML = instrHtml;
 
@@ -272,19 +270,6 @@ function closeInvoiceModal() {
     clearCountdown();
     document.getElementById('invoice-modal').classList.add('hidden');
     if (window._refreshCredits) window._refreshCredits();
-}
-
-function formatVA(va) { return va ? va.replace(/(\d{4})(?=\d)/g,'$1 ').trim() : '—'; }
-
-function copyVA() {
-    var raw = _paymentState.vaNumber || '';
-    if (!raw) return;
-    navigator.clipboard.writeText(raw).then(function() {
-        var btn = document.getElementById('copy-va-btn');
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Tersalin!</span>';
-        btn.style.color = '#22c55e';
-        setTimeout(function() { btn.innerHTML = '<i class="fa-solid fa-copy"></i> <span>Salin Nomor VA</span>'; btn.style.color = '#8B949E'; }, 2000);
-    }).catch(function() { /* fallback */ });
 }
 
 function startCountdown() {
