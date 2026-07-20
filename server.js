@@ -111,6 +111,7 @@ const googleAuthClient          = new OAuth2Client(GOOGLE_CLIENT_ID);
 const DOKU_BASE_URL             = process.env.DOKU_BASE_URL || 'https://api.doku.com';
 const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authorization/v1/access-token/b2b';
 const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
+const DOKU_CHECKOUT_PATH        = process.env.DOKU_CHECKOUT_PATH || '/checkout/v1/payment';
 
 // Credit cost mapping — per-generation pricing (trial phase)
 const CREDIT_COSTS = {
@@ -790,12 +791,13 @@ async function createDokuPaymentLink(accessToken, orderData) {
     const { email, package_id, invoice_number, amount } = orderData;
 
     // Build request body based on API type
-    const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
+    // 'checkout' → DOKU hosted checkout page (QRIS, VA, all active methods from dashboard)
+    // 'direct'   → legacy VA-only endpoint (virtual_account_info)
+    const apiType = 'checkout';
 
-    // Auto-select endpoint: SNAP BI Direct uses the dedicated VA endpoint.
-    // DOKU Checkout uses the env var (defaults to /checkout/v1/payment).
+    // Auto-select endpoint path
     const endpointPath = apiType === 'checkout'
-        ? DOKU_CREATE_VA_PATH
+        ? DOKU_CHECKOUT_PATH
         : '/doku-virtual-account/v2/payment-code';
 
     const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00');
@@ -4195,10 +4197,9 @@ app.post('/api/payment/request-va', async (req, res) => {
 
         // --- Attempt DOKU payment link creation ---
         // DOKU Checkout uses Client-Id + HMAC directly (no B2B token needed).
-        // DOKU Direct (SNAP BI) requires a B2B access token first.
-        const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
+        // Shows all active payment methods from merchant dashboard (QRIS, VA, etc.).
         try {
-            const token = null; // Legacy Non-SNAP — no B2B token needed
+            const token = null; // Checkout — no B2B token needed
             const dokuResult = await createDokuPaymentLink(token, {
                 email, package_id,
                 invoice_number: invoiceNumber,
@@ -4206,7 +4207,7 @@ app.post('/api/payment/request-va', async (req, res) => {
             });
             vaNumber = dokuResult.virtual_account_number || null;
             paymentUrl = dokuResult.payment_url || null;
-            console.log(`  [payment] DOKU ${apiType} — VA: ${vaNumber || 'N/A'} | paymentUrl: ${paymentUrl || 'N/A'}`);
+            console.log(`  [payment] DOKU checkout — VA: ${vaNumber || 'N/A'} | paymentUrl: ${paymentUrl || 'N/A'}`);
         } catch (dokuErr) {
             console.error('  [payment] DOKU API call FAILED:', dokuErr.message);
             return res.status(503).json({
@@ -4295,10 +4296,10 @@ app.post('/api/credits/top-up', async (req, res) => {
         }
 
         // --- Attempt DOKU payment link creation ---
-        const apiType = 'direct'; // TEMP: hardcoded — Hostinger env panel unresponsive
+        // DOKU Checkout — shows all active payment methods (QRIS, VA, etc.)
         let paymentResult = null;
         try {
-            const token = null; // Legacy Non-SNAP — no B2B token needed
+            const token = null; // Checkout — no B2B token needed
             paymentResult = await createDokuPaymentLink(token, {
                 email: email,
                 package_id: package_id,
