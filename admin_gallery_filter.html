@@ -817,6 +817,7 @@
                 formData.append('referenceImage1', state.modalSubjectFile, state.modalSubjectFile.name);
                 formData.append('backgroundPrompt', state.selectedRecord.prompt || '');
                 formData.append('filterTitle', state.selectedRecord.title || '');
+                formData.append('filterId', state.selectedRecord.generation_id || '');
                 formData.append('aspectRatio', state.modalRatio);
                 formData.append('width', state.modalDimensions.width.toString());
                 formData.append('height', state.modalDimensions.height.toString());

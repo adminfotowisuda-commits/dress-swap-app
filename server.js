@@ -2922,7 +2922,7 @@ app.post('/api/admin-gallery-filter/swap', upload.fields([
             return res.status(500).json({ error: 'Server not configured. Set LEONARDO_API_KEY in .env' });
         }
 
-        const { backgroundPrompt, filterTitle, aspectRatio, width, height } = req.body;
+        const { backgroundPrompt, filterTitle, filterId, aspectRatio, width, height } = req.body;
         const w = parseInt(width, 10);
         const h = parseInt(height, 10);
         if (!w || !h || w < 64 || h < 64) {
@@ -2935,6 +2935,14 @@ app.post('/api/admin-gallery-filter/swap', upload.fields([
         const subjectFile = req.files?.referenceImage1?.[0];
         if (!subjectFile) {
             return res.status(400).json({ error: 'Subject image (Image Reference 1) is required.' });
+        }
+
+        // Increment usage counter on the source filter (non-blocking)
+        if (filterId) {
+            db.Generation.updateOne(
+                { generation_id: filterId, type: 'filter-factory' },
+                { $inc: { usageCount: 1 } }
+            ).catch(err => console.warn('  [admin-filter] usageCount increment failed (non-fatal):', err.message));
         }
 
         // ── Capture user email — admin or public user ──────────────
@@ -3053,7 +3061,7 @@ app.post('/api/filter-gallery/swap', upload.fields([
             return res.status(500).json({ error: 'Server not configured. Set LEONARDO_API_KEY in .env' });
         }
 
-        const { backgroundPrompt, filterTitle, aspectRatio, width, height } = req.body;
+        const { backgroundPrompt, filterTitle, filterId, aspectRatio, width, height } = req.body;
         const w = parseInt(width, 10);
         const h = parseInt(height, 10);
         if (!w || !h || w < 64 || h < 64) {
@@ -3066,6 +3074,14 @@ app.post('/api/filter-gallery/swap', upload.fields([
         const subjectFile = req.files?.referenceImage1?.[0];
         if (!subjectFile) {
             return res.status(400).json({ error: 'Subject image (Image Reference 1) is required.' });
+        }
+
+        // Increment usage counter on the source filter (non-blocking)
+        if (filterId) {
+            db.Generation.updateOne(
+                { generation_id: filterId, type: 'filter-factory' },
+                { $inc: { usageCount: 1 } }
+            ).catch(err => console.warn('  [filter-gallery] usageCount increment failed (non-fatal):', err.message));
         }
 
         // This is a PUBLIC endpoint — always use the header/body email, NEVER admin.

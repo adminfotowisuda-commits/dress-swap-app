@@ -760,6 +760,7 @@
                 formData.append('referenceImage1', subjectFile, subjectFile.name);
                 formData.append('backgroundPrompt', state.selectedRecord.prompt || '');
                 formData.append('filterTitle', state.selectedRecord.title || '');
+                formData.append('filterId', state.selectedRecord.generation_id || '');
                 formData.append('aspectRatio', state.modalRatio || '2:3');
                 formData.append('width', String(state.modalDimensions.width));
                 formData.append('height', String(state.modalDimensions.height));

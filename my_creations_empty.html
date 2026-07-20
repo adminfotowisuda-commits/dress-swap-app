@@ -672,9 +672,9 @@ function startProcessingPoll(generationId, serverCreatedAt) {
               }
 
               if (foundRecord && foundRecord.url) {
-                // Build the real card and swap it in
-                var cardIdx = _creations.length; // will be inserted at end
-                _creations.push(foundRecord);
+                // Prepend so newest creation appears first (server returns newest-first order)
+                _creations.unshift(foundRecord);
+                var cardIdx = 0;
                 var newCard = buildCompletedCard(foundRecord, cardIdx);
                 if (cardEl.parentNode) {
                   cardEl.parentNode.replaceChild(newCard, cardEl);
