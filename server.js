@@ -1735,16 +1735,9 @@ app.post('/api/generate', upload.fields([
             return res.status(400).json({ error: 'Valid width and height are required.' });
         }
 
-        // --- Inject lighting style into the prompt -----------------------
-        const LIGHTING_PROMPT_INJECT = {
-            'Soft Light':       ', soft diffused lighting, gentle shadows, ethereal glow',
-            'Strobist':         ', strobist flash lighting, crisp definition, sharp shadows, high-key editorial',
-            'Natural Ambient':  ', natural ambient lighting, soft environmental illumination, realistic outdoor feel'
-        };
+        // --- Prompt is used EXACTLY as provided — no auto-injection ----
+        // Tags/lighting are saved for UI filtering only, NOT for prompt mutation.
         let finalPrompt = prompt.trim();
-        if (lighting && LIGHTING_PROMPT_INJECT[lighting]) {
-            finalPrompt = finalPrompt + ' ' + LIGHTING_PROMPT_INJECT[lighting];
-        }
 
         console.log(`\n=== New generation request ===`);
         console.log(`  Prompt: "${finalPrompt.slice(0, 80)}${finalPrompt.length > 80 ? '…' : ''}"`);
