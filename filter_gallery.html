@@ -253,7 +253,6 @@
         'use strict';
 
         const API_BASE = window.location.origin;
-        const STORAGE_KEY = 'filter_visibility_states';
 
         const ASPECT_RATIO_DIMENSIONS = {
             '2:3': { width: 1696, height: 2528 },
@@ -287,25 +286,6 @@
             modalRatio: '2:3',
             modalDimensions: ASPECT_RATIO_DIMENSIONS['2:3']
         };
-
-        // =====================================================
-        // LOCALSTORAGE â€” read visibility from admin toggles
-        // =====================================================
-
-        function getActiveFilters() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                return raw ? JSON.parse(raw) : {};
-            } catch (_) {
-                return {};
-            }
-        }
-
-        function isFilterVisible(filterId) {
-            const active = getActiveFilters();
-            if (!active.hasOwnProperty(filterId)) return true;
-            return active[filterId] === true;
-        }
 
         // =====================================================
         // IMAGE GRID LOADING
@@ -344,10 +324,10 @@
                 state.records.forEach((record, index) => {
                     const filterId = record.generation_id || `filter-${index}`;
 
-                    // Check admin visibility toggle â€” hide if toggled OFF
-                    if (!isFilterVisible(filterId)) {
-                        return;
-                    }
+                    // Server already filters by isActive: { $ne: false } — no
+                    // client-side localStorage gate needed.  (The legacy
+                    // filter_visibility_states localStorage check was removed
+                    // because stale entries would hide toggled-on filters.)
 
                     visibleCount++;
 

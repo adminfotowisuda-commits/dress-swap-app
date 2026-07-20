@@ -237,19 +237,36 @@ function closePreviewModal() {
 
 // ═══ Toggle ═══
 async function toggleFilter(genId) {
-    var row = document.querySelector('[data-id="' + genId + '"]');
     try {
         var resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(genId) + '/toggle', { method: 'PATCH' });
         var data = await resp.json();
+        if (!resp.ok) {
+            console.error('[Toggle] Server returned ' + resp.status + ': ' + (data.error || 'Unknown error'));
+            alert('Gagal mengubah status filter. Server returned ' + resp.status + '.');
+            return;
+        }
         if (data.success) {
+            console.log('[Toggle] ' + genId + ' → isActive=' + data.isActive);
+            // Clear any stale localStorage entry that could block the public gallery
+            try {
+                var states = JSON.parse(localStorage.getItem('filter_visibility_states') || '{}');
+                if (states.hasOwnProperty(genId)) {
+                    delete states[genId];
+                    localStorage.setItem('filter_visibility_states', JSON.stringify(states));
+                }
+            } catch (_) {}
             // Update local state
             var f = findFilter(genId);
             if (f) f.isActive = data.isActive;
             // Re-render the row to update toggle icon and status badge
             loadFilters();
+        } else {
+            console.error('[Toggle] API returned success=false:', data);
+            alert('Gagal mengubah status filter: ' + (data.error || 'Unknown error'));
         }
     } catch (err) {
-        console.error('Toggle failed:', err);
+        console.error('[Toggle] Network/fetch error:', err.message || err);
+        alert('Gagal terhubung ke server. Periksa koneksi Anda.');
     }
 }
 

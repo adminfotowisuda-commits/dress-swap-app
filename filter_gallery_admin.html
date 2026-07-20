@@ -481,12 +481,31 @@
             try {
                 const resp = await fetch(API_BASE + '/api/admin/filters/' + encodeURIComponent(filterId) + '/toggle', { method: 'PATCH' });
                 const data = await resp.json();
+                if (!resp.ok) {
+                    console.error('[Toggle] Server returned ' + resp.status + ': ' + (data.error || 'Unknown error'));
+                    showCustomAlert('Gagal mengubah status filter. Server returned ' + resp.status + '.');
+                    return;
+                }
                 if (data.success) {
+                    console.log('[Toggle] ' + filterId + ' → isActive=' + data.isActive);
+                    // Also clear any stale localStorage entry that could block the public gallery
+                    try {
+                        var states = JSON.parse(localStorage.getItem('filter_visibility_states') || '{}');
+                        if (states.hasOwnProperty(filterId)) {
+                            delete states[filterId];
+                            localStorage.setItem('filter_visibility_states', JSON.stringify(states));
+                            console.log('[Toggle] Cleared stale localStorage entry for ' + filterId);
+                        }
+                    } catch (_) {}
                     // Refresh list to update toggle icon + status
                     loadImages();
+                } else {
+                    console.error('[Toggle] API returned success=false:', data);
+                    showCustomAlert('Gagal mengubah status filter: ' + (data.error || 'Unknown error'));
                 }
             } catch (err) {
-                console.error('Toggle failed:', err);
+                console.error('[Toggle] Network/fetch error:', err.message || err);
+                showCustomAlert('Gagal terhubung ke server. Periksa koneksi Anda.');
             }
         }
 
