@@ -1549,13 +1549,16 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                         dimensions: ratioLabel,
                         ratio: record._ratio || ratioLabel,
                         reference_image_1_path: persistedRefs?.ref1 || null,
-                        reference_image_2_path: persistedRefs?.ref2 || null,
-                        reference_image_1_url: '',
-                        reference_image_2_url: ''
+                        reference_image_2_path: persistedRefs?.ref2 || null
+                        // NOTE: Do NOT set reference_image_*_url here.
+                        // The immediate Cloudinary upload in the endpoint handler already
+                        // set these URLs. If we include them as empty strings, a failed
+                        // re-upload below would overwrite the good URL with ''.
                     };
 
-                    // Upload reference images to Cloudinary so they survive redeploys
-                    // The local paths in reference_image_*_path get wiped on each deploy.
+                    // Upload reference images to Cloudinary so they survive redeploys.
+                    // This is a fallback — the endpoint handler already did an immediate
+                    // upload, but if that was skipped (legacy records), try again here.
                     for (const [idx, refPath] of [[1, persistedRefs?.ref1], [2, persistedRefs?.ref2]]) {
                         if (!refPath) continue;
                         const absRefPath = path.join(__dirname, refPath);
