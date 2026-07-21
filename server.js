@@ -1730,6 +1730,22 @@ app.post('/api/generate', upload.fields([
                 } catch (err) {
                     console.error(`  Upload failed for ${fieldName}:`, err.message);
                 }
+
+                // 3) Immediately upload reference image to Cloudinary
+                //    so the "Before" image survives Hostinger redeploys
+                //    (local ephemeral storage is wiped on every deploy).
+                try {
+                    const refUpload = await db.uploadToCloudinary(file.buffer, 'references', `ref_${localGenId}_${slot}`);
+                    if (refUpload && refUpload.url) {
+                        await db.Generation.findOneAndUpdate(
+                            { generation_id: localGenId },
+                            { $set: { [`reference_image_${slot}_url`]: refUpload.url } }
+                        );
+                        console.log(`  [cloudinary] Ref image ${slot} uploaded → ${refUpload.url}`);
+                    }
+                } catch (uploadErr) {
+                    console.error(`  [cloudinary] Ref image ${slot} upload failed (non-fatal):`, uploadErr.message);
+                }
             }
         }
 
@@ -2907,6 +2923,22 @@ app.post('/api/admin-gallery-filter/swap', upload.fields([
         // Save subject locally
         const localPath1 = await saveReferenceImageLocally(subjectFile.buffer, localGenId, 1, subjectFile.mimetype);
 
+        // Immediately upload reference image to Cloudinary so the
+        // "Before" image survives Hostinger redeploys (local ephemeral
+        // storage is wiped on every deploy).
+        try {
+            const refUpload = await db.uploadToCloudinary(subjectFile.buffer, 'references', `ref_${localGenId}_1`);
+            if (refUpload && refUpload.url) {
+                await db.Generation.findOneAndUpdate(
+                    { generation_id: localGenId },
+                    { $set: { reference_image_1_url: refUpload.url } }
+                );
+                console.log(`  [cloudinary] Ref image uploaded → ${refUpload.url}`);
+            }
+        } catch (uploadErr) {
+            console.error(`  [cloudinary] Ref image upload failed (non-fatal):`, uploadErr.message);
+        }
+
         // Upload subject to Leonardo
         const subjectImageId = await uploadImageToLeonardo(subjectFile.buffer, subjectFile.originalname, subjectFile.mimetype);
         console.log(`  [admin-filter] Subject Leonardo ID: ${subjectImageId}`);
@@ -3040,6 +3072,22 @@ app.post('/api/filter-gallery/swap', upload.fields([
 
         // Save subject locally
         const localPath1 = await saveReferenceImageLocally(subjectFile.buffer, localGenId, 1, subjectFile.mimetype);
+
+        // Immediately upload reference image to Cloudinary so the
+        // "Before" image survives Hostinger redeploys (local ephemeral
+        // storage is wiped on every deploy).
+        try {
+            const refUpload = await db.uploadToCloudinary(subjectFile.buffer, 'references', `ref_${localGenId}_1`);
+            if (refUpload && refUpload.url) {
+                await db.Generation.findOneAndUpdate(
+                    { generation_id: localGenId },
+                    { $set: { reference_image_1_url: refUpload.url } }
+                );
+                console.log(`  [cloudinary] Ref image uploaded → ${refUpload.url}`);
+            }
+        } catch (uploadErr) {
+            console.error(`  [cloudinary] Ref image upload failed (non-fatal):`, uploadErr.message);
+        }
 
         // Upload subject to Leonardo
         const subjectImageId = await uploadImageToLeonardo(subjectFile.buffer, subjectFile.originalname, subjectFile.mimetype);
