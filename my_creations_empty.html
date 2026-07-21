@@ -203,7 +203,7 @@
     </button>
     <span style="font-size:20px;font-weight:700;color:#fff;">fotowisuda.ai</span>
   </div>
-  <span style=”font-size:11px;color:#8B949E;” id=”user-badge”>—</span>
+  <span style=”font-size:11px;color:#8B949E;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;” id=”user-badge”>—</span>
 </header>
 
 <!-- MAIN -->
@@ -339,7 +339,8 @@ function renderAuth() {
       '<i class="fa-solid fa-right-to-bracket"></i> Masuk Sesi</button>';
   }
   var badge = document.getElementById('user-badge');
-  if (badge) badge.textContent = email || 'Guest';
+  var shortName = email ? email.split('@')[0].split('.')[0] : '';
+  if (badge) badge.textContent = (shortName.charAt(0).toUpperCase() + shortName.slice(1)) || 'Guest';
 }
 
 function doLogin() {

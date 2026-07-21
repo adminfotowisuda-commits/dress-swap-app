@@ -1766,7 +1766,7 @@
                 var users = getUsers();
                 if (!users[email]) {
                     var colors = ['from-cyan-500 to-purple-600','from-purple-500 to-pink-600','from-emerald-500 to-cyan-600','from-amber-500 to-rose-600','from-blue-500 to-indigo-600'];
-                    var namePart = email.split('@')[0];
+                    var namePart = email.split('@')[0].split('.')[0];
                     var dn = namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/[._-]/g, ' ');
                     users[email] = { displayName: dn, gradient: colors[Math.floor(Math.random()*colors.length)], initial: dn.charAt(0).toUpperCase(), createdAt: new Date().toISOString() };
                     saveUsers(users);

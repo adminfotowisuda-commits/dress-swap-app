@@ -126,7 +126,8 @@ function renderUserProfile() {
     }
 
     if (email) {
-        var namePart = email.split('@')[0];
+        // Derive short name: first segment before '@', split by '.', capitalize
+        var namePart = email.split('@')[0].split('.')[0];
         var displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
         var initials = namePart.substring(0, 2).toUpperCase();
         el.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' +

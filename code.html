@@ -483,7 +483,7 @@
             var activeEmail = safeStorage.getItem('active_user_email');
 
             if (activeEmail) {
-                var namePrefix = activeEmail.split('@')[0];
+                var namePrefix = activeEmail.split('@')[0].split('.')[0];
                 var displayName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1);
                 var initials = namePrefix.substring(0, 2).toUpperCase();
 
@@ -491,8 +491,8 @@
                     '<div class="flex items-center gap-3 p-2 bg-slate-950 border border-slate-800/80 rounded-xl">' +
                         '<div class="h-9 w-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase border border-cyan-400/20">' + initials + '</div>' +
                         '<div class="flex flex-col min-w-0">' +
-                            '<span class="text-[11px] font-bold text-white truncate">' + displayName + '</span>' +
-                            '<span class="text-[9px] text-slate-400 truncate">' + activeEmail + '</span>' +
+                            '<span class="text-[11px] font-bold text-white truncate max-w-[80px] sm:max-w-[120px] capitalize">' + displayName + '</span>' +
+                            '<span class="text-[9px] text-slate-400 truncate max-w-[80px] sm:max-w-[120px]">' + activeEmail + '</span>' +
                         '</div>' +
                     '</div>' +
                     '<button onclick="doLogout()" class="flex items-center justify-center gap-2 w-full py-2 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 text-red-300 text-[10px] font-bold rounded-xl transition-all">' +

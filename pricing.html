@@ -49,7 +49,7 @@
         </button>
         <a href="/" style="font-size:20px;font-weight:700;color:#fff;text-decoration:none;">fotowisuda.ai</a>
     </div>
-    <span style="font-size:11px;color:#8B949E;" id="user-badge">—</span>
+    <span style="font-size:11px;color:#8B949E;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="user-badge">—</span>
 </header>
 
 <!-- ═══ Unified Sidebar ═══ -->
@@ -204,7 +204,7 @@ function getEmail() {
 
 function fetchUserBadge() {
     var badge = document.getElementById('user-badge');
-    if (badge) { var e = getEmail(); badge.textContent = e || 'Guest'; }
+    if (badge) { var e = getEmail(); var shortName = e ? e.split('@')[0].split('.')[0] : ''; badge.textContent = shortName.charAt(0).toUpperCase() + shortName.slice(1) || 'Guest'; }
 }
 
 // ═══ Buy Package ═══
