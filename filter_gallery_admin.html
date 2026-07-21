@@ -302,6 +302,22 @@
             '4:3': { width: 2400, height: 1792 }
         };
 
+        function formatDimensions(record) {
+            if (record.width && record.height) {
+                return record.width + ' x ' + record.height + ' px';
+            }
+            var d = (record.dimensions || '');
+            var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            if (pxMatch) {
+                return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
+            }
+            var mapped = ASPECT_RATIO_DIMENSIONS[d];
+            if (mapped) {
+                return mapped.width + ' x ' + mapped.height + ' px';
+            }
+            return d || 'N/A';
+        }
+
         function getAspectClass(record) {
             const dims = (record.dimensions || '').toString();
             const match = dims.match(/(\d+)\s*[xx]\s*(\d+)/i);
@@ -605,7 +621,7 @@
                     const filterId = record.generation_id || `filter-${index}`;
                     const safeTitle = escapeHtml(record.title || record.prompt || 'Untitled');
                     const coverUrl = record.cover_image_path || record.image_url || '';
-                    const dims = record.dimensions || '—';
+                    const dims = formatDimensions(record);
                     const active = (record.isActive !== false); // null/undefined = active
 
                     const row = document.createElement('div');

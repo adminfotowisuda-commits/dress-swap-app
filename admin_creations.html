@@ -208,6 +208,28 @@
         const ADMIN_EMAIL = 'admin.fotowisuda@gmail.com';
         const API_BASE = window.location.origin;
 
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        function formatDimensions(record) {
+            if (record.width && record.height) {
+                return record.width + ' x ' + record.height + ' px';
+            }
+            var d = (record.dimensions || '');
+            var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            if (pxMatch) {
+                return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
+            }
+            var mapped = ASPECT_RATIO_DIMENSIONS[d];
+            if (mapped) {
+                return mapped.width + ' x ' + mapped.height + ' px';
+            }
+            return d || 'N/A';
+        }
+
         let allCreations = [];
         let pendingDeleteId = null;
         let pendingDeleteCard = null;
@@ -510,7 +532,7 @@
                     <h3 class="text-xs text-text-primary font-semibold truncate">${title}</h3>
                     ${tagsHtml}
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
+                        <span class="text-[10px] text-text-secondary">${formatDimensions(record)}</span>
                         <span class="text-[10px] text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">View &rarr;</span>
                     </div>
                 </div>
@@ -557,7 +579,7 @@
             document.getElementById('detail-image').src = detailImgUrl;
             document.getElementById('detail-title').textContent = record.title || 'Untitled';
             document.getElementById('detail-prompt').textContent = record.prompt || '';
-            document.getElementById('detail-dims').textContent = record.dimensions || 'N/A';
+            document.getElementById('detail-dims').textContent = formatDimensions(record);
             document.getElementById('detail-ratio').textContent = record.ratio || 'N/A';
             document.getElementById('detail-tags').textContent = Array.isArray(record.tags) ? record.tags.join(' · ') : '—';
             document.getElementById('detail-date').textContent = record.created_at

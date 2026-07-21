@@ -396,6 +396,26 @@
             '4:3': { width: 2400, height: 1792 }
         };
 
+        function formatDimensions(record) {
+            // Prefer actual width/height from the database
+            if (record.width && record.height) {
+                return record.width + ' x ' + record.height + ' px';
+            }
+            // If dimensions is already a pixel string (e.g. "1696 x 2528"), use it
+            var dims = (record.dimensions || '');
+            var pxMatch = dims.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            if (pxMatch) {
+                return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
+            }
+            // Fallback: map ratio string (e.g. "2:3") to pixel dimensions
+            var mapped = ASPECT_RATIO_DIMENSIONS[dims];
+            if (mapped) {
+                return mapped.width + ' x ' + mapped.height + ' px';
+            }
+            // Last resort
+            return dims || 'N/A';
+        }
+
         function getAspectClass(record) {
             const dims = (record.dimensions || '').toString();
             const match = dims.match(/(\d+)\s*[xx]\s*(\d+)/i);
@@ -492,7 +512,7 @@
                             <h3 class="filter-title text-xs text-text-primary font-semibold truncate">${safeTitle}</h3>
                             ${tagsHtml}
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
+                                <span class="text-[10px] text-text-secondary">${formatDimensions(record)}</span>
                                 <span class="text-[10px] text-electric-cyan opacity-0 group-hover:opacity-100 transition-opacity">Click to use &rarr;</span>
                             </div>
                             <!-- Visibility Toggle -->

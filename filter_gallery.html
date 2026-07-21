@@ -260,6 +260,22 @@
             '4:3': { width: 2400, height: 1792 }
         };
 
+        function formatDimensions(record) {
+            if (record.width && record.height) {
+                return record.width + ' x ' + record.height + ' px';
+            }
+            var dims = (record.dimensions || '');
+            var pxMatch = dims.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            if (pxMatch) {
+                return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
+            }
+            var mapped = ASPECT_RATIO_DIMENSIONS[dims];
+            if (mapped) {
+                return mapped.width + ' x ' + mapped.height + ' px';
+            }
+            return dims || 'N/A';
+        }
+
         function getAspectClass(record) {
             const dims = (record.dimensions || '').toString();
             const match = dims.match(/(\d+)\s*[xx]\s*(\d+)/i);
@@ -363,7 +379,7 @@
                             <h3 class="filter-title text-xs text-text-primary font-semibold truncate">${safeTitle}</h3>
                             ${tagsHtml}
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-text-secondary">${record.dimensions || 'N/A'}</span>
+                                <span class="text-[10px] text-text-secondary">${formatDimensions(record)}</span>
                                 <span class="text-[10px] text-electric-cyan">Click to use &rarr;</span>
                             </div>
                         </div>

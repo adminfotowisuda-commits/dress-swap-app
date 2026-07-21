@@ -127,6 +127,28 @@ var API_BASE = window.location.origin;
 var _filters = [];
 var _deleteTarget = null;
 
+var ASPECT_RATIO_DIMENSIONS = {
+    '2:3': { width: 1696, height: 2528 },
+    '4:5': { width: 1856, height: 2304 },
+    '4:3': { width: 2400, height: 1792 }
+};
+
+function formatDimensions(record) {
+    if (record.width && record.height) {
+        return record.width + ' x ' + record.height + ' px';
+    }
+    var d = (record.dimensions || '');
+    var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+    if (pxMatch) {
+        return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
+    }
+    var mapped = ASPECT_RATIO_DIMENSIONS[d];
+    if (mapped) {
+        return mapped.width + ' x ' + mapped.height + ' px';
+    }
+    return d || 'N/A';
+}
+
 // ═══ Load Filters ═══
 async function loadFilters() {
     var loading = document.getElementById('loading-state');
@@ -167,7 +189,7 @@ async function loadFilters() {
             var f = _filters[i];
             var coverUrl = f.cover_image_url || f.image_url || '';
             var title = f.title || 'Untitled';
-            var dims = f.dimensions || '—';
+            var dims = formatDimensions(f);
             var active = f.isActive !== false;
             var usage = f.usageCount || 0;
             var genId = f.generation_id || '';
@@ -223,7 +245,7 @@ function previewFilter(genId) {
     document.getElementById('preview-title').textContent = f.title || 'Untitled';
     document.getElementById('preview-cover').src = f.cover_image_url || f.image_url || '';
     document.getElementById('preview-tags').textContent = (f.tags && f.tags.length) ? f.tags.join(', ') : '—';
-    document.getElementById('preview-dims').textContent = f.dimensions || '—';
+    document.getElementById('preview-dims').textContent = formatDimensions(f);
     document.getElementById('preview-usage').textContent = f.usageCount || 0;
     document.getElementById('preview-status').innerHTML = f.isActive !== false
         ? '<span class="text-emerald-400 font-semibold">Active (visible to public)</span>'

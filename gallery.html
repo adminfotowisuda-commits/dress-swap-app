@@ -531,6 +531,28 @@
         const API_BASE = window.location.origin;
         const PAGE_SIZE = 24;  // records per page
 
+        const ASPECT_RATIO_DIMENSIONS = {
+            '2:3': { width: 1696, height: 2528 },
+            '4:5': { width: 1856, height: 2304 },
+            '4:3': { width: 2400, height: 1792 }
+        };
+
+        function formatDimensions(record) {
+            if (record.width && record.height) {
+                return record.width + ' x ' + record.height + ' px';
+            }
+            var d = (record.dimensions || '');
+            var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            if (pxMatch) {
+                return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
+            }
+            var mapped = ASPECT_RATIO_DIMENSIONS[d];
+            if (mapped) {
+                return mapped.width + ' x ' + mapped.height + ' px';
+            }
+            return d || 'N/A';
+        }
+
         // =====================================================
         // APPLICATION STATE
         // =====================================================
@@ -1323,7 +1345,7 @@
 
             // Dimensions
             const dimsEl = document.getElementById('detail-modal-dims');
-            if (dimsEl) dimsEl.textContent = record.dimensions || 'N/A';
+            if (dimsEl) dimsEl.textContent = formatDimensions(record);
 
             // Lighting — hide row when value is empty or N/A
             const lightingRow = document.getElementById('detail-modal-lighting-row');
