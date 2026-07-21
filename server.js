@@ -4083,6 +4083,18 @@ app.get('/api/user/transactions', async (req, res) => {
             return res.status(503).json({ error: 'Database unavailable.' });
         }
 
+        // ═══ Auto-expire pending transactions older than 60 minutes ═══
+        // If a user starts a payment but doesn't complete it within 60 min,
+        // the transaction is marked as failed and 0 credits are granted.
+        const cutoff = new Date(Date.now() - 60 * 60 * 1000); // 60 minutes ago
+        const expiredResult = await db.Transaction.updateMany(
+            { email, status: 'pending', created_at: { $lt: cutoff } },
+            { $set: { status: 'failed', credits: 0 } }
+        );
+        if (expiredResult.modifiedCount > 0) {
+            console.log(`  [api/user/transactions] Auto-expired ${expiredResult.modifiedCount} pending transaction(s) for ${email}`);
+        }
+
         const packages = getCreditPackages();
         // Only return actual purchases (top-up) — exclude usage/deduction/refund records
         const txns = await db.Transaction.find({ email, type: { $nin: ['usage', 'deduction'] } }).sort({ created_at: -1 }).lean();
