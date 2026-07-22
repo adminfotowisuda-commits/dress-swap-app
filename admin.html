@@ -86,10 +86,10 @@
         /* Admin Overview Dashboard */
         .overview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             width: 100%;
-            max-width: 900px;
+            max-width: 100%;
         }
         .overview-card {
             background: rgba(15, 23, 42, 0.7);
@@ -167,7 +167,7 @@
     </style>
 </head>
 
-<body class="flex min-h-screen bg-slate-950 text-slate-100 overflow-hidden">
+<body class="flex min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden">
 
     <!-- ============================================================
          TEXT-ONLY SIDEBAR (desktop: always visible; mobile: overlay)
@@ -207,7 +207,7 @@
     <!-- ============================================================
          MAIN WORKSPACE
          ============================================================ -->
-    <main class="flex-grow flex flex-col items-center justify-center p-6 relative overflow-y-auto mt-12 md:mt-0 gap-8">
+    <main class="flex-grow flex flex-col items-center justify-center p-6 relative overflow-y-auto overflow-x-hidden mt-12 md:mt-0 gap-8">
 
         <!-- ═══ OVERVIEW DASHBOARD ═══ -->
         <div class="overview-grid z-10">
