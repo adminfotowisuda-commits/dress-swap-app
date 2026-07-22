@@ -27,7 +27,7 @@ const testPayload = {
     status: 'SUCCESS'
   },
   additional_info: {
-    package_id: 'pkg_trial_11k'
+    package_id: 'pkg_populer_49k'
   },
   customer: {
     email: 'bambang@gmail.com'

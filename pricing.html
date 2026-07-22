@@ -27,10 +27,11 @@
         @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
         .pkg-card{cursor:pointer;transition:all 0.3s ease;background:#161B22;border:1px solid #30363D;border-radius:1.5rem;position:relative;overflow:hidden}
         .pkg-card:hover{transform:translateY(-4px)}
-        .pkg-card.basic:hover{border-color:#00D1FF;box-shadow:0 12px 32px rgba(0,209,255,0.12)}
+        .pkg-card.starter:hover{border-color:#00D1FF;box-shadow:0 12px 32px rgba(0,209,255,0.12)}
         .pkg-card.popular{border-color:rgba(157,91,255,0.5);box-shadow:0 0 30px rgba(157,91,255,0.08)}
         .pkg-card.popular:hover{border-color:#9D5BFF;box-shadow:0 12px 40px rgba(157,91,255,0.2)}
-        .pkg-card.pro:hover{border-color:#fbbf24;box-shadow:0 12px 32px rgba(251,191,36,0.12)}
+        .pkg-card.creator:hover{border-color:#fbbf24;box-shadow:0 12px 32px rgba(251,191,36,0.12)}
+        .pkg-card.studio:hover{border-color:#22c55e;box-shadow:0 12px 32px rgba(34,197,94,0.12)}
         .pkg-badge{position:absolute;top:14px;right:-32px;background:linear-gradient(135deg,#9D5BFF,#00D1FF);color:#fff;font-size:11px;font-weight:700;padding:6px 40px;transform:rotate(45deg);letter-spacing:0.05em;box-shadow:0 4px 12px rgba(157,91,255,0.3)}
         .va-display{font-family:'Courier New',monospace;font-size:1.2rem;font-weight:700;letter-spacing:0.12em;color:#F0F6FC;background:#0c0e12;border:1px dashed #30363D;border-radius:12px;padding:14px 18px;text-align:center;word-break:break-all}
         .countdown-warn{color:#fbbf24!important}
@@ -57,7 +58,7 @@
 <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('pricing');fetchUserBadge();});</script>
 
 <!-- MAIN -->
-<main style="min-height:calc(100vh - 57px);padding:32px 24px;max-width:960px;margin:0 auto;">
+<main style="min-height:calc(100vh - 57px);padding:32px 24px;max-width:1120px;margin:0 auto;">
     <!-- Hero -->
     <div style="text-align:center;margin-bottom:40px;">
         <h1 style="font-size:28px;font-weight:800;margin:0 0 8px;">Top-Up Your Credits</h1>
@@ -67,50 +68,65 @@
     </div>
 
     <!-- ═══ Package Cards ═══ -->
-    <div id="pricing-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-bottom:40px;">
+    <div id="pricing-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:40px;">
 
-        <!-- Card 1: Basic -->
-        <div class="pkg-card basic" style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+        <!-- Card 1: Starter -->
+        <div class="pkg-card starter" style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;">
             <div style="width:56px;height:56px;background:rgba(0,209,255,0.08);border:1px solid rgba(0,209,255,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:24px;color:#00D1FF;">
                 <i class="fa-solid fa-bolt"></i>
             </div>
-            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Paket Basic</h3>
-            <p style="font-size:12px;color:#8B949E;margin:0 0 16px;">Cocok untuk uji coba</p>
-            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 10.000</div>
-            <div style="font-size:14px;color:#00D1FF;font-weight:600;margin-bottom:20px;">+10 Credits</div>
-            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 1.000 / kredit</div>
-            <button onclick="buyPackage('pkg_trial_10k','Paket Basic',10000,10)" style="width:100%;padding:12px;border-radius:12px;background:rgba(0,209,255,0.1);border:1px solid rgba(0,209,255,0.25);color:#00D1FF;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,209,255,0.2)'" onmouseout="this.style.background='rgba(0,209,255,0.1)'">
+            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Starter</h3>
+            <p style="font-size:12px;color:#8B949E;margin:0 0 16px;">Cocok untuk memulai</p>
+            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 29.000</div>
+            <div style="font-size:14px;color:#00D1FF;font-weight:600;margin-bottom:20px;">+135 Credits</div>
+            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 215 / kredit</div>
+            <button onclick="buyPackage('pkg_starter_29k','Starter',29000,135)" style="width:100%;padding:12px;border-radius:12px;background:rgba(0,209,255,0.1);border:1px solid rgba(0,209,255,0.25);color:#00D1FF;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,209,255,0.2)'" onmouseout="this.style.background='rgba(0,209,255,0.1)'">
                 Buy Now
             </button>
         </div>
 
-        <!-- Card 2: Popular -->
+        <!-- Card 2: Populer -->
         <div class="pkg-card popular" style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;transform:scale(1.04);">
             <div class="pkg-badge">BEST VALUE</div>
             <div style="width:56px;height:56px;background:rgba(157,91,255,0.1);border:1px solid rgba(157,91,255,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;margin-top:8px;font-size:24px;color:#9D5BFF;">
                 <i class="fa-solid fa-crown"></i>
             </div>
-            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Paket Popular</h3>
+            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Populer</h3>
             <p style="font-size:12px;color:#8B949E;margin:0 0 16px;">Nilai terbaik</p>
-            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 11.000</div>
-            <div style="font-size:14px;color:#9D5BFF;font-weight:600;margin-bottom:20px;">+20 Credits</div>
-            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 550 / kredit</div>
-            <button onclick="buyPackage('pkg_trial_11k','Paket Popular',11000,20)" class="btn-primary" style="width:100%;padding:12px;border-radius:12px;font-size:13px;">
+            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 49.000</div>
+            <div style="font-size:14px;color:#9D5BFF;font-weight:600;margin-bottom:20px;">+248 Credits</div>
+            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 198 / kredit</div>
+            <button onclick="buyPackage('pkg_populer_49k','Populer',49000,248)" class="btn-primary" style="width:100%;padding:12px;border-radius:12px;font-size:13px;">
                 Buy Now
             </button>
         </div>
 
-        <!-- Card 3: Pro -->
-        <div class="pkg-card pro" style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+        <!-- Card 3: Creator -->
+        <div class="pkg-card creator" style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;">
             <div style="width:56px;height:56px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:24px;color:#fbbf24;">
                 <i class="fa-solid fa-rocket"></i>
             </div>
-            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Paket Pro</h3>
-            <p style="font-size:12px;color:#8B949E;margin:0 0 16px;">Kreator serius</p>
-            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 12.000</div>
-            <div style="font-size:14px;color:#fbbf24;font-weight:600;margin-bottom:20px;">+30 Credits</div>
-            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 400 / kredit</div>
-            <button onclick="buyPackage('pkg_trial_12k','Paket Pro',12000,30)" style="width:100%;padding:12px;border-radius:12px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(251,191,36,0.2)'" onmouseout="this.style.background='rgba(251,191,36,0.1)'">
+            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Creator</h3>
+            <p style="font-size:12px;color:#8B949E;margin:0 0 16px;">Untuk kreator serius</p>
+            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 149.000</div>
+            <div style="font-size:14px;color:#fbbf24;font-weight:600;margin-bottom:20px;">+826 Credits</div>
+            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 180 / kredit</div>
+            <button onclick="buyPackage('pkg_creator_149k','Creator',149000,826)" style="width:100%;padding:12px;border-radius:12px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(251,191,36,0.2)'" onmouseout="this.style.background='rgba(251,191,36,0.1)'">
+                Buy Now
+            </button>
+        </div>
+
+        <!-- Card 4: Studio -->
+        <div class="pkg-card studio" style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <div style="width:56px;height:56px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:24px;color:#22c55e;">
+                <i class="fa-solid fa-gem"></i>
+            </div>
+            <h3 style="font-size:18px;font-weight:700;margin:0 0 4px;">Studio</h3>
+            <p style="font-size:12px;color:#8B949E;margin:0 0 16px;">Produksi skala besar</p>
+            <div style="font-size:36px;font-weight:900;color:#fff;margin-bottom:4px;">Rp 299.000</div>
+            <div style="font-size:14px;color:#22c55e;font-weight:600;margin-bottom:20px;">+1.832 Credits</div>
+            <div style="font-size:11px;color:#8B949E;margin-bottom:20px;">≈ Rp 163 / kredit</div>
+            <button onclick="buyPackage('pkg_studio_299k','Studio',299000,1832)" style="width:100%;padding:12px;border-radius:12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22c55e;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.2)'" onmouseout="this.style.background='rgba(34,197,94,0.1)'">
                 Buy Now
             </button>
         </div>
@@ -118,7 +134,7 @@
 
     <!-- How it works -->
     <div style="text-align:center;padding:20px 0 40px;">
-        <p style="font-size:12px;color:#8B949E;">💡 Kredit tidak kedaluwarsa &bull; Generate Background Change = 2 kredit &bull; Dress Replicate = 2 kredit &bull; Filter Gallery = 1 kredit</p>
+        <p style="font-size:12px;color:#8B949E;">💡 Kredit akan hangus jika tidak ada aktivitas selama 1 bulan &bull; Background Change = 60 kredit &bull; Dress Replicate = 60 kredit &bull; Filter Gallery = 45 kredit</p>
     </div>
 </main>
 

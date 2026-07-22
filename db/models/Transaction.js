@@ -10,7 +10,7 @@ const transactionSchema = new mongoose.Schema({
     package_id:     { type: String, default: '' },
     amount:         { type: Number, default: 0 },       // IDR price (e.g. 10000)
     credits:        { type: Number, default: 0 },       // credits given (e.g. 10)
-    type:           { type: String, enum: ['top-up', 'refund', 'deduction', 'usage'], default: 'top-up' },
+    type:           { type: String, enum: ['top-up', 'refund', 'deduction', 'usage', 'gift', 'expiry'], default: 'top-up' },
     description:    { type: String, default: '' },
     status:         { type: String, enum: ['pending', 'success', 'refund', 'failed'], default: 'pending' },
     created_at:     { type: Date, default: Date.now }

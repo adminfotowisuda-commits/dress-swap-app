@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
     credits_balance: { type: Number, default: 0, min: 0 },
     role:            { type: String, enum: ['user', 'admin'], default: 'user' },
     created_at:      { type: Date, default: Date.now },
-    updated_at:      { type: Date, default: Date.now },
+    updated_at:         { type: Date, default: Date.now },
+    last_activity_date: { type: Date, default: Date.now },
     transactions:    [{
         id:          { type: String },
         amount:      { type: Number },

@@ -113,12 +113,12 @@ const DOKU_B2B_TOKEN_PATH       = process.env.DOKU_B2B_TOKEN_PATH || '/authoriza
 const DOKU_CREATE_VA_PATH       = process.env.DOKU_CREATE_VA_PATH || '/doku-virtual-account/v2/payment-code';
 const DOKU_CHECKOUT_PATH        = process.env.DOKU_CHECKOUT_PATH || '/checkout/v1/payment';
 
-// Credit cost mapping — per-generation pricing (trial phase)
+// Credit cost mapping — per-generation pricing
 const CREDIT_COSTS = {
-    '/api/background-swap':         2,
-    '/api/dress-swap/generate':     2,
-    '/api/admin-gallery-filter/swap': 1,
-    '/api/filter-gallery/swap':     1
+    '/api/background-swap':         60,
+    '/api/dress-swap/generate':     60,
+    '/api/admin-gallery-filter/swap': 45,
+    '/api/filter-gallery/swap':     45
 };
 
 // Human-readable action names for credit usage history
@@ -196,9 +196,10 @@ function ensureDirectories() {
 function ensureDatabase() {
     if (!fs.existsSync(DATABASE_PATH)) {
         const defaultPackages = [
-            { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
-            { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
-            { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+            { package_id: 'pkg_starter_29k',  name: 'Starter',  price: 29000,  credits_given: 135 },
+            { package_id: 'pkg_populer_49k',  name: 'Populer',  price: 49000,  credits_given: 248 },
+            { package_id: 'pkg_creator_149k', name: 'Creator',  price: 149000, credits_given: 826 },
+            { package_id: 'pkg_studio_299k',  name: 'Studio',   price: 299000, credits_given: 1832 }
         ];
         const unified = { users: {}, transactions: [], packages: defaultPackages, generations: [] };
         fs.writeFileSync(DATABASE_PATH, JSON.stringify(unified, null, 2), 'utf8');
@@ -210,9 +211,10 @@ function ensureDatabase() {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
                 const defaultPackages = [
-                    { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
-                    { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
-                    { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+                    { package_id: 'pkg_starter_29k',  name: 'Starter',  price: 29000,  credits_given: 135 },
+                    { package_id: 'pkg_populer_49k',  name: 'Populer',  price: 49000,  credits_given: 248 },
+                    { package_id: 'pkg_creator_149k', name: 'Creator',  price: 149000, credits_given: 826 },
+                    { package_id: 'pkg_studio_299k',  name: 'Studio',   price: 299000, credits_given: 1832 }
                 ];
                 const unified = { users: {}, transactions: [], packages: defaultPackages, generations: parsed };
                 fs.writeFileSync(DATABASE_PATH, JSON.stringify(unified, null, 2), 'utf8');
@@ -494,9 +496,10 @@ async function writeCreditsDB(_data) {
 }
 
 const DEFAULT_PACKAGES = [
-    { package_id: 'pkg_trial_10k',  name: 'Paket Basic',     price: 10000, credits_given: 10 },
-    { package_id: 'pkg_trial_11k',  name: 'Paket Popular',   price: 11000, credits_given: 20 },
-    { package_id: 'pkg_trial_12k',  name: 'Paket Pro',       price: 12000, credits_given: 30 }
+    { package_id: 'pkg_starter_29k',  name: 'Starter',  price: 29000,  credits_given: 135 },
+    { package_id: 'pkg_populer_49k',  name: 'Populer',  price: 49000,  credits_given: 248 },
+    { package_id: 'pkg_creator_149k', name: 'Creator',  price: 149000, credits_given: 826 },
+    { package_id: 'pkg_studio_299k',  name: 'Studio',   price: 299000, credits_given: 1832 }
 ];
 
 function getCreditPackages() {
@@ -522,7 +525,7 @@ async function ensureUserExists(email) {
     try {
         const user = await db.User.findOneAndUpdate(
             { email: key },
-            { $setOnInsert: { email: key, credits_balance: 0, created_at: new Date(), updated_at: new Date() } },
+            { $setOnInsert: { email: key, credits_balance: 0, created_at: new Date(), updated_at: new Date(), last_activity_date: new Date() } },
             { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
         );
         // If created_at is within the last second, it was just created
@@ -546,7 +549,7 @@ async function addCredits(email, amount, invoiceNumber) {
     // Increment user credit balance
     const user = await db.User.findOneAndUpdate(
         { email: key },
-        { $inc: { credits_balance: amount }, $set: { updated_at: new Date() } },
+        { $inc: { credits_balance: amount }, $set: { updated_at: new Date(), last_activity_date: new Date() } },
         { returnDocument: 'after' }
     );
 
@@ -570,7 +573,7 @@ async function deductCredits(email, amount, description) {
         { email: key, credits_balance: { $gte: amount } },
         {
             $inc: { credits_balance: -amount },
-            $set: { updated_at: new Date() },
+            $set: { updated_at: new Date(), last_activity_date: new Date() },
             $push: {
                 transactions: {
                     id: Date.now().toString(),
@@ -627,6 +630,51 @@ async function refundCredits(email, amount) {
         status: 'success'
     });
     console.log(`  [mongodb] REFUND +${amount} credits → ${key}`);
+}
+
+// ═══ Credit Expiration Logic ═══
+// If a user has no activity for >30 days, their credit balance resets to 0.
+// Called from the balance endpoint, auth handler, and the deduction middleware.
+async function checkAndExpireCredits(email) {
+    if (!db.isConnected()) return { expired: false, balance: null };
+    const key = email.trim().toLowerCase();
+    const user = await db.User.findOne({ email: key });
+    if (!user) return { expired: false, balance: null };
+
+    // Users with no last_activity_date yet (pre-migration) get it set now
+    if (!user.last_activity_date) {
+        await db.User.findOneAndUpdate(
+            { email: key },
+            { $set: { last_activity_date: new Date() } }
+        );
+        return { expired: false, balance: user.credits_balance };
+    }
+
+    const msSinceActivity = Date.now() - new Date(user.last_activity_date).getTime();
+    const daysSinceActivity = Math.floor(msSinceActivity / (1000 * 60 * 60 * 24));
+
+    if (daysSinceActivity > 30 && user.credits_balance > 0) {
+        const expiredAmount = user.credits_balance;
+        await db.User.findOneAndUpdate(
+            { email: key },
+            { $set: { credits_balance: 0, last_activity_date: new Date() } }
+        );
+        // Record the expiration as a transaction for audit trail
+        await db.Transaction.create({
+            invoice_number: 'expire_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            email: key,
+            amount: 0,
+            credits: -expiredAmount,
+            type: 'expiry',
+            description: 'Kredit hangus — tidak ada aktivitas selama 1 bulan',
+            status: 'success',
+            created_at: new Date()
+        });
+        console.log(`  [expiry] ${expiredAmount} credits expired for ${key} (last activity: ${user.last_activity_date})`);
+        return { expired: true, balance: 0 };
+    }
+
+    return { expired: false, balance: user.credits_balance };
 }
 
 // ------------------------------------------------------------------
@@ -3766,6 +3814,12 @@ async function validateAndDeductCredits(req, res, next) {
             });
         }
 
+        // ═══ Check and expire stale credits before deduction ═══
+        const expireResult = await checkAndExpireCredits(userEmail);
+        if (expireResult.balance !== null) {
+            user.credits_balance = expireResult.balance;
+        }
+
         if (user.credits_balance < creditCost) {
             return res.status(402).json({
                 success: false,
@@ -3816,17 +3870,24 @@ app.delete('/api/user/delete-account', async (req, res) => {
         const email = (req.body.email || '').trim().toLowerCase();
         if (!email) return res.status(400).json({ error: 'Email is required.' });
 
-        const db = await readCreditsDB();
-        if (db.users[email]) {
-            delete db.users[email];
-            // Remove user's transactions too
-            db.transactions = db.transactions.filter(t => t.email !== email);
-            writeCreditsDB(db);
-            console.log(`  [user] Account deleted: ${email}`);
-            res.json({ success: true, message: 'Account and all associated data deleted.' });
-        } else {
-            res.status(404).json({ error: 'User not found.' });
+        // ── MongoDB cleanup ──
+        if (db.isConnected()) {
+            await db.User.deleteOne({ email });
+            await db.Transaction.deleteMany({ email });
+            // Intentionally do NOT delete ClaimedWelcomeGift — permanent anti-abuse tracker
+            console.log(`  [user] MongoDB data deleted for: ${email}`);
         }
+
+        // ── Legacy database.json cleanup ──
+        const legacyDb = await readCreditsDB();
+        if (legacyDb.users && legacyDb.users[email]) {
+            delete legacyDb.users[email];
+            legacyDb.transactions = (legacyDb.transactions || []).filter(t => t.email !== email);
+            writeCreditsDB(legacyDb);
+            console.log(`  [user] Legacy database.json entry deleted: ${email}`);
+        }
+
+        res.json({ success: true, message: 'Account and all associated data deleted.' });
     } catch (err) {
         console.error('[/api/user/delete-account] Error:', err);
         res.status(500).json({ error: 'Failed to delete account.' });
@@ -3895,26 +3956,68 @@ app.post('/api/auth/google', async (req, res) => {
         try {
             user = await db.User.findOne({ email: key });
             if (user) {
+                // Existing user: update last_activity_date to track login activity
+                await db.User.findOneAndUpdate(
+                    { email: key },
+                    { $set: { last_activity_date: new Date() } }
+                );
                 console.log('[GOOGLE AUTH] Existing user found:', key);
             } else {
                 console.log('[GOOGLE AUTH] New Google user — creating account:', key);
+
+                // ── Anti-abuse: check if this email has ever claimed the welcome gift ──
+                let alreadyClaimed = false;
+                try {
+                    const claimed = await db.ClaimedWelcomeGift.findOne({ email: key });
+                    alreadyClaimed = !!claimed;
+                } catch (_) { /* collection may not exist yet — safe fallback */ }
+
                 user = await db.User.create({
                     email: key,
                     password: crypto.randomBytes(16).toString('hex'),
-                    credits_balance: 0
+                    credits_balance: alreadyClaimed ? 0 : 60,
+                    last_activity_date: new Date()
                 });
+
+                if (!alreadyClaimed) {
+                    // Permanent record: this email can never claim the welcome gift again
+                    try {
+                        await db.ClaimedWelcomeGift.create({ email: key, claimed_at: new Date() });
+                    } catch (claimErr) {
+                        if (claimErr.code !== 11000) console.error('[GOOGLE AUTH] ClaimedWelcomeGift create error:', claimErr.message);
+                    }
+                    // Record the gift as a transaction for the purchase history modal
+                    await db.Transaction.create({
+                        invoice_number: 'gift_welcome_' + Date.now(),
+                        email: key,
+                        amount: 0,
+                        credits: 60,
+                        type: 'gift',
+                        description: 'New Account Gift',
+                        status: 'success',
+                        created_at: new Date()
+                    });
+                    console.log(`[GOOGLE AUTH] Welcome gift of 60 credits granted to ${key}`);
+                } else {
+                    console.log(`[GOOGLE AUTH] ${key} already claimed welcome gift before — no bonus credits`);
+                }
+
                 isNewUser = true;
-                console.log(`[GOOGLE AUTH] New user created in MongoDB: ${key} (0 credits)`);
+                console.log(`[GOOGLE AUTH] New user created in MongoDB: ${key} (${user.credits_balance} credits)`);
             }
         } catch (dbErr) {
             console.error('[GOOGLE AUTH] MongoDB error:', dbErr.message);
             return res.status(500).json({ success: false, error: 'Database error. Please try again later.' });
         }
 
+        // ═══ Check and apply credit expiration before returning balance ═══
+        const expireResult = await checkAndExpireCredits(key);
+        const effectiveBalance = expireResult.balance !== null ? expireResult.balance : (user.credits_balance || 0);
+
         const responsePayload = {
             success: true,
             email: key,
-            credits_balance: user.credits_balance || 0,
+            credits_balance: effectiveBalance,
             created_at: user.created_at || new Date().toISOString(),
             is_new_user: isNewUser
         };
@@ -4053,12 +4156,17 @@ app.get('/api/credits/balance', async (req, res) => {
         if (!user) {
             return res.status(503).json({ error: 'Layanan sementara tidak tersedia. Silakan coba lagi.' });
         }
+
+        // ═══ Check and expire stale credits ═══
+        const expireResult = await checkAndExpireCredits(email);
+
         const packages = getCreditPackages();
         res.json({
             email: user.email,
-            credits_balance: user.credits_balance,
+            credits_balance: expireResult.balance !== null ? expireResult.balance : (user.credits_balance || 0),
             created_at: user.created_at || new Date().toISOString(),
-            packages: packages
+            packages: packages,
+            credits_expired: expireResult.expired || false
         });
     } catch (err) {
         console.error('[/api/credits/balance] Error:', err);
@@ -4099,14 +4207,20 @@ app.get('/api/user/transactions', async (req, res) => {
         }
 
         const packages = getCreditPackages();
-        // Only return actual purchases (top-up) — exclude usage/deduction/refund records
-        const txns = await db.Transaction.find({ email, type: { $nin: ['usage', 'deduction'] } }).sort({ created_at: -1 }).lean();
+        // Only return purchases/refunds/gifts — exclude usage, deduction, and expiry records
+        const txns = await db.Transaction.find({ email, type: { $nin: ['usage', 'deduction', 'expiry'] } }).sort({ created_at: -1 }).lean();
 
         const enriched = txns.map(txn => {
             const pkg = packages.find(p => p.package_id === txn.package_id);
             const amount = txn.amount || 0;
             let credits = txn.credits || pkg?.credits_given || 0;
-            let packageName = pkg ? pkg.name : (txn.package_id || '');
+            // Gift transactions use description as package name
+            let packageName;
+            if (txn.type === 'gift') {
+                packageName = txn.description || 'New Account Gift';
+            } else {
+                packageName = pkg ? pkg.name : (txn.package_id || '');
+            }
             if (!packageName && !txn.package_id) packageName = amount > 0 ? amount + ' Kredit' : '—';
 
             return {
@@ -4431,9 +4545,10 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             const amountRaw = Math.round(parseFloat(req.body.AMOUNT || '0'));
 
             // Map amount to credits and package
-            if (amountRaw === 10000) { packageId = 'pkg_trial_10k'; }
-            else if (amountRaw === 11000) { packageId = 'pkg_trial_11k'; }
-            else if (amountRaw === 12000) { packageId = 'pkg_trial_12k'; }
+            if (amountRaw === 29000) { packageId = 'pkg_starter_29k'; }
+            else if (amountRaw === 49000) { packageId = 'pkg_populer_49k'; }
+            else if (amountRaw === 149000) { packageId = 'pkg_creator_149k'; }
+            else if (amountRaw === 299000) { packageId = 'pkg_studio_299k'; }
             else { packageId = ''; }
 
             console.log(`  [doku-callback] LEGACY — invoice: ${invoice_number}, status: ${statusCode}, amount: ${amountRaw}, email: ${userEmail}, pkg: ${packageId}`);
@@ -4460,9 +4575,10 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             // Priority: explicit package_id from additional_info, then map from amount
             packageId = req.body.additional_info?.package_id || '';
             if (!packageId) {
-                if (amountRaw === 10000)      { packageId = 'pkg_trial_10k'; }
-                else if (amountRaw === 11000) { packageId = 'pkg_trial_11k'; }
-                else if (amountRaw === 12000) { packageId = 'pkg_trial_12k'; }
+                if (amountRaw === 29000)      { packageId = 'pkg_starter_29k'; }
+                else if (amountRaw === 49000)  { packageId = 'pkg_populer_49k'; }
+                else if (amountRaw === 149000) { packageId = 'pkg_creator_149k'; }
+                else if (amountRaw === 299000) { packageId = 'pkg_studio_299k'; }
             }
 
             // Try to extract email from various nested locations, or fall back to transaction lookup

@@ -6,9 +6,10 @@
  */
 const { connectDB, isConnected, mongoose } = require('./connection');
 const { uploadToCloudinary, CLOUDINARY_CONFIGURED } = require('./cloudinary');
-const User        = require('./models/User');
-const Transaction = require('./models/Transaction');
-const Generation  = require('./models/Generation');
+const User               = require('./models/User');
+const Transaction        = require('./models/Transaction');
+const Generation         = require('./models/Generation');
+const ClaimedWelcomeGift = require('./models/ClaimedWelcomeGift');
 
 // Re-export everything
 module.exports = {
@@ -18,6 +19,7 @@ module.exports = {
     User,
     Transaction,
     Generation,
+    ClaimedWelcomeGift,
     uploadToCloudinary,
     CLOUDINARY_CONFIGURED
 };
