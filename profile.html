@@ -346,7 +346,7 @@ async function loadProfile() {
     try {
         var resp = await fetch(API_BASE + '/api/credits/balance?email=' + encodeURIComponent(email));
         var data = await resp.json();
-        document.getElementById('profile-credits').textContent = 'Sisa Kredit: ' + (data.credits_balance || 0) + ' Credits';
+        document.getElementById('profile-credits').innerHTML = '<span style="display:flex;align-items:center;gap:6px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><ellipse cx="12" cy="6" rx="10" ry="3"/><path d="M2 6v6c0 1.66 4.48 3 10 3s10-1.34 10-3V6"/><path d="M2 12v6c0 1.66 4.48 3 10 3s10-1.34 10-3v-6"/></svg> ' + (data.credits_balance || 0) + ' Credits</span>';
         if (data.created_at) {
             var d = new Date(data.created_at);
             var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -355,7 +355,7 @@ async function loadProfile() {
             document.getElementById('profile-created').textContent = 'Akun dibuat pada: ' + new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
         }
     } catch(err) {
-        document.getElementById('profile-credits').textContent = 'Sisa Kredit: — Credits';
+        document.getElementById('profile-credits').innerHTML = '<span style="display:flex;align-items:center;gap:6px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><ellipse cx="12" cy="6" rx="10" ry="3"/><path d="M2 6v6c0 1.66 4.48 3 10 3s10-1.34 10-3V6"/><path d="M2 12v6c0 1.66 4.48 3 10 3s10-1.34 10-3v-6"/></svg> — Credits</span>';
         document.getElementById('profile-created').textContent = 'Akun dibuat pada: —';
     }
 }

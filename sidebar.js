@@ -82,7 +82,8 @@ function injectSidebarHTML() {
     html += '<span style="font-size:10px;font-weight:700;color:#5c6370;text-transform:uppercase;letter-spacing:0.15em;">💰 Kredit</span>';
     html += '<button onclick="window._openTopUp()" style="background:rgba(0,209,255,0.1);border:1px solid rgba(0,209,255,0.2);color:#00D1FF;padding:4px 12px;border-radius:20px;font-size:9px;font-weight:700;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background=\'rgba(0,209,255,0.2)\';this.style.borderColor=\'rgba(0,209,255,0.4)\'" onmouseout="this.style.background=\'rgba(0,209,255,0.1)\';this.style.borderColor=\'rgba(0,209,255,0.2)\'">Isi Ulang</button>';
     html += '</div>';
-    html += '<div style="display:flex;align-items:baseline;gap:4px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    html += '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00D1FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><ellipse cx="12" cy="6" rx="10" ry="3"/><path d="M2 6v6c0 1.66 4.48 3 10 3s10-1.34 10-3V6"/><path d="M2 12v6c0 1.66 4.48 3 10 3s10-1.34 10-3v-6"/></svg>';
     html += '<span id="unified-credit-balance" style="font-size:20px;font-weight:800;color:#F0F6FC;">—</span>';
     html += '<span style="font-size:10px;color:#8B949E;">kredit</span>';
     html += '</div>';
