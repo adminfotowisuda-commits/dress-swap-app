@@ -2942,14 +2942,6 @@ app.post('/api/admin-gallery-filter/swap', upload.fields([
             return res.status(400).json({ error: 'Subject image (Image Reference 1) is required.' });
         }
 
-        // Increment usage counter on the source filter (non-blocking)
-        if (filterId) {
-            db.Generation.updateOne(
-                { generation_id: filterId, type: 'filter-factory' },
-                { $inc: { usageCount: 1 } }
-            ).catch(err => console.warn('  [admin-filter] usageCount increment failed (non-fatal):', err.message));
-        }
-
         // ── Capture user email — admin or public user ──────────────
         // Public users pass email via X-User-Email header (set by filter_gallery.html).
         // Admin users already have a session cookie and may not send the header.
@@ -2957,6 +2949,18 @@ app.post('/api/admin-gallery-filter/swap', upload.fields([
         const ownerEmail = isAdmin
             ? ADMIN_EMAIL
             : (req.headers['x-user-email'] || req.body.email || '');
+
+        // Increment usage counter on the source filter (non-blocking)
+        // Admin test-runs are excluded so usage metrics reflect real customer activity
+        if (filterId && !isAdmin) {
+            db.Generation.updateOne(
+                { generation_id: filterId, type: 'filter-factory' },
+                { $inc: { usageCount: 1 } }
+            ).catch(err => console.warn('  [admin-filter] usageCount increment failed (non-fatal):', err.message));
+        }
+
+        // ── Rest of flow ──
+        // (isAdmin and ownerEmail already resolved above)
 
         const prompt = backgroundPrompt.trim();
 
