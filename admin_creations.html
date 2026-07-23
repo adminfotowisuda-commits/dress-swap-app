@@ -210,9 +210,11 @@
         const API_BASE = window.location.origin;
 
         const ASPECT_RATIO_DIMENSIONS = {
-            '2:3': { width: 1696, height: 2528 },
-            '4:5': { width: 1856, height: 2304 },
-            '4:3': { width: 2400, height: 1792 }
+            '1:1':  { width: 2048, height: 2048 },
+            '2:3':  { width: 1696, height: 2528 },
+            '4:5':  { width: 1856, height: 2304 },
+            '9:16': { width: 1536, height: 2752 },
+            '3:2':  { width: 2528, height: 1696 }
         };
 
         function formatDimensions(record) {

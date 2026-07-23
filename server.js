@@ -1675,11 +1675,13 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
  */
 function dimensionToRatioLabel(width, height) {
     const ratio = width / height;
-    if      (Math.abs(ratio - (2 / 3))  < 0.05) return '2:3';
+    if      (Math.abs(ratio - (9 / 16)) < 0.05) return '9:16';
+    else if (Math.abs(ratio - (2 / 3))  < 0.05) return '2:3';
     else if (Math.abs(ratio - (4 / 5))  < 0.05) return '4:5';
-    else if (Math.abs(ratio - (4 / 3))  < 0.05) return '4:3';
-    else if (Math.abs(ratio - (16 / 9)) < 0.05) return '16:9';
     else if (Math.abs(ratio - (1 / 1))  < 0.05) return '1:1';
+    else if (Math.abs(ratio - (4 / 3))  < 0.05) return '4:3';
+    else if (Math.abs(ratio - (3 / 2))  < 0.05) return '3:2';
+    else if (Math.abs(ratio - (16 / 9)) < 0.05) return '16:9';
     else return `${width}×${height}`;
 }
 

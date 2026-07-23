@@ -379,17 +379,21 @@
                     </label>
                     <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden"
                          id="ratio-container">
-                        <div class="ratio-slider absolute top-1 bottom-1 left-1 w-[calc(33.33%-4px)] bg-electric-cyan rounded-lg z-0"
+                        <div class="ratio-slider absolute top-1 bottom-1 left-1 w-[calc(20%-3.2px)] bg-electric-cyan rounded-lg z-0"
                              id="ratioHighlight"></div>
-                        <button class="ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300"
-                                data-ratio="2:3">2:3</button>
-                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300"
-                                data-ratio="4:5">4:5</button>
-                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300"
-                                data-ratio="4:3">4:3</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-surface-background font-bold transition-colors duration-300 flex flex-col items-center"
+                                data-ratio="1:1"><span class="text-sm font-bold">1:1</span><span class="text-[8px] opacity-60 leading-tight">Profile</span></button>
+                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center"
+                                data-ratio="2:3"><span class="text-sm font-bold">2:3</span><span class="text-[8px] opacity-60 leading-tight">Portrait</span></button>
+                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center"
+                                data-ratio="4:5"><span class="text-sm font-bold">4:5</span><span class="text-[8px] opacity-60 leading-tight">Feed IG</span></button>
+                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center"
+                                data-ratio="9:16"><span class="text-sm font-bold">9:16</span><span class="text-[8px] opacity-60 leading-tight">Story IG</span></button>
+                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center"
+                                data-ratio="3:2"><span class="text-sm font-bold">3:2</span><span class="text-[8px] opacity-60 leading-tight">Landscape</span></button>
                     </div>
                     <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">
-                        Dimensions: 1696 x 2528 px
+                        Dimensions: 2048 x 2048 px
                     </p>
                 </div>
 
@@ -566,15 +570,19 @@
         const API_BASE = window.location.origin;
 
         /**
-         * Aspect ratio → pixel dimensions (PRD spec):
-         *   2:3 → 1696 x 2528
-         *   4:5 → 1856 x 2304
-         *   4:3 → 2400 x 1792
+         * Aspect ratio → pixel dimensions:
+         *   1:1  → 2048 x 2048   (Photo Profile)
+         *   2:3  → 1696 x 2528   (Portrait)
+         *   4:5  → 1856 x 2304   (Feed IG)
+         *   9:16 → 1536 x 2752   (Story IG)
+         *   3:2  → 2528 x 1696   (Landscape)
          */
         const ASPECT_RATIO_DIMENSIONS = {
-            '2:3': { width: 1696, height: 2528 },
-            '4:5': { width: 1856, height: 2304 },
-            '4:3': { width: 2400, height: 1792 }
+            '1:1':  { width: 2048, height: 2048 },
+            '2:3':  { width: 1696, height: 2528 },
+            '4:5':  { width: 1856, height: 2304 },
+            '9:16': { width: 1536, height: 2752 },
+            '3:2':  { width: 2528, height: 1696 }
         };
 
         // =====================================================
@@ -582,8 +590,8 @@
         // =====================================================
 
         const state = {
-            selectedRatio: '2:3',
-            selectedDimensions: ASPECT_RATIO_DIMENSIONS['2:3'],
+            selectedRatio: '1:1',
+            selectedDimensions: ASPECT_RATIO_DIMENSIONS['1:1'],
             referenceImages: [null, null],          // File objects [slot1, slot2]
             isGenerating: false,
             generationId: null,
