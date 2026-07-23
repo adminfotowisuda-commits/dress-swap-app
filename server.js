@@ -4651,6 +4651,191 @@ app.get('/api/payments/doku-callback', async (req, res) => {
 });
 
 // ------------------------------------------------------------------
+// Admin User Management API
+// ------------------------------------------------------------------
+
+/**
+ * GET /api/admin/users
+ * ------------------------------------------------------------------
+ * Returns aggregated user data for the Admin "Kelola Pengguna" table.
+ * Each user includes: email, createdAt, status, totalPurchases,
+ * totalSpentRp, currentCredit, totalAccumulatedCredit.
+ * Protected by requireAdminApi middleware.
+ */
+app.get('/api/admin/users', requireAdminApi, async (req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
+        const users = await db.User.aggregate([
+            // Exclude admin accounts from user management
+            { $match: { role: { $ne: 'admin' } } },
+            // Left-join with transactions collection
+            {
+                $lookup: {
+                    from: 'transactions',
+                    localField: 'email',
+                    foreignField: 'email',
+                    pipeline: [
+                        { $match: { status: 'success' } }
+                    ],
+                    as: 'txns'
+                }
+            },
+            // Shape the output
+            {
+                $project: {
+                    email: 1,
+                    created_at: 1,
+                    credits_balance: 1,
+                    // Soft-delete support: check isDeleted flag, default false
+                    status: {
+                        $cond: [
+                            { $eq: [{ $ifNull: ['$isDeleted', false] }, true] },
+                            'Deleted',
+                            'Active'
+                        ]
+                    },
+                    // Count of successful top-up transactions
+                    totalPurchases: {
+                        $size: {
+                            $filter: {
+                                input: '$txns',
+                                as: 't',
+                                cond: { $eq: ['$$t.type', 'top-up'] }
+                            }
+                        }
+                    },
+                    // Sum of all positive monetary amounts (IDR)
+                    totalSpentRp: {
+                        $sum: {
+                            $map: {
+                                input: '$txns',
+                                as: 't',
+                                in: {
+                                    $cond: [
+                                        { $gt: ['$$t.amount', 0] },
+                                        '$$t.amount',
+                                        0
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    // Sum of all positive credit additions
+                    totalAccumulatedCredit: {
+                        $sum: {
+                            $map: {
+                                input: '$txns',
+                                as: 't',
+                                in: {
+                                    $cond: [
+                                        { $gt: ['$$t.credits', 0] },
+                                        '$$t.credits',
+                                        0
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            // Newest users first
+            { $sort: { created_at: -1 } }
+        ]);
+
+        console.log(`  [api/admin/users] Returned ${users.length} users`);
+        res.json({ users });
+    } catch (err) {
+        console.error('[/api/admin/users] Error:', err);
+        res.status(500).json({ error: 'Failed to retrieve user data.' });
+    }
+});
+
+/**
+ * POST /api/admin/users/gift
+ * ------------------------------------------------------------------
+ * Manually inject (gift) credits to a specific user.
+ * Accepts { email, amount } in JSON body.
+ * Protected by requireAdminApi middleware.
+ *
+ * Actions:
+ *   a. Increments the user's credits_balance by `amount`.
+ *   b. Inserts a Transaction record (type: "gift") so the user sees
+ *      it in their own "Riwayat Pembelian" (credit history).
+ */
+app.post('/api/admin/users/gift', requireAdminApi, async (req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
+        const { email, amount } = req.body;
+        const creditsToGift = parseInt(amount, 10);
+
+        // --- Validation ---
+        if (!email || typeof email !== 'string' || !email.trim()) {
+            return res.status(400).json({ error: 'Email pengguna diperlukan.' });
+        }
+        if (!creditsToGift || creditsToGift <= 0) {
+            return res.status(400).json({ error: 'Jumlah kredit harus lebih dari 0.' });
+        }
+
+        const key = email.trim().toLowerCase();
+
+        // Ensure the user exists
+        const userExists = await db.User.findOne({ email: key });
+        if (!userExists) {
+            return res.status(404).json({ error: 'Pengguna dengan email tersebut tidak ditemukan.' });
+        }
+
+        // --- Increment user credit balance ---
+        const updatedUser = await db.User.findOneAndUpdate(
+            { email: key },
+            {
+                $inc: { credits_balance: creditsToGift },
+                $set: { updated_at: new Date(), last_activity_date: new Date() }
+            },
+            { returnDocument: 'after' }
+        );
+
+        // --- Insert gift transaction record ---
+        const invoiceNumber = 'gift_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        await db.Transaction.create({
+            invoice_number: invoiceNumber,
+            email: key,
+            amount: 0,                         // Rp 0 — this is a free gift
+            credits: creditsToGift,
+            type: 'gift',
+            description: 'Gift from Admin',
+            status: 'success',
+            created_at: new Date()
+        });
+
+        console.log(`  [api/admin/users/gift] +${creditsToGift} credits gifted to ${key} (balance: ${updatedUser.credits_balance})`);
+
+        res.json({
+            success: true,
+            message: `${creditsToGift} kredit berhasil diberikan kepada ${key}.`,
+            user: {
+                email: updatedUser.email,
+                credits_balance: updatedUser.credits_balance,
+                created_at: updatedUser.created_at,
+                status: updatedUser.isDeleted ? 'Deleted' : 'Active'
+            }
+        });
+    } catch (err) {
+        console.error('[/api/admin/users/gift] Error:', err);
+        res.status(500).json({ error: 'Gagal memberikan kredit.' });
+    }
+});
+
+// Admin User Management page (PROTECTED)
+app.get('/admin-users', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_users.html')));
+app.get('/admin_users', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_users.html')));
+
+// ------------------------------------------------------------------
 // Global error handlers
 // ------------------------------------------------------------------
 
