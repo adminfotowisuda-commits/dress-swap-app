@@ -321,93 +321,145 @@
     <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('home');});</script>
 
     <!-- ════════════════════════════════════════════════════════════
-         MAIN WORKSPACE — Modern Bento Grid Dashboard
+         MAIN WORKSPACE — PAS Marketing Landing Page
          ============================================================ -->
     <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] bg-surface-background overflow-y-auto">
         <!-- Ambient background glows -->
         <div class="fixed top-1/4 right-0 w-[500px] h-[500px] bg-electric-cyan/5 blur-[150px] pointer-events-none"></div>
         <div class="fixed bottom-1/4 left-0 w-[500px] h-[500px] bg-vivid-purple/5 blur-[150px] pointer-events-none"></div>
+        <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/3 blur-[200px] pointer-events-none"></div>
 
-        <div class="relative z-10 p-6 md:p-12 flex flex-col items-center">
+        <div class="relative z-10 p-6 md:p-12 flex flex-col items-center max-w-7xl mx-auto">
 
-            <!-- ═══ HERO SECTION ═══ -->
-            <div class="text-center max-w-2xl mx-auto pt-8 md:pt-16 pb-4">
-                <h1 class="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent font-extrabold text-3xl md:text-5xl leading-tight tracking-tight">
-                    Wujudkan Foto Wisuda Impianmu
+            <!-- ════════════════════════════════════════════════════
+                 HERO — Emotional Hook (Problem + Agitation)
+                 ════════════════════════════════════════════════════ -->
+            <div class="text-center max-w-4xl mx-auto pt-8 md:pt-20 pb-4">
+                <h1 class="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold text-4xl md:text-6xl leading-tight tracking-tight">
+                    Wujudkan Foto Wisuda Impianmu.<br>Tanpa Antri, Tanpa Mahal, Bebas Hujan.
                 </h1>
-                <p class="text-text-secondary text-sm md:text-base mt-4 max-w-lg mx-auto leading-relaxed">
-                    Pilih fitur AI di bawah ini untuk memulai transformasi foto Anda.
+                <p class="text-text-secondary text-base md:text-lg mt-6 max-w-3xl mx-auto leading-relaxed">
+                    Sudah keluar uang jutaan, tapi foto wisuda hancur karena cuaca buruk atau antrian panjang di kampus? Kembalikan senyum di hari spesialmu dan dapatkan hasil foto ala studio premium dalam hitungan detik.
                 </p>
+                <!-- Primary CTA -->
+                <div class="mt-8">
+                    <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
+                       class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:-translate-y-1 transition-all duration-300 no-underline">
+                        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL':1;">bolt</span>
+                        Coba Gratis Sekarang (Dapat 60 Koin!)
+                    </a>
+                    <p class="text-text-secondary text-xs mt-3 opacity-60">Tidak perlu kartu kredit • Hasil instan • Bisa diunduh HD</p>
+                </div>
             </div>
 
-            <!-- ═══ BENTO GRID ═══ -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto pb-16">
+            <!-- ════════════════════════════════════════════════════
+                 THE "WHY" — Bento Grid (Solution)
+                 ════════════════════════════════════════════════════ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16 w-full">
 
                 <!-- ═══ CARD 1: Background Change ═══ -->
                 <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
-                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-cyan-500/40 transition-all duration-300 cursor-pointer no-underline">
-                    <!-- Image -->
-                    <div class="rounded-xl overflow-hidden h-48 w-full mb-4 relative">
-                        <img src="/image_display/menu_image_bg/menu_before_bg.jpg" alt="Background Change"
+                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-cyan-500/40 transition-all duration-300 cursor-pointer no-underline">
+                    <!-- Visual -->
+                    <div class="rounded-xl overflow-hidden h-48 w-full relative shrink-0">
+                        <img src="/image_display/menu_image_bg/menu_before_bg.jpg" alt="Before"
                              class="slideshow-before absolute inset-0 w-full h-full object-cover" />
-                        <img src="/image_display/menu_image_bg/menu_after_bg.webp" alt="Background Change After"
+                        <img src="/image_display/menu_image_bg/menu_after_bg.webp" alt="After"
                              class="slideshow-after absolute inset-0 w-full h-full object-cover" />
                         <div class="slideshow-before absolute top-2 left-2 bg-slate-900/85 border border-slate-600/40 text-[9px] font-bold text-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none">BEFORE</div>
                         <div class="slideshow-after absolute top-2 right-2 bg-cyan-500/20 border border-cyan-500/40 text-[9px] font-bold text-cyan-300 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-cyan-500/10">AFTER</div>
                     </div>
-                    <!-- Content -->
-                    <h3 class="text-cyan-400 font-bold text-xl mb-2 group-hover:text-cyan-300 transition-colors">Background Change</h3>
-                    <p class="text-text-secondary text-sm leading-relaxed mb-4 flex-1">
-                        Ubah latar belakang foto wisuda sesuai referensi dengan rapi & instan.
+                    <h3 class="text-cyan-400 font-bold text-xl mt-5 mb-3 group-hover:text-cyan-300 transition-colors">Gagal Foto di Spot Ikonik? Kita Perbaiki.</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed mb-5 flex-1">
+                        Kecewa bayar fotografer mahal tapi gagal foto di Balairung UGM karena antrian krodit, atau tiba-tiba hujan lebat? Jangan biarkan momen sekali seumur hidupmu rusak. Pindahkan dirimu ke latar belakang mana pun, dengan cuaca cerah sempurna, persis seperti yang kamu impikan.
                     </p>
-                    <div class="w-full mt-auto bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 py-2.5 rounded-lg text-sm font-bold text-center group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                        Coba Gratis
+                    <div class="w-full mt-auto bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 py-3 rounded-xl text-sm font-bold text-center group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                        Coba Background Change →
                     </div>
                 </a>
 
                 <!-- ═══ CARD 2: Dress Replicate ═══ -->
                 <a href="/dress-swap" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
-                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-purple-500/40 transition-all duration-300 cursor-pointer no-underline">
-                    <!-- Image -->
-                    <div class="rounded-xl overflow-hidden h-48 w-full mb-4 relative">
-                        <img src="/image_display/menu_image_dress/menu_before_dress.jpg" alt="Dress Replicate"
+                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-purple-500/40 transition-all duration-300 cursor-pointer no-underline">
+                    <!-- Visual -->
+                    <div class="rounded-xl overflow-hidden h-48 w-full relative shrink-0">
+                        <img src="/image_display/menu_image_dress/menu_before_dress.jpg" alt="Before"
                              class="slideshow-before absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
-                        <img src="/image_display/menu_image_dress/menu_after_dress.jpg" alt="Dress Replicate After"
+                        <img src="/image_display/menu_image_dress/menu_after_dress.jpg" alt="After"
                              class="slideshow-after absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
                         <div class="slideshow-before absolute top-2 left-2 bg-slate-900/85 border border-slate-600/40 text-[9px] font-bold text-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none" style="animation-delay:-2s">BEFORE</div>
                         <div class="slideshow-after absolute top-2 right-2 bg-purple-500/20 border border-purple-500/40 text-[9px] font-bold text-purple-300 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-purple-500/10" style="animation-delay:-2s">AFTER</div>
                     </div>
-                    <!-- Content -->
-                    <h3 class="text-purple-400 font-bold text-xl mb-2 group-hover:text-purple-300 transition-colors">Dress Replicate</h3>
-                    <p class="text-text-secondary text-sm leading-relaxed mb-4 flex-1">
-                        Ganti kebaya atau jas pada foto wisuda mengikuti referensi pakaian favoritmu.
+                    <h3 class="text-purple-400 font-bold text-xl mt-5 mb-3 group-hover:text-purple-300 transition-colors">Tampil Mewah, Tanpa Menguras Kantong.</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed mb-5 flex-1">
+                        Ingin tampil memukau dengan kebaya full payet seharga 5 jutaan tapi budget habis untuk MUA & sewa mobil? Atau rental kebaya langganan terlalu jauh untuk fitting? Gunakan fitur Dress Try-On. Eksperimen dengan ratusan gaun mewah dari kamarmu. Tampil bak sultan, bayar harga mahasiswa.
                     </p>
-                    <div class="w-full mt-auto bg-purple-500/20 text-purple-400 border border-purple-500/50 py-2.5 rounded-lg text-sm font-bold text-center group-hover:bg-purple-500 group-hover:text-white transition-all">
-                        Coba Gratis
+                    <div class="w-full mt-auto bg-purple-500/15 text-purple-400 border border-purple-500/40 py-3 rounded-xl text-sm font-bold text-center group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        Coba Dress Replicate →
                     </div>
                 </a>
 
                 <!-- ═══ CARD 3: Filter Gallery ═══ -->
                 <a href="/filter-gallery" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
-                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-amber-500/40 transition-all duration-300 cursor-pointer no-underline md:col-span-2 lg:col-span-1">
-                    <!-- Image -->
-                    <div class="rounded-xl overflow-hidden h-48 w-full mb-4 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center">
+                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-amber-500/40 transition-all duration-300 cursor-pointer no-underline md:col-span-2 lg:col-span-1">
+                    <!-- Visual -->
+                    <div class="rounded-xl overflow-hidden h-48 w-full bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-orange-500/20 flex items-center justify-center shrink-0">
                         <div class="text-center">
-                            <span class="material-symbols-outlined text-5xl text-amber-400/60" style="font-variation-settings:'FILL':1;">filter_vintage</span>
-                            <p class="text-amber-400/40 text-xs mt-2 font-semibold tracking-wider uppercase">Curated Presets</p>
+                            <span class="material-symbols-outlined text-6xl text-amber-400/50" style="font-variation-settings:'FILL':1;">filter_vintage</span>
+                            <p class="text-amber-400/30 text-[10px] mt-2 font-bold tracking-[0.2em] uppercase">Curated Presets</p>
                         </div>
                     </div>
-                    <!-- Content -->
-                    <h3 class="text-amber-400 font-bold text-xl mb-2 group-hover:text-amber-300 transition-colors">Filter Gallery</h3>
-                    <p class="text-text-secondary text-sm leading-relaxed mb-4 flex-1">
-                        Pilih dari puluhan preset filter wisuda siap pakai yang memukau.
+                    <h3 class="text-amber-400 font-bold text-xl mt-5 mb-3 group-hover:text-amber-300 transition-colors">Tetap Fyp, Koleksi Foto Nggak Bikin Bosen.</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed mb-5 flex-1">
+                        Trend foto wisuda berubah cepat! Dari tren lensa fisheye, strobist, filter anime, sampai studio estetik ala Pinterest. Sewa studio ganti tema butuh biaya besar. Dengan puluhan preset instan kami, wujudkan variasi foto tanpa batas. Tanpa perlu touch-up make-up, apalagi panas-panasan ke pantai.
                     </p>
-                    <div class="w-full mt-auto bg-amber-500/20 text-amber-400 border border-amber-500/50 py-2.5 rounded-lg text-sm font-bold text-center group-hover:bg-amber-500 group-hover:text-white transition-all">
-                        Jelajahi Gallery
+                    <div class="w-full mt-auto bg-amber-500/15 text-amber-400 border border-amber-500/40 py-3 rounded-xl text-sm font-bold text-center group-hover:bg-amber-500 group-hover:text-white transition-all">
+                        Eksplor Filter Gallery →
                     </div>
                 </a>
 
             </div>
+
+            <!-- ════════════════════════════════════════════════════
+                 SOCIAL PROOF — Testimonial
+                 ════════════════════════════════════════════════════ -->
+            <div class="mt-16 w-full max-w-3xl mx-auto text-center">
+                <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-10">
+                    <span class="material-symbols-outlined text-4xl text-purple-400/40 mb-4" style="font-variation-settings:'FILL':1;">format_quote</span>
+                    <blockquote class="text-text-secondary text-base md:text-lg leading-relaxed italic max-w-2xl mx-auto">
+                        "Nangis banget pas wisuda kemaren ujan deres, foto di outdoor gelap semua. Untung nemu fotowisuda.ai, foto di gedung rektorat jadi cerah berasa VIP gak ada orang lewat!"
+                    </blockquote>
+                    <p class="text-text-secondary text-sm mt-5 opacity-60 italic">— Sarah, Lulusan 2026</p>
+                    <!-- Trust dots -->
+                    <div class="flex items-center justify-center gap-1.5 mt-5">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400/60"></span>
+                        <span class="w-2 h-2 rounded-full bg-purple-400/60"></span>
+                        <span class="w-2 h-2 rounded-full bg-amber-400/60"></span>
+                        <span class="text-text-secondary text-[10px] ml-2 opacity-50 tracking-wider uppercase">Ribuan mahasiswa puas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ════════════════════════════════════════════════════
+                 FINAL CTA — Closing
+                 ════════════════════════════════════════════════════ -->
+            <div class="mt-16 w-full max-w-4xl mx-auto text-center bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-10 md:p-14">
+                <h2 class="text-white font-extrabold text-2xl md:text-4xl leading-tight tracking-tight">
+                    Jangan biarkan foto wisudamu berakhir<br>jadi penyesalan di galeri HP.
+                </h2>
+                <p class="text-text-secondary text-sm md:text-base mt-4 max-w-lg mx-auto leading-relaxed">
+                    Setiap momen wisuda hanya datang sekali. Pastikan kamu punya foto terbaik untuk dikenang selamanya.
+                </p>
+                <div class="mt-8">
+                    <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
+                       class="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all duration-300 no-underline">
+                        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL':1;">stars</span>
+                        Klaim 60 Kredit Gratis & Selamatkan Fotomu!
+                    </a>
+                </div>
+                <p class="text-text-secondary text-xs mt-4 opacity-50">Gabung dengan ribuan mahasiswa yang sudah mempercayakan foto wisudanya ke fotowisuda.ai</p>
+            </div>
+
         </div>
     </main>
 
