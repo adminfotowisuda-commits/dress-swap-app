@@ -321,64 +321,93 @@
     <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('home');});</script>
 
     <!-- ════════════════════════════════════════════════════════════
-         MAIN WORKSPACE â€" Centered welcome dashboard
+         MAIN WORKSPACE — Modern Bento Grid Dashboard
          ============================================================ -->
-    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex items-center justify-center bg-surface-background overflow-y-auto">
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] bg-surface-background overflow-y-auto">
         <!-- Ambient background glows -->
-        <div class="absolute top-1/4 right-0 w-64 h-64 bg-electric-cyan/5 blur-[120px] pointer-events-none"></div>
-        <div class="absolute bottom-1/4 left-0 w-64 h-64 bg-vivid-purple/5 blur-[120px] pointer-events-none"></div>
+        <div class="fixed top-1/4 right-0 w-[500px] h-[500px] bg-electric-cyan/5 blur-[150px] pointer-events-none"></div>
+        <div class="fixed bottom-1/4 left-0 w-[500px] h-[500px] bg-vivid-purple/5 blur-[150px] pointer-events-none"></div>
 
-        <div class="relative z-10 text-center px-4 pt-12 pb-12 w-full max-w-lg mx-auto">
+        <div class="relative z-10 p-6 md:p-12 flex flex-col items-center">
 
-            <!-- ═══ Card 1: Background Change ═══ -->
-            <div class="flex flex-col items-center">
-                <div class="w-full max-w-[240px]">
-                    <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-cyan-500/5">
-                        <img src="/image_display/menu_image_bg/menu_before_bg.jpg" alt="Before" class="slideshow-before absolute inset-0 w-full h-full object-cover" />
-                        <img src="/image_display/menu_image_bg/menu_after_bg.webp" alt="After" class="slideshow-after absolute inset-0 w-full h-full object-cover" />
+            <!-- ═══ HERO SECTION ═══ -->
+            <div class="text-center max-w-2xl mx-auto pt-8 md:pt-16 pb-4">
+                <h1 class="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent font-extrabold text-3xl md:text-5xl leading-tight tracking-tight">
+                    Wujudkan Foto Wisuda Impianmu
+                </h1>
+                <p class="text-text-secondary text-sm md:text-base mt-4 max-w-lg mx-auto leading-relaxed">
+                    Pilih fitur AI di bawah ini untuk memulai transformasi foto Anda.
+                </p>
+            </div>
+
+            <!-- ═══ BENTO GRID ═══ -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 w-full max-w-6xl mx-auto pb-16">
+
+                <!-- ═══ CARD 1: Background Change ═══ -->
+                <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
+                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-cyan-500/40 transition-all duration-300 cursor-pointer no-underline">
+                    <!-- Image -->
+                    <div class="rounded-xl overflow-hidden h-48 w-full mb-4 relative">
+                        <img src="/image_display/menu_image_bg/menu_before_bg.jpg" alt="Background Change"
+                             class="slideshow-before absolute inset-0 w-full h-full object-cover" />
+                        <img src="/image_display/menu_image_bg/menu_after_bg.webp" alt="Background Change After"
+                             class="slideshow-after absolute inset-0 w-full h-full object-cover" />
                         <div class="slideshow-before absolute top-2 left-2 bg-slate-900/85 border border-slate-600/40 text-[9px] font-bold text-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none">BEFORE</div>
                         <div class="slideshow-after absolute top-2 right-2 bg-cyan-500/20 border border-cyan-500/40 text-[9px] font-bold text-cyan-300 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-cyan-500/10">AFTER</div>
                     </div>
-                </div>
-            </div>
+                    <!-- Content -->
+                    <h3 class="text-cyan-400 font-bold text-xl mb-2 group-hover:text-cyan-300 transition-colors">Background Change</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed mb-4 flex-1">
+                        Ubah latar belakang foto wisuda sesuai referensi dengan rapi & instan.
+                    </p>
+                    <div class="w-full mt-auto bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 py-2.5 rounded-lg text-sm font-bold text-center group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                        Coba Gratis
+                    </div>
+                </a>
 
-            <!-- Spacer -->
-            <div class="my-10"></div>
-
-            <!-- Hero Text 1 -->
-            <p class="text-base font-bold text-white leading-snug max-w-[280px] mx-auto mb-4">
-                Ubah <span class="text-electric-cyan">background</span> foto wisuda sesuai referensi-mu
-            </p>
-            <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 26px;background:linear-gradient(135deg,#00D1FF,#0088cc);color:#0A0C10;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 14px rgba(0,209,255,0.2);" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,209,255,0.35)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 14px rgba(0,209,255,0.2)';this.style.transform='translateY(0)'">
-                Coba Gratis
-            </a>
-
-            <!-- Spacer -->
-            <div class="my-12"></div>
-
-            <!-- ═══ Card 2: Dress Replicate ═══ -->
-            <div class="flex flex-col items-center">
-                <div class="w-full max-w-[240px]">
-                    <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-purple-500/5">
-                        <img src="/image_display/menu_image_dress/menu_before_dress.jpg" alt="Before" class="slideshow-before absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
-                        <img src="/image_display/menu_image_dress/menu_after_dress.jpg" alt="After" class="slideshow-after absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
+                <!-- ═══ CARD 2: Dress Replicate ═══ -->
+                <a href="/dress-swap" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
+                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-purple-500/40 transition-all duration-300 cursor-pointer no-underline">
+                    <!-- Image -->
+                    <div class="rounded-xl overflow-hidden h-48 w-full mb-4 relative">
+                        <img src="/image_display/menu_image_dress/menu_before_dress.jpg" alt="Dress Replicate"
+                             class="slideshow-before absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
+                        <img src="/image_display/menu_image_dress/menu_after_dress.jpg" alt="Dress Replicate After"
+                             class="slideshow-after absolute inset-0 w-full h-full object-cover" style="animation-delay:-2s" />
                         <div class="slideshow-before absolute top-2 left-2 bg-slate-900/85 border border-slate-600/40 text-[9px] font-bold text-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none" style="animation-delay:-2s">BEFORE</div>
                         <div class="slideshow-after absolute top-2 right-2 bg-purple-500/20 border border-purple-500/40 text-[9px] font-bold text-purple-300 px-2 py-0.5 rounded-md uppercase tracking-wider backdrop-blur-sm z-10 pointer-events-none shadow-lg shadow-purple-500/10" style="animation-delay:-2s">AFTER</div>
                     </div>
-                </div>
+                    <!-- Content -->
+                    <h3 class="text-purple-400 font-bold text-xl mb-2 group-hover:text-purple-300 transition-colors">Dress Replicate</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed mb-4 flex-1">
+                        Ganti kebaya atau jas pada foto wisuda mengikuti referensi pakaian favoritmu.
+                    </p>
+                    <div class="w-full mt-auto bg-purple-500/20 text-purple-400 border border-purple-500/50 py-2.5 rounded-lg text-sm font-bold text-center group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        Coba Gratis
+                    </div>
+                </a>
+
+                <!-- ═══ CARD 3: Filter Gallery ═══ -->
+                <a href="/filter-gallery" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
+                   class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-amber-500/40 transition-all duration-300 cursor-pointer no-underline md:col-span-2 lg:col-span-1">
+                    <!-- Image -->
+                    <div class="rounded-xl overflow-hidden h-48 w-full mb-4 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 flex items-center justify-center">
+                        <div class="text-center">
+                            <span class="material-symbols-outlined text-5xl text-amber-400/60" style="font-variation-settings:'FILL':1;">filter_vintage</span>
+                            <p class="text-amber-400/40 text-xs mt-2 font-semibold tracking-wider uppercase">Curated Presets</p>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <h3 class="text-amber-400 font-bold text-xl mb-2 group-hover:text-amber-300 transition-colors">Filter Gallery</h3>
+                    <p class="text-text-secondary text-sm leading-relaxed mb-4 flex-1">
+                        Pilih dari puluhan preset filter wisuda siap pakai yang memukau.
+                    </p>
+                    <div class="w-full mt-auto bg-amber-500/20 text-amber-400 border border-amber-500/50 py-2.5 rounded-lg text-sm font-bold text-center group-hover:bg-amber-500 group-hover:text-white transition-all">
+                        Jelajahi Gallery
+                    </div>
+                </a>
+
             </div>
-
-            <!-- Spacer -->
-            <div class="my-10"></div>
-
-            <!-- Hero Text 2 -->
-            <p class="text-base font-bold text-white leading-snug max-w-[280px] mx-auto mb-4">
-                Ubah <span class="text-vivid-purple">dress</span> foto wisuda sesuai referensi-mu
-            </p>
-            <a href="/dress-swap" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 26px;background:linear-gradient(135deg,#9D5BFF,#7c3aed);color:#fff;border-radius:14px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 14px rgba(157,91,255,0.2);" onmouseover="this.style.boxShadow='0 6px 20px rgba(157,91,255,0.35)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 14px rgba(157,91,255,0.2)';this.style.transform='translateY(0)'">
-                Coba Gratis
-            </a>
-
         </div>
     </main>
 
