@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <script>
@@ -8,7 +8,7 @@
     </script>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Background Change â€” fotowisuda.ai</title>
+    <title>Background Change â€" fotowisuda.ai</title>
 
     <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
@@ -147,7 +147,7 @@
 
     <style>
         /* ============================================================
-           Custom Styles â€” Background Swap Tool
+           Custom Styles â€" Background Swap Tool
            ============================================================ */
 
         .ratio-slider {
@@ -268,38 +268,38 @@
             text-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
         }
 
-        /* Before-After Slideshow Animation â€” Cinema Zoom-Out Crossfade (4s cycle) */
+        /* Before-After Slideshow Animation â€" Cinema Zoom-Out Crossfade (4s cycle) */
         @keyframes zoomOutBefore {
-            /* 0sâ€“1.5s: Stable BEFORE hold */
+            /* 0sâ€"1.5s: Stable BEFORE hold */
             0%, 37.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 1.5sâ€“2.0s: Zoom-out + fade out â†’ AFTER reveals */
-            /* 2.0sâ€“3.5s: Fully hidden behind AFTER */
+            /* 1.5sâ€"2.0s: Zoom-out + fade out â†' AFTER reveals */
+            /* 2.0sâ€"3.5s: Fully hidden behind AFTER */
             50%, 87.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 3.5sâ€“4.0s: Zoom-in + fade in â†’ BEFORE returns */
+            /* 3.5sâ€"4.0s: Zoom-in + fade in â†' BEFORE returns */
             100% {
                 opacity: 1;
                 transform: scale(1);
             }
         }
         @keyframes zoomOutAfter {
-            /* 0sâ€“1.5s: Fully hidden behind BEFORE */
+            /* 0sâ€"1.5s: Fully hidden behind BEFORE */
             0%, 37.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 1.5sâ€“2.0s: Zoom-in + fade in â†’ AFTER reveals */
-            /* 2.0sâ€“3.5s: Stable AFTER hold */
+            /* 1.5sâ€"2.0s: Zoom-in + fade in â†' AFTER reveals */
+            /* 2.0sâ€"3.5s: Stable AFTER hold */
             50%, 87.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 3.5sâ€“4.0s: Fade out â†’ BEFORE returns */
+            /* 3.5sâ€"4.0s: Fade out â†' BEFORE returns */
             100% {
                 opacity: 0;
                 transform: scale(1.25);
@@ -324,7 +324,7 @@
 <body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
 
     <!-- ============================================================
-         TOP NAVIGATION BAR â€” Full-width, glassmorphic
+         TOP NAVIGATION BAR â€" Full-width, glassmorphic
          ============================================================ -->
     <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
         <div class="flex items-center gap-3">
@@ -340,11 +340,11 @@
     <!-- ============================================================
 
     <!-- ============================================================
-         MAIN WORKSPACE â€” Offset for sidebar + header
+         MAIN WORKSPACE â€" Offset for sidebar + header
          ============================================================ -->
     <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex items-start justify-center">
         <!-- ========================================================
-             MAIN CONFIG PANEL â€” Centered, focused dashboard layout
+             MAIN CONFIG PANEL â€" Centered, focused dashboard layout
              ======================================================== -->
         <section class="w-full max-w-[480px] bg-surface-dim overflow-y-auto hide-scrollbar p-6 flex flex-col">
             <div class="flex-1 space-y-6">
@@ -356,7 +356,7 @@
                 </header>
 
                 <!-- Before-After Comparison Slider -->
-                <!-- Animated Before-After Slideshow â€” Cinema Zoom-Out Crossfade -->
+                <!-- Animated Before-After Slideshow â€" Cinema Zoom-Out Crossfade -->
                 <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-cyan-500/5 mx-auto max-w-[280px]">
                     <!-- BEFORE image -->
                     <img src="/Image_display_background_change/before_bg_change.jpg"
@@ -497,31 +497,31 @@
         // CONFIGURATION
         // =====================================================
 
-        /** API base URL â€” always the same server that served this page. */
+        /** API base URL â€" always the same server that served this page. */
         const API_BASE = window.location.origin;
 
         /**
-         * Aspect ratio â†’ pixel dimensions:
-         *   1:1  â†’ 2048 x 2048   (Photo Profile)
-         *   2:3  â†’ 1696 x 2528   (Portrait)
-         *   4:5  â†’ 1856 x 2304   (Feed IG)
-         *   9:16 â†’ 1536 x 2752   (Story IG)
-         *   3:2  â†’ 2528 x 1696   (Landscape)
+         * Aspect ratio â†' pixel dimensions:
+         *   1:1  â†' 2048 x 2048   (Photo Profile)
+         *   2:3  â†' 1696 x 2528   (Portrait)
+         *   4:5  â†' 1856 x 2304   (Feed IG)
+         *   9:16 â†' 1536 x 2752   (Story IG)
+         *   3:2  â†' 2528 x 1696   (Landscape)
          */
         const RATIO_LABELS = {
-            ‘1:1’:  ‘Photo Profile’,
-            ‘2:3’:  ‘Portrait’,
-            ‘4:5’:  ‘Feed IG’,
-            ‘9:16’: ‘Story IG’,
-            ‘3:2’:  ‘Landscape’
+            '1:1':  'Photo Profile',
+            '2:3':  'Portrait',
+            '4:5':  'Feed IG',
+            '9:16': 'Story IG',
+            '3:2':  'Landscape'
         };
 
         const ASPECT_RATIO_DIMENSIONS = {
-            ‘1:1’:  { width: 2048, height: 2048 },
-            ‘2:3’:  { width: 1696, height: 2528 },
-            ‘4:5’:  { width: 1856, height: 2304 },
-            ‘9:16’: { width: 1536, height: 2752 },
-            ‘3:2’:  { width: 2528, height: 1696 }
+            '1:1':  { width: 2048, height: 2048 },
+            '2:3':  { width: 1696, height: 2528 },
+            '4:5':  { width: 1856, height: 2304 },
+            '9:16': { width: 1536, height: 2752 },
+            '3:2':  { width: 2528, height: 1696 }
         };
 
         // =====================================================
@@ -833,7 +833,7 @@
                     method: 'POST',
                     headers: { 'X-User-Email': activeEmail },
                     body: formData
-                    // NOTE: Do NOT set Content-Type â€” browser auto-sets
+                    // NOTE: Do NOT set Content-Type â€" browser auto-sets
                     //       the multipart boundary for FormData.
                 });
                 const timerPromise = new Promise(function(r) { setTimeout(r, MIN_DISPLAY_MS); });
@@ -841,16 +841,16 @@
 
                 if (!genResp.ok) {
                     await hideGeneratingOverlay();
-                    // 402 Payment Required â€” insufficient credits
+                    // 402 Payment Required â€" insufficient credits
                     if (genResp.status === 402) {
                         const errData = await genResp.json().catch(() => ({}));
                         showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
                         return;
                     }
-                    // 503 Service Unavailable â€” show friendly Indonesian modal, block redirect
+                    // 503 Service Unavailable â€" show friendly Indonesian modal, block redirect
                     if (genResp.status === 503) {
                         showErrorModal503();
-                        return; // stop â€” no redirect, user can retry
+                        return; // stop â€" no redirect, user can retry
                     }
                     const errData = await genResp.json().catch(() => ({}));
                     throw new Error(errData.error || `Server returned ${genResp.status}`);
@@ -1196,7 +1196,7 @@
         }
 
         // =====================================================
-        // SIMULATED LOGIN SYSTEM â€” localStorage sandbox-safe
+        // SIMULATED LOGIN SYSTEM â€" localStorage sandbox-safe
         // =====================================================
 
         var safeStorage = {
@@ -1280,7 +1280,7 @@
 
             console.log('Background Swap Tool initialized.');
             console.log(`API base: ${API_BASE}`);
-            console.log(`Default aspect ratio: ${state.selectedRatio} â†’ ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
+            console.log(`Default aspect ratio: ${state.selectedRatio} â†' ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
         }
 
         // =====================================================
