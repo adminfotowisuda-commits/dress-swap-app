@@ -229,13 +229,14 @@
                 </label>
                 <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden" id="modal-ratio-container">
                     <div class="absolute top-1 bottom-1 left-1 w-[calc(20%-3.2px)] bg-electric-cyan rounded-lg z-0 transition-transform duration-300 ease-out" id="modalRatioHighlight"></div>
-                    <button class="modal-ratio-btn relative z-10 flex-1 py-1.5 text-surface-background font-bold transition-colors duration-300 flex flex-col items-center" data-ratio="1:1"><span class="text-sm font-bold">1:1</span><span class="text-[8px] opacity-60 leading-tight">Profile</span></button>
-                    <button class="modal-ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="2:3"><span class="text-sm font-bold">2:3</span><span class="text-[8px] opacity-60 leading-tight">Portrait</span></button>
-                    <button class="modal-ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="4:5"><span class="text-sm font-bold">4:5</span><span class="text-[8px] opacity-60 leading-tight">Feed IG</span></button>
-                    <button class="modal-ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="9:16"><span class="text-sm font-bold">9:16</span><span class="text-[8px] opacity-60 leading-tight">Story IG</span></button>
-                    <button class="modal-ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="3:2"><span class="text-sm font-bold">3:2</span><span class="text-[8px] opacity-60 leading-tight">Landscape</span></button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300" data-ratio="1:1">1:1</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="2:3">2:3</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="9:16">9:16</button>
+                    <button class="modal-ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="3:2">3:2</button>
                 </div>
-                <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="modal-dimension-readout">Dimensions: 2048 x 2048 px</p>
+                <p class="font-label-sm text-label-sm text-white font-semibold mt-2" id="modal-ratio-label">Photo Profile</p>
+                <p class="font-label-sm text-label-sm text-text-secondary mt-0.5" id="modal-dimension-readout">Dimensions: 2048 x 2048 px</p>
             </div>
 
             <!-- Generate Button -->
@@ -257,6 +258,14 @@
         'use strict';
 
         const API_BASE = window.location.origin;
+
+        const RATIO_LABELS = {
+            '1:1':  'Photo Profile',
+            '2:3':  'Portrait',
+            '4:5':  'Feed IG',
+            '9:16': 'Story IG',
+            '3:2':  'Landscape'
+        };
 
         const ASPECT_RATIO_DIMENSIONS = {
             '1:1':  { width: 2048, height: 2048 },
@@ -708,6 +717,9 @@
             const ratio = buttons[index].getAttribute('data-ratio');
             state.modalRatio = ratio;
             state.modalDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
+            // Update ratio label
+            var labelEl = document.getElementById('modal-ratio-label');
+            if (labelEl) labelEl.textContent = RATIO_LABELS[ratio] || ratio;
             if (state.modalDimensions) {
                 document.getElementById('modal-dimension-readout').textContent =
                     `Dimensions: ${state.modalDimensions.width} x ${state.modalDimensions.height} px`;

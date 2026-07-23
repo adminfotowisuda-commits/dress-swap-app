@@ -190,12 +190,14 @@
                         <div>
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 block">Aspect Ratio</label>
                             <div id="ratio-group" class="flex flex-wrap gap-2">
-                                <button class="ratio-btn px-5 py-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full text-sm font-semibold transition-all hover:bg-cyan-500/20 active" data-ratio="1:1">1:1 · Profile</button>
-                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="2:3">2:3 · Portrait</button>
-                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="4:5">4:5 · Feed IG</button>
-                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="9:16">9:16 · Story IG</button>
-                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="3:2">3:2 · Landscape</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full text-sm font-semibold transition-all hover:bg-cyan-500/20 active" data-ratio="1:1">1:1</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="2:3">2:3</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="4:5">4:5</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="9:16">9:16</button>
+                                <button class="ratio-btn px-5 py-2.5 bg-surface-card border border-border-subtle text-text-secondary rounded-full text-sm font-semibold transition-all hover:border-cyan-500/30 hover:text-white" data-ratio="3:2">3:2</button>
                             </div>
+                            <p class="text-xs text-white font-semibold mt-2" id="ratio-label">Photo Profile</p>
+                            <p class="text-xs text-slate-400 mt-0.5" id="dimension-readout">Dimensions: 2048 x 2048 px</p>
                         </div>
 
                         <!-- [B.7] Generate Now Button -->
@@ -323,6 +325,14 @@
     (function() {
         'use strict';
 
+        const RATIO_LABELS = {
+            '1:1':  'Photo Profile',
+            '2:3':  'Portrait',
+            '4:5':  'Feed IG',
+            '9:16': 'Story IG',
+            '3:2':  'Landscape'
+        };
+
         const ASPECT_RATIO_DIMENSIONS = {
             '1:1':  { width: 2048, height: 2048 },
             '2:3':  { width: 1696, height: 2528 },
@@ -379,7 +389,14 @@
             const active   = ['bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/20'];
             const inactive = ['bg-surface-card', 'border-border-subtle', 'text-text-secondary'];
             initMutualGroup('.ratio-btn', active, inactive, btn => {
-                selection.ratio = btn.getAttribute('data-ratio');
+                var ratio = btn.getAttribute('data-ratio');
+                selection.ratio = ratio;
+                // Update ratio label and dimension readout
+                var labelEl = document.getElementById('ratio-label');
+                if (labelEl) labelEl.textContent = RATIO_LABELS[ratio] || ratio;
+                var dims = ASPECT_RATIO_DIMENSIONS[ratio];
+                var dimEl = document.getElementById('dimension-readout');
+                if (dimEl && dims) dimEl.textContent = 'Dimensions: ' + dims.width + ' x ' + dims.height + ' px';
             });
         }
 

@@ -397,13 +397,14 @@
                     </label>
                     <div class="relative flex gap-0 p-1 bg-surface-container rounded-xl border border-border-subtle overflow-hidden" id="ratio-container">
                         <div class="absolute top-1 bottom-1 left-1 w-[calc(20%-3.2px)] bg-electric-cyan rounded-lg z-0 transition-transform duration-300 ease-out" id="ratioHighlight"></div>
-                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-surface-background font-bold transition-colors duration-300 flex flex-col items-center" data-ratio="1:1"><span class="text-sm font-bold">1:1</span><span class="text-[8px] opacity-60 leading-tight">Profile</span></button>
-                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="2:3"><span class="text-sm font-bold">2:3</span><span class="text-[8px] opacity-60 leading-tight">Portrait</span></button>
-                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="4:5"><span class="text-sm font-bold">4:5</span><span class="text-[8px] opacity-60 leading-tight">Feed IG</span></button>
-                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="9:16"><span class="text-sm font-bold">9:16</span><span class="text-[8px] opacity-60 leading-tight">Story IG</span></button>
-                        <button class="ratio-btn relative z-10 flex-1 py-1.5 text-text-secondary font-medium transition-colors duration-300 flex flex-col items-center" data-ratio="3:2"><span class="text-sm font-bold">3:2</span><span class="text-[8px] opacity-60 leading-tight">Landscape</span></button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-surface-background font-bold text-sm transition-colors duration-300" data-ratio="1:1">1:1</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="2:3">2:3</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="4:5">4:5</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="9:16">9:16</button>
+                        <button class="ratio-btn relative z-10 flex-1 py-2 text-text-secondary font-medium text-sm transition-colors duration-300" data-ratio="3:2">3:2</button>
                     </div>
-                    <p class="font-label-sm text-label-sm text-text-secondary mt-1" id="dimension-readout">
+                    <p class="font-label-sm text-label-sm text-white font-semibold mt-2" id="ratio-label">Photo Profile</p>
+                    <p class="font-label-sm text-label-sm text-text-secondary mt-0.5" id="dimension-readout">
                         Dimensions: 2048 x 2048 px
                     </p>
                 </div>
@@ -551,6 +552,14 @@
 
         const API_BASE = window.location.origin;
 
+        const RATIO_LABELS = {
+            '1:1':  'Photo Profile',
+            '2:3':  'Portrait',
+            '4:5':  'Feed IG',
+            '9:16': 'Story IG',
+            '3:2':  'Landscape'
+        };
+
         const ASPECT_RATIO_DIMENSIONS = {
             '1:1':  { width: 2048, height: 2048 },
             '2:3':  { width: 1696, height: 2528 },
@@ -570,7 +579,7 @@
         };
 
         const DOM = {
-            ratioHighlight: null, ratioButtons: null, dimensionReadout: null,
+            ratioHighlight: null, ratioButtons: null, ratioLabel: null, dimensionReadout: null,
             generateBtn: null, promptTextarea: null, filterTitleInput: null,
             placeholderContent: null, processingState: null, resultImage: null,
             progressBar: null, progressPercentage: null, progressDetail: null, processingText: null,
@@ -580,6 +589,7 @@
         function cacheDomReferences() {
             DOM.ratioHighlight     = document.getElementById('ratioHighlight');
             DOM.ratioButtons       = document.querySelectorAll('.ratio-btn');
+            DOM.ratioLabel         = document.getElementById('ratio-label');
             DOM.dimensionReadout   = document.getElementById('dimension-readout');
             DOM.generateBtn        = document.getElementById('generate-btn');
             DOM.promptTextarea     = document.getElementById('prompt-textarea');
@@ -613,11 +623,14 @@
                     btn.classList.add('text-text-secondary', 'font-medium');
                 }
             });
-            const ratio = DOM.ratioButtons[index].getAttribute('data-ratio');
+            // Update state, label, and dimensions
+            var ratio = DOM.ratioButtons[index].getAttribute('data-ratio');
             state.selectedRatio = ratio;
             state.selectedDimensions = ASPECT_RATIO_DIMENSIONS[ratio];
-            if (DOM.dimensionReadout) {
-                DOM.dimensionReadout.textContent = `Dimensions: ${state.selectedDimensions.width} x ${state.selectedDimensions.height} px`;
+            if (DOM.ratioLabel) DOM.ratioLabel.textContent = RATIO_LABELS[ratio] || ratio;
+            if (DOM.dimensionReadout && state.selectedDimensions) {
+                DOM.dimensionReadout.textContent =
+                    `Dimensions: ${state.selectedDimensions.width} x ${state.selectedDimensions.height} px`;
             }
         }
 
