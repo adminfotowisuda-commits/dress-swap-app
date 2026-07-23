@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Filter Gallery Factory — fotowisuda.ai</title>
+    <title>Filter Gallery Factory (BG Campus) — fotowisuda.ai</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -83,8 +83,8 @@
                 <p class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-4">System Controls</p>
                 <a href="/admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Home</a>
                 <a href="/filter-gallery-admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Admin</a>
-                <a href="/filter-gallery-factory" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
-                <a href="/filter-gallery-factory-bg-campus" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Factory (BG Campus)</a>
+                <a href="/filter-gallery-factory" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
+                <a href="/filter-gallery-factory-bg-campus" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">Filter Factory (BG Campus)</a>
                 <a href="/admin-creations" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Creations</a>
                 <a href="/admin-users" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Kelola Pengguna</a>
             </div>
@@ -111,8 +111,8 @@
 
             <!-- Page Title -->
             <div class="mb-8">
-                <h2 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight mb-2">Filter Gallery Factory</h2>
-                <p class="text-text-secondary text-sm">Create a new background filter preset for the public gallery.</p>
+                <h2 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight mb-2">Filter Gallery Factory (BG Campus)</h2>
+                <p class="text-text-secondary text-sm">Create a new background filter preset using 2 reference images (Subject + Background).</p>
             </div>
 
             <!-- ==========================================
@@ -143,23 +143,45 @@
                                    class="w-full bg-surface-card border border-border-subtle rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 transition-all">
                         </div>
 
-                        <!-- Image Upload Zone -->
+                        <!-- Image Upload Zone 1 — Subject Image (Reference 1) -->
                         <div>
-                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Upload Reference Image</label>
-                            <div id="filter-upload-zone"
-                                 class="relative border-2 border-dashed border-purple-500/20 bg-slate-950 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-purple-500/40 transition-all cursor-pointer min-h-[180px] overflow-hidden">
-                                <input type="file" id="filter-upload-input" accept="image/*" class="hidden">
-                                <div id="filter-upload-placeholder" class="flex flex-col items-center gap-3 text-center">
-                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-purple-400/60 group-hover:text-purple-400 transition-colors"></i>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Upload Subject Image (Reference 1)</label>
+                            <div id="filter-upload-zone-1"
+                                 class="relative border-2 border-dashed border-cyan-500/20 bg-slate-950 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-cyan-500/40 transition-all cursor-pointer min-h-[180px] overflow-hidden">
+                                <input type="file" id="filter-upload-input-1" accept="image/*" class="hidden">
+                                <div id="filter-upload-placeholder-1" class="flex flex-col items-center gap-3 text-center">
+                                    <i class="fa-solid fa-user-circle text-3xl text-cyan-400/60 group-hover:text-cyan-400 transition-colors"></i>
                                     <div>
-                                        <p class="text-sm font-bold text-purple-400">Upload Reference Image</p>
-                                        <p class="text-xs text-slate-500 mt-1">Drag &amp; drop or click to upload target visual preset</p>
+                                        <p class="text-sm font-bold text-cyan-400">Upload Subject Image</p>
+                                        <p class="text-xs text-slate-500 mt-1">Drag &amp; drop or click to upload the graduation subject</p>
                                     </div>
                                 </div>
-                                <img id="filter-upload-preview" class="absolute inset-0 w-full h-full object-cover rounded-2xl hidden" alt="Uploaded reference preview" />
-                                <button id="filter-upload-remove"
+                                <img id="filter-upload-preview-1" class="absolute inset-0 w-full h-full object-cover rounded-2xl hidden" alt="Subject reference preview" />
+                                <button id="filter-upload-remove-1"
                                         class="absolute top-3 right-3 p-1.5 bg-slate-950/90 rounded-full hidden z-10 hover:bg-red-900/80 transition-colors border border-slate-700/50"
-                                        title="Remove image">
+                                        title="Remove subject image">
+                                    <i class="fa-solid fa-xmark text-sm text-slate-400 hover:text-red-400 transition-colors"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Image Upload Zone 2 — Background Image (Reference 2) -->
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Upload Background Image (Reference 2)</label>
+                            <div id="filter-upload-zone-2"
+                                 class="relative border-2 border-dashed border-amber-500/20 bg-slate-950 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-amber-500/40 transition-all cursor-pointer min-h-[180px] overflow-hidden">
+                                <input type="file" id="filter-upload-input-2" accept="image/*" class="hidden">
+                                <div id="filter-upload-placeholder-2" class="flex flex-col items-center gap-3 text-center">
+                                    <i class="fa-solid fa-image text-3xl text-amber-400/60 group-hover:text-amber-400 transition-colors"></i>
+                                    <div>
+                                        <p class="text-sm font-bold text-amber-400">Upload Background Image</p>
+                                        <p class="text-xs text-slate-500 mt-1">Drag &amp; drop or click to upload the target background</p>
+                                    </div>
+                                </div>
+                                <img id="filter-upload-preview-2" class="absolute inset-0 w-full h-full object-cover rounded-2xl hidden" alt="Background reference preview" />
+                                <button id="filter-upload-remove-2"
+                                        class="absolute top-3 right-3 p-1.5 bg-slate-950/90 rounded-full hidden z-10 hover:bg-red-900/80 transition-colors border border-slate-700/50"
+                                        title="Remove background image">
                                     <i class="fa-solid fa-xmark text-sm text-slate-400 hover:text-red-400 transition-colors"></i>
                                 </button>
                             </div>
@@ -230,7 +252,7 @@
                             <div class="space-y-2">
                                 <h3 class="text-lg font-bold text-white tracking-wide">Menunggu Input Parameter</h3>
                                 <p class="text-sm text-slate-500 max-w-xs leading-relaxed">
-                                    Lengkapi formulir di sebelah kiri dan klik <span class="text-purple-400 font-semibold">Generate Now</span> untuk memulai pembuatan filter wisuda.
+                                    Lengkapi formulir di sebelah kiri dan klik <span class="text-purple-400 font-semibold">Generate Now</span> untuk memulai pembuatan filter wisuda dengan 2 gambar referensi.
                                 </p>
                             </div>
                         </div>
@@ -317,8 +339,6 @@
         </div>
     </main>
 
-    </main>
-
     <!-- ============================================================
          APPLICATION LOGIC
          ============================================================ -->
@@ -342,15 +362,19 @@
             '3:2':  { width: 2528, height: 1696 }
         };
 
-        // ---- Selection state ----
+        // ---- Selection state (dual image) ----
         const selection = {
             prompt: '',
             title: '',
             tag1: 'Studio',
             tag2: 'Soft Light',
             ratio: '1:1',
-            uploadedImageData: null,
-            uploadedFile: null
+            // Reference Image 1 — Subject
+            uploadedImageData1: null,
+            uploadedFile1: null,
+            // Reference Image 2 — Background
+            uploadedImageData2: null,
+            uploadedFile2: null
         };
 
         // ---- Mutually exclusive group helpers ----
@@ -425,26 +449,39 @@
             } catch (_) {}
         }
 
-        // ---- Image upload zone handlers ----
+        // ---- Dual image upload zone handlers ----
+        // Each zone is independent: zone 1 = Subject, zone 2 = Background
 
-        function initImageUpload() {
-            const zone    = document.getElementById('filter-upload-zone');
-            const input   = document.getElementById('filter-upload-input');
-            const preview = document.getElementById('filter-upload-preview');
-            const placeholder = document.getElementById('filter-upload-placeholder');
-            const removeBtn  = document.getElementById('filter-upload-remove');
+        function createImageUploadHandler(slot) {
+            // slot: 1 = Subject, 2 = Background
+            const zone    = document.getElementById('filter-upload-zone-' + slot);
+            const input   = document.getElementById('filter-upload-input-' + slot);
+            const preview = document.getElementById('filter-upload-preview-' + slot);
+            const placeholder = document.getElementById('filter-upload-placeholder-' + slot);
+            const removeBtn  = document.getElementById('filter-upload-remove-' + slot);
 
             if (!zone || !input || !preview || !placeholder || !removeBtn) return;
+
+            const borderActiveColor = slot === 1 ? 'border-cyan-400/40' : 'border-amber-400/40';
+            const borderInactive    = slot === 1 ? 'border-cyan-500/20' : 'border-amber-500/20';
 
             function handleFile(file) {
                 if (!file || !file.type.startsWith('image/')) return;
 
                 // Preserve the raw File object for S3 upload
-                selection.uploadedFile = file;
+                if (slot === 1) {
+                    selection.uploadedFile1 = file;
+                } else {
+                    selection.uploadedFile2 = file;
+                }
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    selection.uploadedImageData = e.target.result;
+                    if (slot === 1) {
+                        selection.uploadedImageData1 = e.target.result;
+                    } else {
+                        selection.uploadedImageData2 = e.target.result;
+                    }
                     preview.src = e.target.result;
                     preview.classList.remove('hidden');
                     preview.style.opacity = '0';
@@ -455,33 +492,39 @@
                     });
                     placeholder.classList.add('hidden');
                     removeBtn.classList.remove('hidden');
-                    zone.classList.add('border-purple-400/40');
-                    zone.classList.remove('border-purple-500/20', 'border-dashed');
+                    zone.classList.add(borderActiveColor);
+                    zone.classList.remove(borderInactive, 'border-dashed');
                     zone.style.cursor = 'default';
-                    console.log('[Factory] Reference image loaded:', file.name, '(' + (file.size / 1024).toFixed(1) + ' KB)');
+                    console.log('[Factory BG Campus] Reference image ' + slot + ' loaded:', file.name, '(' + (file.size / 1024).toFixed(1) + ' KB)');
                 };
                 reader.readAsDataURL(file);
             }
 
             function clearImage() {
-                selection.uploadedImageData = null;
-                selection.uploadedFile = null;
+                if (slot === 1) {
+                    selection.uploadedImageData1 = null;
+                    selection.uploadedFile1 = null;
+                } else {
+                    selection.uploadedImageData2 = null;
+                    selection.uploadedFile2 = null;
+                }
                 preview.classList.add('hidden');
                 preview.src = '';
                 preview.style.opacity = '';
                 placeholder.classList.remove('hidden');
                 removeBtn.classList.add('hidden');
-                zone.classList.remove('border-purple-400/40');
-                zone.classList.add('border-purple-500/20', 'border-dashed');
+                zone.classList.remove(borderActiveColor);
+                zone.classList.add(borderInactive, 'border-dashed');
                 zone.style.cursor = 'pointer';
                 input.value = '';
-                console.log('[Factory] Reference image cleared.');
+                console.log('[Factory BG Campus] Reference image ' + slot + ' cleared.');
             }
 
             // Click to open file dialog
             zone.addEventListener('click', (e) => {
                 if (e.target === removeBtn || removeBtn.contains(e.target)) return;
-                if (!selection.uploadedImageData) input.click();
+                const hasImage = slot === 1 ? !!selection.uploadedImageData1 : !!selection.uploadedImageData2;
+                if (!hasImage) input.click();
             });
 
             // File input change
@@ -501,23 +544,28 @@
             zone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                zone.classList.add('border-purple-400/60', 'bg-purple-500/5');
+                zone.classList.add(slot === 1 ? 'border-cyan-400/60' : 'border-amber-400/60', slot === 1 ? 'bg-cyan-500/5' : 'bg-amber-500/5');
             });
 
             zone.addEventListener('dragleave', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                zone.classList.remove('border-purple-400/60', 'bg-purple-500/5');
+                zone.classList.remove(slot === 1 ? 'border-cyan-400/60' : 'border-amber-400/60', slot === 1 ? 'bg-cyan-500/5' : 'bg-amber-500/5');
             });
 
             zone.addEventListener('drop', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                zone.classList.remove('border-purple-400/60', 'bg-purple-500/5');
+                zone.classList.remove(slot === 1 ? 'border-cyan-400/60' : 'border-amber-400/60', slot === 1 ? 'bg-cyan-500/5' : 'bg-amber-500/5');
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
                     handleFile(e.dataTransfer.files[0]);
                 }
             });
+        }
+
+        function initImageUploads() {
+            createImageUploadHandler(1);  // Subject
+            createImageUploadHandler(2);  // Background
         }
 
         // ---- Panel state management ----
@@ -569,9 +617,10 @@
 
         const SIMULATED_LOGS = [
             'Menghubungkan ke API REST Leonardo.ai...',
-            'Mengunggah gambar referensi subjek (The Graduate)...',
-            'Menyelaraskan model nano-banana-2...',
-            'Memproses transfer busana kebaya & pencahayaan...',
+            'Mengunggah gambar Subject (Reference 1) ke S3...',
+            'Mengunggah gambar Background (Reference 2) ke S3...',
+            'Menyelaraskan model nano-banana-2 dengan dual image guidance...',
+            'Memproses blend subjek + background dengan pencahayaan...',
             'Menyusun hasil pratinjau resolusi tinggi...'
         ];
 
@@ -639,7 +688,7 @@
                 localStorage.setItem('all_creations', JSON.stringify(creations));
             } catch (_) {}
 
-            console.log('[Factory] Filter saved — visibilityKey:', visibilityKey, '| title:', filterObject.title, '| OFF');
+            console.log('[Factory BG Campus] Filter saved — visibilityKey:', visibilityKey, '| title:', filterObject.title, '| OFF');
         }
 
         // ---- Populate completed panel ----
@@ -671,19 +720,27 @@
             if (promptEl) promptEl.value = '';
             if (titleEl)  titleEl.value  = '';
 
-            // Clear uploaded image
-            selection.uploadedImageData = null;
-            selection.uploadedFile = null;
-            const preview     = document.getElementById('filter-upload-preview');
-            const placeholder = document.getElementById('filter-upload-placeholder');
-            const removeBtn   = document.getElementById('filter-upload-remove');
-            const zone        = document.getElementById('filter-upload-zone');
-            const input       = document.getElementById('filter-upload-input');
-            if (preview)     { preview.classList.add('hidden'); preview.src = ''; }
-            if (placeholder) placeholder.classList.remove('hidden');
-            if (removeBtn)   removeBtn.classList.add('hidden');
-            if (zone)        { zone.classList.remove('border-purple-400/40'); zone.classList.add('border-purple-500/20', 'border-dashed'); zone.style.cursor = 'pointer'; }
-            if (input)       input.value = '';
+            // Clear both uploaded images
+            for (var slot = 1; slot <= 2; slot++) {
+                if (slot === 1) {
+                    selection.uploadedImageData1 = null;
+                    selection.uploadedFile1 = null;
+                } else {
+                    selection.uploadedImageData2 = null;
+                    selection.uploadedFile2 = null;
+                }
+                const preview     = document.getElementById('filter-upload-preview-' + slot);
+                const placeholder = document.getElementById('filter-upload-placeholder-' + slot);
+                const removeBtn   = document.getElementById('filter-upload-remove-' + slot);
+                const zone        = document.getElementById('filter-upload-zone-' + slot);
+                const input       = document.getElementById('filter-upload-input-' + slot);
+                const borderInactive = slot === 1 ? 'border-cyan-500/20' : 'border-amber-500/20';
+                if (preview)     { preview.classList.add('hidden'); preview.src = ''; }
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (removeBtn)   removeBtn.classList.add('hidden');
+                if (zone)        { zone.classList.remove(slot === 1 ? 'border-cyan-400/40' : 'border-amber-400/40'); zone.classList.add(borderInactive, 'border-dashed'); zone.style.cursor = 'pointer'; }
+                if (input)       input.value = '';
+            }
 
             // Reset panel to IDLE
             showPanel('idle');
@@ -693,7 +750,7 @@
         // ---- Server proxy (API key secured in .env, like swap-bg) ----
         const API_BASE = window.location.origin;
 
-        // ---- Generate flow (server-side proxy pattern) ----
+        // ---- Generate flow (dual-image S3 upload via server proxy) ----
 
         async function handleGenerate() {
             const promptEl = document.getElementById('factory-prompt');
@@ -701,10 +758,11 @@
             const prompt   = (promptEl?.value || '').trim();
             const title    = (titleEl?.value || '').trim();
 
-            // --- Validation ---
+            // --- Validation (BOTH images required) ---
             if (!prompt)  { showToast('Please enter a prompt describing the background scene.', 'warn'); return; }
             if (!title)   { showToast('Please enter a filter preset name.', 'warn'); return; }
-            if (!selection.uploadedFile) { showToast('Please upload a reference image.', 'warn'); return; }
+            if (!selection.uploadedFile1) { showToast('Please upload a Subject image (Reference 1).', 'warn'); return; }
+            if (!selection.uploadedFile2) { showToast('Please upload a Background image (Reference 2).', 'warn'); return; }
 
             // --- Transition to PROCESSING ---
             lockGenerateButton();
@@ -729,6 +787,7 @@
             try {
                 // ============================================================
                 //  POST to server — server handles Leonardo securely (.env key)
+                //  Sends BOTH reference images for dual-image guidance
                 // ============================================================
                 appendLog('Connecting to server proxy...');
 
@@ -739,9 +798,11 @@
                 formData.append('height', selectedHeight.toString());
                 formData.append('selected_tag', selection.tag1);
                 formData.append('lighting', selection.tag2);
-                formData.append('referenceImage1', selection.uploadedFile, selection.uploadedFile.name);
+                // Dual image upload: Subject (Reference 1) + Background (Reference 2)
+                formData.append('referenceImage1', selection.uploadedFile1, selection.uploadedFile1.name);
+                formData.append('referenceImage2', selection.uploadedFile2, selection.uploadedFile2.name);
 
-                appendLog('Uploading reference image & prompt to server...');
+                appendLog('Uploading Subject image (Ref 1) & Background image (Ref 2) to server...');
 
                 const genResp = await fetch(API_BASE + '/api/generate', {
                     method: 'POST',
@@ -756,7 +817,7 @@
                 const { jobId } = await genResp.json();
                 serverJobId = jobId;
                 appendLog('Pipeline initialized — jobId: ' + jobId);
-                console.log('[Factory] Server job accepted:', jobId);
+                console.log('[Factory BG Campus] Server job accepted:', jobId);
 
                 // ============================================================
                 //  Poll server for status (server polls Leonardo in background)
@@ -786,7 +847,7 @@
                         if (status === 'COMPLETE') {
                             generatedImageUrl = data.imageUrl || null;
                             if (generatedImageUrl) {
-                                appendLog('Generation complete — image received!');
+                                appendLog('Generation complete — dual guidance image received!');
                                 apiSuccess = true;
                             }
                             break;
@@ -804,14 +865,15 @@
                 }
 
             } catch (err) {
-                console.warn('[Factory] Server proxy error:', err.message);
+                console.warn('[Factory BG Campus] Server proxy error:', err.message);
                 appendLog('Server error: ' + (err.message || 'unknown') + ' — falling back to local');
             }
 
             // ============================================================
             //  Build final filter object & show COMPLETED
             // ============================================================
-            const finalImageUrl = generatedImageUrl || selection.uploadedImageData;
+            // Fallback: if generation fails, show the subject image as preview
+            const finalImageUrl = generatedImageUrl || selection.uploadedImageData1;
 
             // Use server jobId as generation_id so visibility key matches admin/public pages
             const effectiveId = serverJobId || localFilterId;
@@ -845,12 +907,12 @@
             }
 
             if (apiSuccess) {
-                showToast('Filter "' + title + '" generated via Leonardo.ai! Status: OFF.', 'success');
+                showToast('Filter "' + title + '" generated via Leonardo.ai (dual guidance)! Status: OFF.', 'success');
             } else {
                 showToast('Filter "' + title + '" saved with local fallback. Status: OFF.', 'warn');
             }
 
-            console.log('[Factory] Filter created — id:', effectiveId,
+            console.log('[Factory BG Campus] Filter created — id:', effectiveId,
                         '| api:', apiSuccess ? 'server-proxy' : 'local-fallback',
                         '| visibility: OFF (filter_visibility_states[' + effectiveId + '] = false)');
         }
@@ -895,7 +957,7 @@
                 const blobUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = blobUrl;
-                a.download = 'filter-wisuda-' + Date.now() + '.png';
+                a.download = 'filter-wisuda-bg-campus-' + Date.now() + '.png';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -905,7 +967,7 @@
                 if (iconEl)  iconEl.className = 'fa-solid fa-download text-xs';
                 showToast('Gambar berhasil diunduh!', 'success');
             } catch (err) {
-                console.error('[Factory] Download failed:', err);
+                console.error('[Factory BG Campus] Download failed:', err);
                 if (btn) {
                     const labelEl = btn.querySelector('span');
                     const iconEl  = btn.querySelector('i');
@@ -923,7 +985,7 @@
             initTag1Group();
             initTag2Group();
             initRatioGroup();
-            initImageUpload();
+            initImageUploads();   // Dual upload zones (Subject + Background)
 
             const genBtn = document.getElementById('factory-generate-btn');
             if (genBtn) genBtn.addEventListener('click', handleGenerate);
@@ -934,7 +996,7 @@
             const downloadBtn = document.getElementById('panel-download-btn');
             if (downloadBtn) downloadBtn.addEventListener('click', downloadGeneratedImage);
 
-            console.log('Filter Gallery Factory initialized.');
+            console.log('Filter Gallery Factory (BG Campus) initialized — dual image guidance ready.');
         }
 
         if (document.readyState === 'loading') {

@@ -455,6 +455,10 @@ app.get('/filter_gallery_admin', requireAdminPage, (_req, res) => sendHtmlNoCach
 app.get('/filter-gallery-factory', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_factory.html')));
 app.get('/filter_gallery_factory', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_factory.html')));
 
+// Filter Gallery Factory (BG Campus) (PROTECTED)
+app.get('/filter-gallery-factory-bg-campus', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_factory_bg_campus.html')));
+app.get('/filter_gallery_factory_bg_campus', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery_factory_bg_campus.html')));
+
 // Admin Creations (PROTECTED)
 app.get('/admin-creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_creations.html')));
 app.get('/admin_creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_creations.html')));
@@ -1215,12 +1219,13 @@ function buildGenerationPayload(prompt, width, height, imageIds) {
         }
     };
 
-    // Attach reference images as guidances if any were uploaded
+    // Attach reference images as guidances if any were uploaded.
+    // First image (Subject) at HIGH strength, subsequent at MID.
     if (imageIds && imageIds.length > 0) {
         payload.parameters.guidances = {
-            image_reference: imageIds.map(id => ({
+            image_reference: imageIds.map((id, index) => ({
                 image: { id, type: 'UPLOADED' },
-                strength: 'MID'
+                strength: index === 0 ? 'HIGH' : 'MID'
             }))
         };
     }
@@ -4877,6 +4882,7 @@ app.listen(PORT, () => {
     console.log('║    GET  /filter-gallery    Filter Gallery (Public)        ║');
     console.log('║    GET  /admin-gallery-filter  Filter Gallery Admin    ║');
 	    console.log('║    GET  /filter-gallery-factory  Filter Gallery Factory   ║');
+    console.log('║    GET  /filter-gallery-factory-bg-campus  BG Campus     ║');
     console.log('║    POST /api/generate      Start generation               ║');
     console.log('║    GET  /api/status/:id    Poll generation status         ║');
     console.log('║    POST /api/background-swap     Start bg-swap pipeline    ║');
