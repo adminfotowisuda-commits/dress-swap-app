@@ -306,6 +306,15 @@
         @keyframes toastSlideOut{from{opacity:1;transform:translate(-50%, 0)}to{opacity:0;transform:translate(-50%, -24px)}}
         .toast-enter{animation:toastSlideIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards}
         .toast-exit{animation:toastSlideOut 0.3s cubic-bezier(0.4,0,1,1) forwards}
+        /* Filter Gallery bento card — horizontal Before-After carousel */
+        @keyframes carouselSlide {
+            0%, 42%   { transform: translateX(0); }      /* Hold on BEFORE */
+            50%, 92%  { transform: translateX(-50%); }   /* Slide to AFTER and hold */
+            100%      { transform: translateX(0); }      /* Slide back to BEFORE */
+        }
+        .animate-carousel-slide {
+            animation: carouselSlide 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
     </style>
 </head>
 
@@ -443,11 +452,19 @@
                 <!-- ═══ CARD 3: Filter Gallery ═══ -->
                 <a href="/filter-gallery" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
                    class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-amber-500/40 transition-all duration-300 cursor-pointer no-underline md:col-span-2 lg:col-span-1">
-                    <!-- Visual -->
-                    <div class="rounded-xl overflow-hidden w-full aspect-[4/5] bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-orange-500/20 flex items-center justify-center shrink-0">
-                        <div class="text-center">
-                            <span class="material-symbols-outlined text-6xl text-amber-400/50" style="font-variation-settings:'FILL':1;">filter_vintage</span>
-                            <p class="text-amber-400/30 text-[10px] mt-2 font-bold tracking-[0.2em] uppercase">Curated Presets</p>
+                    <!-- Visual — Before-After carousel -->
+                    <div class="rounded-xl overflow-hidden w-full aspect-[4/5] bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-orange-500/20 shrink-0 relative">
+                        <div class="flex w-[200%] h-full animate-carousel-slide">
+                            <!-- Image 1 (BEFORE) -->
+                            <div class="relative w-1/2 h-full">
+                                <img src="/image_display/hero_image_filter_g/hero_image_filter_g_before.jpg" alt="Before Filter" class="w-full h-full object-cover" loading="lazy" />
+                                <span class="absolute top-3 left-3 bg-slate-950/75 border border-slate-700/50 text-[10px] font-bold text-slate-300 px-2 py-1 rounded-md uppercase tracking-wider">BEFORE</span>
+                            </div>
+                            <!-- Image 2 (AFTER) -->
+                            <div class="relative w-1/2 h-full">
+                                <img src="/image_display/hero_image_filter_g/hero_image_filter_g_after.jpg" alt="After Filter" class="w-full h-full object-cover" loading="lazy" />
+                                <span class="absolute top-3 right-3 bg-amber-950/80 border border-amber-500/40 text-[10px] font-bold text-amber-300 px-2 py-1 rounded-md uppercase tracking-wider shadow-lg shadow-amber-500/10">AFTER</span>
+                            </div>
                         </div>
                     </div>
                     <h3 class="text-amber-400 font-bold text-xl mt-5 mb-3 group-hover:text-amber-300 transition-colors">Tetap Fyp, Koleksi Foto Nggak Bikin Bosen.</h3>
