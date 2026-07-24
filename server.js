@@ -4594,7 +4594,7 @@ app.post('/api/payments/doku-callback', async (req, res) => {
         const isSnapBi = req.body.order && req.body.payment_status;
         const isNestedDirect = req.body.transaction && req.body.transaction.status && req.body.order;
 
-        let invoice_number, userEmail, paymentSuccess;
+        let invoice_number, paymentSuccess;
         let packageId = '';
 
         if (isLegacy) {
@@ -4602,7 +4602,6 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             invoice_number = req.body.TRANSIDMERCHANT || req.body.ORDERID || '';
             const statusCode = req.body.STATUSCODE || req.body.RESULTCODE || '';
             paymentSuccess = statusCode === '0000' || statusCode === '00';
-            userEmail = req.body.EMAIL || req.body.CUSTEMAIL || '';
             const amountRaw = Math.round(parseFloat(req.body.AMOUNT || '0'));
 
             // Map amount to credits and package
@@ -4612,7 +4611,7 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             else if (amountRaw === 299000) { packageId = 'pkg_studio_299k'; }
             else { packageId = ''; }
 
-            console.log(`  [doku-callback] LEGACY — invoice: ${invoice_number}, status: ${statusCode}, amount: ${amountRaw}, email: ${userEmail}, pkg: ${packageId}`);
+            console.log(`  [doku-callback] LEGACY — invoice: ${invoice_number}, status: ${statusCode}, amount: ${amountRaw}, pkg: ${packageId}`);
         } else if (isSnapBi) {
             // ═══ DOKU SNAP BI Notification ═══
             const rawBody = JSON.stringify(req.body);
@@ -4623,9 +4622,8 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             }
             invoice_number = req.body.invoice_number || '';
             paymentSuccess = req.body.payment_status === 'SUCCESS';
-            userEmail = (req.body.order || {}).virtual_account?.email || req.body.customer?.email || '';
             packageId = req.body.additional_info?.package_id || '';
-            console.log(`  [doku-callback] SNAP BI — invoice: ${invoice_number}, status: ${req.body.payment_status}, email: ${userEmail}`);
+            console.log(`  [doku-callback] SNAP BI — invoice: ${invoice_number}, status: ${req.body.payment_status}, pkg: ${packageId}`);
         } else if (isNestedDirect) {
             // ═══ DOKU Nested Direct Notification (Production) ═══
             // Payload shape: { order: { invoice_number, amount }, transaction: { status }, additional_info: { package_id } }
@@ -4642,16 +4640,44 @@ app.post('/api/payments/doku-callback', async (req, res) => {
                 else if (amountRaw === 299000) { packageId = 'pkg_studio_299k'; }
             }
 
-            // Try to extract email from various nested locations, or fall back to transaction lookup
-            userEmail = req.body.customer?.email
-                     || req.body.order?.customer?.email
-                     || req.body.order?.virtual_account?.email
-                     || '';
-
-            console.log(`  [doku-callback] NESTED DIRECT — invoice: ${invoice_number}, status: ${req.body.transaction?.status}, amount: ${amountRaw}, email: ${userEmail || '(via txn lookup)'}, pkg: ${packageId}`);
+            console.log(`  [doku-callback] NESTED DIRECT — invoice: ${invoice_number}, status: ${req.body.transaction?.status}, amount: ${amountRaw}, pkg: ${packageId}`);
         } else {
             console.warn('  [doku-callback] Unrecognized payload format — body keys:', Object.keys(req.body).join(', '));
             return res.status(200).send('CONTINUE'); // Return 200 to stop DOKU retries even on unrecognized
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // CRITICAL: NEVER trust webhook customer.email for credit assignment.
+        // DOKU Sandbox overwrites the real email with dummy test addresses
+        // (e.g. "QR1.admin.fotowisuda@gmail.com"). Always resolve the true
+        // user email from our LOCAL transaction record created at checkout.
+        // ══════════════════════════════════════════════════════════════
+        let userEmail = '';
+        let txnRecord = null;
+
+        if (invoice_number && db.isConnected()) {
+            try {
+                txnRecord = await db.Transaction.findOne({ invoice_number });
+                if (txnRecord && txnRecord.email) {
+                    userEmail = txnRecord.email;
+                    // If the webhook didn't include a package_id, use the one from our transaction
+                    if (!packageId && txnRecord.package_id) {
+                        packageId = txnRecord.package_id;
+                    }
+                    console.log(`  [doku-callback] Resolved real email from local txn: ${userEmail} (webhook claimed: ${req.body.customer?.email || 'N/A'})`);
+                }
+            } catch (lookupErr) {
+                console.error(`  [doku-callback] Failed to lookup transaction ${invoice_number}:`, lookupErr.message);
+            }
+        }
+
+        // Fallback for DOKU Legacy when MongoDB is down — try JSON file
+        if (!userEmail && invoice_number) {
+            try {
+                const dbLegacy = await readCreditsDB();
+                const txnLegacy = dbLegacy.transactions.find(t => t.invoice_number === invoice_number);
+                if (txnLegacy) userEmail = txnLegacy.email;
+            } catch (_) { /* ignore */ }
         }
 
         if (paymentSuccess) {
@@ -4659,18 +4685,11 @@ app.post('/api/payments/doku-callback', async (req, res) => {
             const pkg = packages.find(p => p.package_id === packageId);
             const credits = pkg ? pkg.credits_given : 0;
 
-            // If Legacy and no email found, try to match via transaction record
-            if (!userEmail) {
-                const db = await readCreditsDB();
-                const txn = db.transactions.find(t => t.invoice_number === invoice_number);
-                if (txn) userEmail = txn.email;
-            }
-
             if (credits > 0 && userEmail) {
                 addCredits(userEmail, credits, invoice_number);
             }
 
-            console.log(`  [doku-callback] PAYMENT SUCCESS — ${userEmail} received ${credits} credits (invoice: ${invoice_number})`);
+            console.log(`  [doku-callback] PAYMENT SUCCESS — ${userEmail || 'UNKNOWN'} received ${credits} credits (invoice: ${invoice_number})`);
         }
 
         // Return "CONTINUE" for Legacy, JSON for SNAP BI — DOKU expects 200 to stop retrying
