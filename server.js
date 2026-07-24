@@ -752,6 +752,41 @@ async function refundCredits(email, amount) {
     console.log(`  [mongodb] REFUND +${amount} credits → ${key}`);
 }
 
+// ═══ Generation-type → credit cost mapping (used for auto-refund on failure) ═══
+const GENERATION_TYPE_CREDIT_COST = {
+    'bgswap':          60,
+    'background-swap': 60,
+    'dress-swap':      60,
+    'filter-swap':     45
+};
+
+/**
+ * Auto-refund credits if an AI generation pipeline fails (async failure,
+ * timeout, or Gemini/Leonardo pipeline crash). Only refunds once — the
+ * activeGenerations record is updated with `_refunded: true` to prevent
+ * double-refund in edge cases.
+ */
+async function refundGenerationCredits(localGenId, reason) {
+    if (!db.isConnected()) return;
+    try {
+        const record = activeGenerations.get(localGenId);
+        if (!record) return;
+        if (record._refunded) return; // already refunded — safety guard
+
+        const email = record._userEmail || '';
+        const genType = record.type || '';
+        const cost = GENERATION_TYPE_CREDIT_COST[genType] || 0;
+
+        if (cost > 0 && email) {
+            await refundCredits(email, cost);
+            record._refunded = true;
+            console.log(`  [auto-refund] ✓ ${email} refunded +${cost} credits — reason: ${reason} (gen: ${localGenId})`);
+        }
+    } catch (err) {
+        console.error(`  [auto-refund] Failed for ${localGenId}:`, err.message);
+    }
+}
+
 // ═══ Credit Expiration Logic ═══
 // If a user has no activity for >30 days, their credit balance resets to 0.
 // Called from the balance endpoint, auth handler, and the deduction middleware.
@@ -1739,6 +1774,8 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                     status: 'failed',
                     error: record.error
                 });
+                // Auto-refund credits — generation failed on Leonardo side
+                refundGenerationCredits(localGenId, 'Leonardo generation FAILED: ' + (record.error || ''));
             } else {
                 console.log(`  [poll] ${localGenId} → ${status} (attempt ${attempts})`);
             }
@@ -1759,6 +1796,8 @@ function startBackgroundPoll(localGenId, leonardoGenId, persistedRefs) {
                     status: 'failed',
                     error: record.error
                 });
+                // Auto-refund credits — generation timed out
+                refundGenerationCredits(localGenId, 'TIMEOUT: generation timed out after 6 minutes');
             }
         }
     }, 5000);
@@ -2305,6 +2344,8 @@ async function executeBackgroundSwapPipeline(localGenId, file1, file2, w, h, loc
             record.status = 'FAILED';
             record.error = err.message || 'Background pipeline failed';
         }
+        // Auto-refund credits — deduction happened before pipeline launched
+        refundGenerationCredits(localGenId, 'bg-swap pipeline: ' + (err.message || 'unknown'));
     }
 }
 
@@ -2728,6 +2769,8 @@ async function executeDressSwapPipeline(localGenId, file1, file2, w, h, localPat
             record.status = 'FAILED';
             record.error = err.message || 'Background pipeline failed';
         }
+        // Auto-refund credits — deduction happened before pipeline launched
+        refundGenerationCredits(localGenId, 'dress-swap pipeline: ' + (err.message || 'unknown'));
     }
 }
 
