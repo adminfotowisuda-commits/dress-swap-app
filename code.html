@@ -874,14 +874,16 @@
 
         async function fetchCreditBalance() {
             var display = document.getElementById('credit-balance-display');
-            if (!display) return;
             var email = getActiveEmail();
-            if (!email) { display.textContent = '0'; return; }
+            var balance = 0;
             try {
-                var resp = await fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}`);
+                var resp = await fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}&_=${Date.now()}`, { cache: 'no-cache' });
                 var data = await resp.json();
-                display.textContent = data.credits_balance || 0;
-            } catch (_) { display.textContent = 'â€"'; }
+                balance = data.credits_balance || 0;
+            } catch (_) { balance = '—'; }
+            if (display) display.textContent = balance;
+            // Also refresh the unified sidebar credit display if present
+            if (window._refreshCredits) window._refreshCredits();
         }
 
         // â•â•â• Package Selection Modal â•â•â•
@@ -893,7 +895,7 @@
             var packagesEl = document.getElementById('top-up-packages');
             if (!modal || !packagesEl) return;
 
-            fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}`)
+            fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}&_=${Date.now()}`, { cache: 'no-cache' })
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     var popularIdx = 1; // middle package is "popular"

@@ -4215,6 +4215,13 @@ app.get('/api/credits/balance', async (req, res) => {
         const expireResult = await checkAndExpireCredits(email);
 
         const packages = getCreditPackages();
+
+        // Prevent browser from caching a stale credit balance
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+        res.set('Surrogate-Control', 'no-store');
+
         res.json({
             email: user.email,
             credits_balance: expireResult.balance !== null ? expireResult.balance : (user.credits_balance || 0),

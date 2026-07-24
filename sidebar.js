@@ -154,7 +154,7 @@ function fetchCreditBalance() {
     var email = getEmail();
     if (!email) { display.textContent = '0'; return; }
     try {
-        fetch(API_BASE + '/api/credits/balance?email=' + encodeURIComponent(email))
+        fetch(API_BASE + '/api/credits/balance?email=' + encodeURIComponent(email) + '&_=' + Date.now(), { cache: 'no-cache' })
             .then(function(r) { return r.json(); })
             .then(function(data) { display.textContent = data.credits_balance || 0; })
             .catch(function() { display.textContent = '—'; });
