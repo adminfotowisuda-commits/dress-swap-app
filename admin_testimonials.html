@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Kelola Testimoni — fotowisuda.ai</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "surface-background": "#0A0C10",
+                            "surface-card": "#161B22",
+                            "surface-container": "#1e2024",
+                            "border-subtle": "#30363D",
+                            "text-primary": "#F0F6FC",
+                            "text-secondary": "#8B949E",
+                            "electric-cyan": "#00D1FF",
+                            "vivid-purple": "#9D5BFF"
+                        }
+                    }
+                }
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        @keyframes adminGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .admin-glowing-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #06b6d4, #6366f1, #a855f7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: adminGradientFlow 5s ease infinite;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+        }
+
+        .card-enter {
+            animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Testimonial card hover */
+        .testimonial-row {
+            transition: background 0.15s ease;
+        }
+        .testimonial-row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Delete button */
+        .delete-btn {
+            transition: all 0.2s ease;
+        }
+        .delete-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Modal animation */
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate-in {
+            animation: modalIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Skeleton loading */
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.8s ease-in-out infinite;
+            border-radius: 6px;
+        }
+
+        /* Star colors */
+        .star-gold { color: #f59e0b; }
+        .star-empty { color: #334155; }
+
+        /* Scrollbar styling */
+        .table-container::-webkit-scrollbar { height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: transparent; }
+        .table-container::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.15); border-radius: 3px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.3); }
+
+        /* Overview stat cards */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 100%;
+        }
+        .overview-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+            border-radius: 18px;
+            padding: 20px 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            opacity: 0.06;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .overview-card:hover {
+            border-color: rgba(168, 85, 247, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .overview-card:hover::before {
+            opacity: 0.12;
+            transform: scale(1.2);
+        }
+        .card-total::before  { background: #00D1FF; }
+        .card-rating::before { background: #f59e0b; }
+
+        .overview-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .icon-total    { background: rgba(0,209,255,0.1);  border: 1px solid rgba(0,209,255,0.2);  color: #00D1FF; }
+        .icon-rating   { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: #f59e0b; }
+
+        .overview-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+        .overview-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #F0F6FC;
+            line-height: 1.2;
+        }
+        .overview-spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(148,163,184,0.2);
+            border-top-color: #9D5BFF;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden">
+
+    <!-- ============================================================
+         TEXT-ONLY SIDEBAR (desktop: always visible; mobile: overlay)
+         ============================================================ -->
+    <aside id="sidebar" class="hidden md:flex w-60 bg-slate-950/40 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 h-screen sticky top-0 z-30 transition-transform duration-300">
+        <nav class="flex flex-col gap-8">
+            <!-- SYSTEM CONTROLS -->
+            <div>
+                <p class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-4">System Controls</p>
+                <a href="/admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Home</a>
+                <a href="/filter-gallery-admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Admin</a>
+                <a href="/filter-gallery-factory" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
+                <a href="/filter-gallery-factory-bg-campus" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Factory (BG Campus)</a>
+                <a href="/admin-creations" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Creations</a>
+                <a href="/admin-users" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Kelola Pengguna</a>
+                <a href="/admin-system-prompts" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">System Prompt</a>
+                <a href="/admin-testimonials" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">Kelola Testimoni</a>
+            </div>
+        </nav>
+        <!-- Sidebar footer -->
+        <div class="pt-6 border-t border-slate-800/60 flex flex-col gap-3">
+            <p class="text-[9px] text-slate-600 tracking-wider font-medium">fotowisuda.ai &mdash; Admin</p>
+            <button id="admin-logout-btn" onclick="handleAdminLogout()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 hover:border-red-800/60 text-red-400 hover:text-red-300 text-[11px] font-bold rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                <span>Keluar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar overlay (backdrop) -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden" onclick="closeSidebar()"></div>
+
+    <!-- ============================================================
+         MOBILE HEADER BAR (visible only < md)
+         ============================================================ -->
+    <div class="md:hidden fixed top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60">
+        <span class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase">fotowisuda.ai</span>
+        <button id="menu-toggle" onclick="toggleSidebar()" class="text-xs font-bold text-slate-400 hover:text-white tracking-widest uppercase transition-all">Menu</button>
+    </div>
+
+    <!-- ============================================================
+         MAIN WORKSPACE
+         ============================================================ -->
+    <main class="flex-grow flex flex-col p-6 relative overflow-y-auto overflow-x-hidden mt-12 md:mt-0">
+
+        <!-- Ambient background glows -->
+        <div class="absolute top-[-15%] right-[-15%] w-[600px] h-[600px] bg-purple-600/8 blur-[150px] rounded-full pointer-events-none"></div>
+        <div class="absolute bottom-[-15%] left-[-15%] w-[500px] h-[500px] bg-cyan-500/6 blur-[150px] rounded-full pointer-events-none"></div>
+
+        <!-- Page Header -->
+        <div class="card-enter relative z-10 mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600/20 to-amber-500/20 border border-purple-500/20 flex items-center justify-center">
+                    <i class="fa-solid fa-star text-xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h1 class="admin-glowing-title text-2xl md:text-3xl tracking-tight leading-tight">
+                        Kelola Testimoni
+                    </h1>
+                    <p class="text-text-secondary text-sm leading-relaxed mt-1">
+                        Manajemen testimoni pengguna — lihat, tinjau, dan hapus ulasan.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ STATS DASHBOARD ═══ -->
+        <div class="relative z-10 overview-grid mb-8">
+            <!-- Total Testimoni -->
+            <div class="overview-card card-total card-enter">
+                <div class="overview-icon icon-total">
+                    <i class="fa-solid fa-comment-dots"></i>
+                </div>
+                <div>
+                    <p class="overview-label">Total Testimoni</p>
+                    <p id="stat-total" class="overview-value">
+                        <span class="overview-spinner"></span>
+                    </p>
+                </div>
+            </div>
+            <!-- Rata-rata Rating -->
+            <div class="overview-card card-rating card-enter">
+                <div class="overview-icon icon-rating">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div>
+                    <p class="overview-label">Rata-rata Rating</p>
+                    <p id="stat-average" class="overview-value">
+                        <span class="overview-spinner"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TESTIMONIAL LIST ═══ -->
+        <div class="card-enter relative z-10 bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden"
+             style="box-shadow: 0 0 60px rgba(168, 85, 247, 0.05), 0 0 0 1px rgba(168, 85, 247, 0.06);">
+
+            <!-- Toolbar -->
+            <div class="flex items-center justify-between gap-4 p-6 pb-0">
+                <span id="result-count" class="text-xs text-slate-500">Memuat data...</span>
+                <button id="refresh-btn" onclick="fetchTestimonials()" class="flex items-center gap-2 px-4 py-2.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 hover:border-slate-600/60 text-slate-300 text-xs font-semibold rounded-xl transition-all">
+                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+
+            <!-- Testimonial Cards Container -->
+            <div id="testimonials-container" class="p-6 flex flex-col gap-4">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Loading skeleton -->
+            <div id="loading-skeleton" class="p-6 flex flex-col gap-4">
+                <div class="skeleton" style="height:120px;"></div>
+                <div class="skeleton" style="height:140px;"></div>
+                <div class="skeleton" style="height:100px;"></div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-star text-2xl text-slate-600"></i>
+                </div>
+                <p class="text-slate-400 font-semibold">Belum ada testimoni</p>
+                <p class="text-slate-600 text-xs mt-1">Testimoni dari pengguna akan muncul di sini.</p>
+            </div>
+
+            <!-- Error state -->
+            <div id="error-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl text-rose-400"></i>
+                </div>
+                <p id="error-message" class="text-rose-400 font-semibold">Gagal memuat data</p>
+                <button onclick="fetchTestimonials()" class="mt-4 px-6 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-xl transition-all">Coba Lagi</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="relative z-10 mt-8 text-center">
+            <p class="text-[10px] text-slate-500/60 tracking-wider font-medium">
+                fotowisuda.ai &bull; Admin Portal v1.0 &bull; Testimoni Management
+            </p>
+        </div>
+
+    </main>
+
+    <!-- ============================================================
+         DELETE CONFIRMATION MODAL
+         ============================================================ -->
+    <div id="delete-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="modal-animate-in bg-slate-900 border border-red-500/20 shadow-2xl shadow-red-500/10 rounded-3xl p-8 max-w-md w-full flex flex-col gap-5">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/15 to-rose-500/15 border border-red-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-trash-can text-lg text-red-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Hapus Testimoni Ini?</h3>
+                        <p class="text-xs text-slate-400">Tindakan ini tidak dapat dibatalkan.</p>
+                    </div>
+                </div>
+                <button onclick="closeDeleteModal()" class="text-slate-500 hover:text-white transition-colors text-xl leading-none">&times;</button>
+            </div>
+
+            <!-- Target preview -->
+            <div id="delete-target-preview" class="p-4 bg-slate-800/60 border border-slate-700/60 rounded-xl">
+                <p class="text-xs text-slate-500 uppercase tracking-wider mb-2">Testimoni yang akan dihapus:</p>
+                <p id="delete-target-name" class="text-sm font-semibold text-white">—</p>
+                <p id="delete-target-email" class="text-xs text-slate-400 mt-1">—</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-3 pt-1">
+                <button onclick="closeDeleteModal()" class="flex-1 bg-transparent border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white font-semibold py-3 rounded-xl transition-all text-xs tracking-wider uppercase">Batal</button>
+                <button id="delete-confirm-btn" onclick="confirmDelete()" class="flex-1 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-600/20 active:scale-[0.97] text-xs tracking-wider uppercase flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
+                    <span>Hapus Permanen</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
+    <script>
+        // ═══ Sidebar Toggle ═══
+        function openSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('hidden')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        }
+
+        // ═══ Admin Logout ═══
+        async function handleAdminLogout() {
+            var btn = document.getElementById('admin-logout-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(239,68,68,0.3);border-top-color:#ef4444;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;"></span> <span>Keluar...</span>';
+            }
+            try {
+                var resp = await fetch(window.location.origin + '/api/auth/admin-logout', { method: 'POST' });
+                var data = await resp.json();
+                if (data.success) {
+                    window.location.href = '/admin-login';
+                } else {
+                    alert('Gagal logout: ' + (data.message || 'Unknown error'));
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-right-from-bracket text-xs"></i> <span>Keluar</span>';
+                    }
+                }
+            } catch (err) {
+                alert('Kesalahan jaringan: ' + err.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-right-from-bracket text-xs"></i> <span>Keluar</span>';
+                }
+            }
+        }
+
+        // ═══ State ═══
+        var API_BASE = window.location.origin;
+        var allTestimonials = [];
+        var deleteTargetId = null;
+
+        // ═══ Format Helpers ═══
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            var d = new Date(dateStr);
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() +
+                ' · ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        // ═══ Star Icons ═══
+        function renderStars(rating) {
+            var html = '';
+            for (var i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    html += '<i class="fa-solid fa-star star-gold text-xs"></i>';
+                } else {
+                    html += '<i class="fa-regular fa-star star-empty text-xs"></i>';
+                }
+            }
+            return html;
+        }
+
+        // ═══ Fetch & Render ═══
+        async function fetchTestimonials() {
+            var container = document.getElementById('testimonials-container');
+            var loading = document.getElementById('loading-skeleton');
+            var empty = document.getElementById('empty-state');
+            var error = document.getElementById('error-state');
+            var resultCount = document.getElementById('result-count');
+
+            // Show loading
+            container.innerHTML = '';
+            loading.style.display = 'block';
+            empty.classList.add('hidden');
+            error.classList.add('hidden');
+
+            try {
+                var resp = await fetch(API_BASE + '/api/testimonials?_=' + Date.now(), { cache: 'no-cache' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+                allTestimonials = await resp.json();
+                loading.style.display = 'none';
+
+                if (!allTestimonials || allTestimonials.length === 0) {
+                    empty.classList.remove('hidden');
+                    resultCount.textContent = '0 testimoni';
+                    updateStats(0, 0);
+                    return;
+                }
+
+                resultCount.textContent = allTestimonials.length + ' testimoni';
+                renderTestimonials(allTestimonials);
+                updateStats(allTestimonials.length, calcAverage(allTestimonials));
+
+            } catch (err) {
+                console.error('[fetchTestimonials] Error:', err.message);
+                loading.style.display = 'none';
+                error.classList.remove('hidden');
+                document.getElementById('error-message').textContent = 'Gagal memuat data: ' + err.message;
+                resultCount.textContent = 'Error';
+                updateStats(0, 0);
+            }
+        }
+
+        function calcAverage(testimonials) {
+            if (!testimonials || testimonials.length === 0) return 0;
+            var sum = 0;
+            testimonials.forEach(function(t) { sum += (t.rating || 0); });
+            return sum / testimonials.length;
+        }
+
+        function updateStats(total, avg) {
+            var totalEl = document.getElementById('stat-total');
+            var avgEl = document.getElementById('stat-average');
+
+            if (totalEl) {
+                totalEl.innerHTML = total > 0
+                    ? '<span style="color:#00D1FF;">' + total + '</span>'
+                    : '<span style="color:#64748b;">—</span>';
+            }
+            if (avgEl) {
+                avgEl.innerHTML = avg > 0
+                    ? '<span style="color:#f59e0b;">' + avg.toFixed(1) + '</span> <span style="font-size:14px;color:#64748b;">/ 5.0</span> <i class="fa-solid fa-star star-gold text-sm ml-1"></i>'
+                    : '<span style="color:#64748b;">—</span>';
+            }
+        }
+
+        function renderTestimonials(testimonials) {
+            var container = document.getElementById('testimonials-container');
+            var html = '';
+
+            testimonials.forEach(function(t) {
+                var initials = (t.user_name || 'A').substring(0, 2).toUpperCase();
+                var avatarHtml = '';
+                if (t.user_avatar) {
+                    avatarHtml = '<img src="' + escapeHtml(t.user_avatar) + '" alt="' + escapeHtml(t.user_name) + '" class="w-10 h-10 rounded-full object-cover border border-slate-700 shrink-0">';
+                } else {
+                    avatarHtml = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">' + initials + '</div>';
+                }
+
+                var imageHtml = '';
+                if (t.image_url) {
+                    imageHtml = '<div class="shrink-0 ml-4">' +
+                        '<a href="' + escapeHtml(t.image_url) + '" target="_blank" rel="noopener">' +
+                        '<img src="' + escapeHtml(t.image_url) + '" alt="Foto testimoni" class="w-20 h-20 object-cover rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer" loading="lazy">' +
+                        '</a></div>';
+                }
+
+                html += '<div class="testimonial-row flex flex-col md:flex-row md:items-start gap-4 p-5 bg-slate-900/30 border border-slate-800/60 rounded-2xl group">' +
+                    // Avatar + User info
+                    '<div class="flex items-start gap-3 flex-1 min-w-0">' +
+                        avatarHtml +
+                        '<div class="min-w-0 flex-1">' +
+                            '<div class="flex items-center gap-2 flex-wrap">' +
+                                '<span class="text-white font-semibold text-sm">' + escapeHtml(t.user_name || 'Anonymous') + '</span>' +
+                                '<span class="text-xs text-slate-500">' + escapeHtml(t.user_email || '') + '</span>' +
+                            '</div>' +
+                            '<div class="mt-1">' + renderStars(t.rating) + '</div>' +
+                            '<p class="text-slate-300 text-sm mt-2 leading-relaxed whitespace-pre-line">' + escapeHtml(t.message) + '</p>' +
+                            '<p class="text-[11px] text-slate-500 mt-2">' + formatDate(t.created_at) + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    // Image + Delete
+                    '<div class="flex items-start gap-3 shrink-0">' +
+                        imageHtml +
+                        '<button onclick="openDeleteModal(\'' + t._id + '\', \'' + escapeAttr(t.user_name || 'Anonymous') + '\', \'' + escapeAttr(t.user_email || '') + '\')" ' +
+                            'class="delete-btn flex items-center gap-2 px-4 py-2.5 bg-red-950/20 hover:bg-red-950/50 border border-red-900/30 hover:border-red-800/60 text-red-400 hover:text-red-300 text-xs font-bold rounded-xl transition-all">' +
+                            '<i class="fa-solid fa-trash-can"></i>' +
+                            '<span class="hidden sm:inline">Hapus</span>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function escapeAttr(str) {
+            if (!str) return '';
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // ═══ Delete Modal ═══
+        function openDeleteModal(id, name, email) {
+            deleteTargetId = id;
+            document.getElementById('delete-target-name').textContent = name;
+            document.getElementById('delete-target-email').textContent = email;
+            document.getElementById('delete-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDeleteModal() {
+            deleteTargetId = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        async function confirmDelete() {
+            if (!deleteTargetId) return;
+
+            var btn = document.getElementById('delete-confirm-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block;"></span> <span>Menghapus...</span>';
+
+            try {
+                var resp = await fetch(API_BASE + '/api/testimonials/' + encodeURIComponent(deleteTargetId), {
+                    method: 'DELETE'
+                });
+
+                if (!resp.ok) {
+                    var errData = await resp.json().catch(function() { return {}; });
+                    throw new Error(errData.error || 'Gagal menghapus testimoni');
+                }
+
+                // Remove from local array
+                allTestimonials = allTestimonials.filter(function(t) { return t._id !== deleteTargetId; });
+
+                // Close modal
+                closeDeleteModal();
+
+                // Re-render the list
+                renderTestimonials(allTestimonials);
+
+                // Update stats
+                updateStats(allTestimonials.length, calcAverage(allTestimonials));
+
+                // Update result count
+                document.getElementById('result-count').textContent = allTestimonials.length + ' testimoni';
+
+                // Show empty state if needed
+                if (allTestimonials.length === 0) {
+                    document.getElementById('empty-state').classList.remove('hidden');
+                }
+
+            } catch (err) {
+                console.error('[confirmDelete] Error:', err.message);
+                alert('Gagal menghapus testimoni: ' + err.message);
+                closeDeleteModal();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-trash-can text-xs"></i> <span>Hapus Permanen</span>';
+            }
+        }
+
+        // Close modals on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDeleteModal();
+        });
+
+        // Close delete modal on overlay click
+        document.getElementById('delete-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
+        // ═══ Init ═══
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchTestimonials();
+        });
+    </script>
+</body>
+</html>

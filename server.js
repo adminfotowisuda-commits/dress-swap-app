@@ -470,6 +470,10 @@ app.get('/admin_creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res
 app.get('/admin', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin.html')));
 app.get('/admin-filters', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_filters.html')));
 
+// Admin Testimonials (PROTECTED)
+app.get('/admin-testimonials', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_testimonials.html')));
+app.get('/admin_testimonials', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_testimonials.html')));
+
 // Admin System Prompts (PROTECTED)
 app.get('/admin-system-prompts', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_system_prompts.html')));
 app.get('/admin_system_prompts', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_system_prompts.html')));
@@ -2357,6 +2361,32 @@ app.post('/api/testimonials', testimonialUpload.single('image'), async (req, res
     } catch (err) {
         console.error('[/api/testimonials POST] Error:', err);
         res.status(500).json({ error: 'Gagal menyimpan testimoni.' });
+    }
+});
+
+/**
+ * DELETE /api/testimonials/:id
+ * ------------------------------------------------------------------
+ * ADMIN PROTECTED — Permanently deletes a testimonial by ID.
+ */
+app.delete('/api/testimonials/:id', requireAdminApi, async (req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
+        const { id } = req.params;
+        const deleted = await db.Testimonial.findByIdAndDelete(id);
+
+        if (!deleted) {
+            return res.status(404).json({ error: 'Testimoni tidak ditemukan.' });
+        }
+
+        console.log(`  [testimonial] Deleted testimonial ${id} from ${deleted.user_email}`);
+        res.json({ deleted: true, id: id });
+    } catch (err) {
+        console.error('[/api/testimonials/:id DELETE] Error:', err);
+        res.status(500).json({ error: 'Gagal menghapus testimoni.' });
     }
 });
 
