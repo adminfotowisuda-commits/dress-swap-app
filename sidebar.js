@@ -139,7 +139,7 @@ function renderUserProfile() {
                     '<div style="font-size:9px;color:#8B949E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + email + '</div>' +
                 '</div>' +
             '</div>' +
-            '<button onclick="window._doLogout()" style="width:100%;padding:8px;background:rgba(255,180,171,0.1);border:1px solid rgba(255,180,171,0.2);color:#ffb4ab;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi</button>' +
+            '<button onclick="window._doLogout()" style="width:100%;padding:8px;background:rgba(255,180,171,0.1);border:1px solid rgba(255,180,171,0.2);color:#ffb4ab;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>' +
         '</div>';
     } else {
         el.innerHTML = '<button onclick="window._openLogin()" style="width:100%;padding:10px;background:#0a0c10;border:1px solid #30363D;color:#c4b5fd;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">' +
