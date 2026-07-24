@@ -10,6 +10,7 @@ const User               = require('./models/User');
 const Transaction        = require('./models/Transaction');
 const Generation         = require('./models/Generation');
 const ClaimedWelcomeGift = require('./models/ClaimedWelcomeGift');
+const Settings          = require('./models/Settings');
 
 // Re-export everything
 module.exports = {
@@ -20,6 +21,7 @@ module.exports = {
     Transaction,
     Generation,
     ClaimedWelcomeGift,
+    Settings,
     uploadToCloudinary,
     CLOUDINARY_CONFIGURED
 };

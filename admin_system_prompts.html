@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>System Prompt — fotowisuda.ai Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "surface-background": "#0A0C10",
+                            "surface-card": "#161B22",
+                            "surface-container": "#1e2024",
+                            "border-subtle": "#30363D",
+                            "text-primary": "#F0F6FC",
+                            "text-secondary": "#8B949E",
+                            "electric-cyan": "#00D1FF",
+                            "vivid-purple": "#9D5BFF"
+                        }
+                    }
+                }
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes adminGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .admin-glowing-title {
+            background: linear-gradient(135deg, #a855f7, #06b6d4, #6366f1, #a855f7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: adminGradientFlow 5s ease infinite;
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+            font-weight: 800;
+        }
+        @keyframes toastSlideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .toast-animate {
+            animation: toastSlideUp 0.3s ease-out;
+        }
+    </style>
+</head>
+
+<body class="flex min-h-screen bg-surface-background text-text-primary" style="font-family: 'Inter','Plus Jakarta Sans',system-ui,sans-serif;">
+
+    <!-- ============================================================
+         TEXT-ONLY SIDEBAR
+         ============================================================ -->
+    <aside id="sidebar" class="hidden md:flex w-60 bg-slate-950/40 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 h-screen sticky top-0 z-30 transition-transform duration-300">
+        <nav class="flex flex-col gap-8">
+            <div>
+                <p class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-4">System Controls</p>
+                <a href="/admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Home</a>
+                <a href="/filter-gallery-admin" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Admin</a>
+                <a href="/filter-gallery-factory" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Gallery Factory</a>
+                <a href="/filter-gallery-factory-bg-campus" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Filter Factory (BG Campus)</a>
+                <a href="/admin-creations" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Admin Creations</a>
+                <a href="/admin-users" class="text-xs font-semibold text-slate-400 hover:text-white tracking-wider transition-all py-2 block">Kelola Pengguna</a>
+                <a href="/admin-system-prompts" class="text-xs font-semibold text-purple-400 font-bold tracking-wider transition-all py-2 block">System Prompt</a>
+            </div>
+        </nav>
+        <div class="pt-6 border-t border-slate-800/60">
+            <p class="text-[9px] text-slate-600 tracking-wider font-medium">fotowisuda.ai &mdash; Admin</p>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden" onclick="closeSidebar()"></div>
+
+    <!-- Mobile header bar -->
+    <div class="md:hidden fixed top-0 inset-x-0 z-10 flex items-center justify-between px-5 py-3 bg-surface-background/95 backdrop-blur-md border-b border-border-subtle">
+        <span class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase">fotowisuda.ai</span>
+        <button id="menu-toggle" onclick="toggleSidebar()" class="text-xs font-bold text-slate-400 hover:text-white tracking-widest uppercase transition-all">Menu</button>
+    </div>
+
+    <!-- ============================================================
+         MAIN WORKSPACE
+         ============================================================ -->
+    <main class="flex-grow overflow-y-auto mt-12 md:mt-0 p-8">
+        <div class="w-full max-w-[1200px] mx-auto">
+
+            <!-- Page Title -->
+            <div class="mb-8">
+                <h2 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight mb-2">System Prompt</h2>
+                <p class="text-text-secondary text-sm">Edit Gemini AI system instructions for Background Change and Dress Replicate pipelines. Changes take effect immediately.</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-8 space-y-8 shadow-2xl">
+
+                <!-- Textarea 1: Background Change -->
+                <div>
+                    <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-purple-400 text-xs"></i>
+                        System Prompt — Background Change
+                    </label>
+                    <textarea id="prompt-bg-change"
+                              rows="14"
+                              class="w-full bg-surface-card border border-border-subtle rounded-xl p-5 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 resize-y transition-all font-mono leading-relaxed"
+                              placeholder="Loading system prompt..."></textarea>
+                    <p class="text-[10px] text-slate-600 mt-1.5">Used by <code class="text-cyan-400/80">generatePromptsWithGemini()</code> — the Background Change pipeline (Graduate Subject + Target Background).</p>
+                </div>
+
+                <!-- Textarea 2: Dress Replicate -->
+                <div>
+                    <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-amber-400 text-xs"></i>
+                        System Prompt — Dress Replicate
+                    </label>
+                    <textarea id="prompt-dress-replicate"
+                              rows="14"
+                              class="w-full bg-surface-card border border-border-subtle rounded-xl p-5 text-sm text-text-primary placeholder:text-slate-600 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/20 resize-y transition-all font-mono leading-relaxed"
+                              placeholder="Loading system prompt..."></textarea>
+                    <p class="text-[10px] text-slate-600 mt-1.5">Used by <code class="text-cyan-400/80">generateDressSwapPromptsWithGemini()</code> — the Dress Replicate pipeline (Base Identity + Target Fashion).</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button id="save-btn"
+                            class="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 shadow-lg shadow-purple-600/20 active:scale-95 text-sm tracking-wider uppercase border border-purple-400/20 disabled:opacity-60 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span id="save-btn-text">Simpan Perubahan</span>
+                    </button>
+                    <button id="reset-defaults-btn"
+                            class="flex-1 bg-transparent border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white font-semibold py-3.5 px-6 rounded-2xl transition-all text-xs tracking-wider uppercase flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
+                        <span>Reset ke Default</span>
+                    </button>
+                </div>
+
+                <!-- Toast message area -->
+                <div id="toast" class="hidden text-center text-xs font-semibold tracking-wide toast-animate"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ============================================================
+         APPLICATION LOGIC
+         ============================================================ -->
+    <script>
+    (function() {
+        'use strict';
+
+        const API_BASE = window.location.origin;
+
+        // Elements
+        const bgTextarea     = document.getElementById('prompt-bg-change');
+        const dressTextarea  = document.getElementById('prompt-dress-replicate');
+        const saveBtn        = document.getElementById('save-btn');
+        const saveBtnText    = document.getElementById('save-btn-text');
+        const resetBtn       = document.getElementById('reset-defaults-btn');
+        const toastEl        = document.getElementById('toast');
+
+        // Cache for defaults (populated on load so Reset knows what to fall back to)
+        let _defaults = { prompt_bg_change: '', prompt_dress_replicate: '' };
+
+        // ---- Toast helper ----
+        function showToast(message, type) {
+            if (!toastEl) return;
+            toastEl.textContent = message;
+            toastEl.classList.remove('hidden', 'text-emerald-400', 'text-amber-400', 'text-red-400');
+            toastEl.classList.add(type === 'error' ? 'text-red-400' : type === 'warn' ? 'text-amber-400' : 'text-emerald-400');
+            // Auto-hide after 5 seconds
+            clearTimeout(toastEl._hideTimeout);
+            toastEl._hideTimeout = setTimeout(function () {
+                toastEl.classList.add('hidden');
+            }, 5000);
+        }
+
+        // ---- Fetch current prompts ----
+        async function loadPrompts() {
+            try {
+                bgTextarea.placeholder = 'Loading system prompt...';
+                dressTextarea.placeholder = 'Loading system prompt...';
+
+                const resp = await fetch(API_BASE + '/api/admin/system-prompts', {
+                    credentials: 'same-origin'
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(function () { return {}; });
+                    throw new Error(err.error || 'HTTP ' + resp.status);
+                }
+
+                const data = await resp.json();
+                bgTextarea.value    = data.prompt_bg_change || '';
+                dressTextarea.value = data.prompt_dress_replicate || '';
+
+                // Store defaults from server (these ARE the server-side defaults if DB is empty)
+                _defaults.prompt_bg_change       = data.prompt_bg_change || '';
+                _defaults.prompt_dress_replicate = data.prompt_dress_replicate || '';
+
+                console.log('[System Prompt] Prompts loaded (' + data.prompt_bg_change.length + ' / ' + data.prompt_dress_replicate.length + ' chars)');
+            } catch (err) {
+                console.error('[System Prompt] Failed to load prompts:', err);
+                showToast('Gagal memuat system prompts: ' + (err.message || 'unknown'), 'error');
+                bgTextarea.placeholder = 'Failed to load. Check server connection.';
+                dressTextarea.placeholder = 'Failed to load. Check server connection.';
+            }
+        }
+
+        // ---- Save prompts ----
+        async function savePrompts() {
+            const bgVal    = (bgTextarea.value || '').trim();
+            const dressVal = (dressTextarea.value || '').trim();
+
+            if (!bgVal && !dressVal) {
+                showToast('Setidaknya satu prompt harus diisi.', 'warn');
+                return;
+            }
+
+            // Lock button
+            saveBtn.disabled = true;
+            saveBtnText.innerHTML = '<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Menyimpan…';
+
+            try {
+                const resp = await fetch(API_BASE + '/api/admin/system-prompts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        prompt_bg_change: bgVal,
+                        prompt_dress_replicate: dressVal
+                    })
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(function () { return {}; });
+                    throw new Error(err.error || 'HTTP ' + resp.status);
+                }
+
+                const data = await resp.json();
+                console.log('[System Prompt] Save successful:', data.message);
+                showToast('System prompts berhasil disimpan! Perubahan langsung berlaku.', 'success');
+            } catch (err) {
+                console.error('[System Prompt] Save failed:', err);
+                showToast('Gagal menyimpan: ' + (err.message || 'unknown'), 'error');
+            } finally {
+                // Restore button
+                saveBtn.disabled = false;
+                saveBtnText.innerHTML = 'Simpan Perubahan';
+            }
+        }
+
+        // ---- Reset to defaults ----
+        function resetToDefaults() {
+            if (!confirm('Reset kedua prompt ke default bawaan server? Perubahan ini akan langsung disimpan.')) return;
+
+            bgTextarea.value    = _defaults.prompt_bg_change;
+            dressTextarea.value = _defaults.prompt_dress_replicate;
+            savePrompts();
+        }
+
+        // ---- Init ----
+        function init() {
+            loadPrompts();
+
+            saveBtn.addEventListener('click', savePrompts);
+            resetBtn.addEventListener('click', resetToDefaults);
+
+            console.log('Admin System Prompts initialized.');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+
+    <!-- ============================================================
+         MOBILE SIDEBAR TOGGLE SCRIPT
+         ============================================================ -->
+    <script>
+        function openSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('fixed', 'inset-y-0', 'left-0');
+            }
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar && sidebar.classList.contains('hidden')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        }
+    </script>
+
+</body>
+</html>

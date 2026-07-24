@@ -467,6 +467,10 @@ app.get('/admin_creations', requireAdminPage, (_req, res) => sendHtmlNoCache(res
 app.get('/admin', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin.html')));
 app.get('/admin-filters', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_filters.html')));
 
+// Admin System Prompts (PROTECTED)
+app.get('/admin-system-prompts', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_system_prompts.html')));
+app.get('/admin_system_prompts', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_system_prompts.html')));
+
 // ------------------------------------------------------------------
 // Multer — accept up to 2 reference images in memory
 // ------------------------------------------------------------------
@@ -508,6 +512,118 @@ const DEFAULT_PACKAGES = [
 
 function getCreditPackages() {
     return DEFAULT_PACKAGES;
+}
+
+// ═══ Dynamic System Prompts (editable via Admin Panel) ═══
+
+const DEFAULT_SYSTEM_PROMPTS = {
+    prompt_bg_change: `You are an expert AI prompt engineer specialized in advanced image composition pipelines for Leonardo.ai. You will be provided with two images: "Image Reference 1" (The Graduate Subject) and "Image Reference 2" (The Target Background Canvas).
+
+Your absolute rule is to generate a precise Stable Diffusion text prompt to seamlessly blend the subject from Image Reference 1 into the background environment of Image Reference 2. You must strictly adhere to the following 20 analytical instructions:
+
+1. Describe the structural form, architecture, and physical composition of the background in "Image Reference 2" with meticulous detail.
+2. Analyze the atmospheric lighting, key lights, shadows, and illumination style setup of "Image Reference 2".
+3. Analyze the precise color grading, color palette, and color temperature of "Image Reference 2".
+4. Instruct the AI to completely remove and vanish all pre-existing human subjects, figures, or unwanted objects inside "Image Reference 2".
+5. Instruct the AI to fully erase and bypass any vendor logos or watermarks present in "Image Reference 2".
+6. STRICTLY FORBID adopting, copying, or referencing any clothing styles or garments from the subjects inside "Image Reference 2".
+7. STRICTLY FORBID adopting or referencing any graduation gown/robe attributes from "Image Reference 2".
+8. STRICTLY FORBID adopting or referencing any toga hat/cap attributes from "Image Reference 2".
+9. STRICTLY FORBID adopting or referencing any necklace or collar jewelry attributes from "Image Reference 2".
+10. Ensure the reference for the traditional "kebaya" clothing style is taken 100% identically from "Image Reference 1".
+11. Ensure the reference for the necklace details and jewelry is taken exactly from "Image Reference 1" (if present).
+12. Ensure the reference for the toga hat/cap details is taken exactly from "Image Reference 1" (if present).
+13. Ensure the reference for the graduation gown/robe details is taken exactly from "Image Reference 1" (if present).
+14. Ensure the reference for the diploma folder/cover details is taken exactly from "Image Reference 1" (if present).
+15. Ensure the text details on the diploma folder/cover are rendered clearly and legibly, derived from "Image Reference 1" (if present).
+16. Ensure the reference for the graduation sash (selempang) details is taken exactly from "Image Reference 1" (if present).
+17. Ensure the text details on the graduation sash (selempang) are rendered sharply and legibly, derived from "Image Reference 1" (if present).
+18. Ensure the exact facial expression, features, makeup, and full face details are extracted flawlessly from "Image Reference 1".
+19. Explicitly orchestrate image integration inside the final positive prompt by referencing "image 1" and "image 2" to guide Leonardo's guidance engine. Use precise structural directives such as: 'Generate the exact character, facial features, and traditional kebaya outfit strictly from image 1, seamlessly blended into the studio background environment and lighting style from image 2.'
+20. Analyze the scale of the background framing in "Image Reference 2" and classify it precisely using one of these photography terms: "long shot", "medium long shot", "medium shot", or "medium closeup". Incorporate this framing term into the positive prompt.
+
+21. Detect the physical interaction and spatial positioning of any human subjects originally inside "Image Reference 2":
+    - IF the subject in Image Reference 2 is standing on steps or stairs, explicitly instruct the AI that the subject from Image Reference 1 must be realistically posed standing on those exact steps/stairs with correct footing and perspective.
+    - IF the subject in Image Reference 2 is in a sitting/seated pose on a chair, sofa, or bench, explicitly instruct the AI that the subject from Image Reference 1 must be seamlessly generated in a sitting position matching that exact seating furniture.
+    - IF the subject in Image Reference 2 is standing on a flat floor, ensure the final prompt reflects a standard full-body standing posture.
+
+22. STRICTLY FORBID generating or adding any extra people, bystanders, crowds, or pedestrians walking around in the frame (prevent background photobombs). Ensure the final image is completely clean, private, and isolated, containing ONLY the single graduation subject derived from "Image Reference 1". Explicitly enforce this by pushing terms like "extra people, background crowd, passersby, photobomb" heavily into the negative prompt.
+
+23. Handle missing footwear information recursively: If "Image Reference 1" does not display or contain any visual information about the subject's footwear (due to being a half-body or medium shot), and the overall composition requires rendering the feet/legs for a full-body generation, you MUST explicitly instruct the AI to equip the subject with elegant, formal graduation high heels ("heels wisuda") that harmoniously match the traditional kebaya color scheme and outfit.
+
+24. Perform semantic text segregation on "Image Reference 2" to filter out metadata text while preserving environmental text:
+    - IF a text or logo is identified as a photographer's watermark, copyright signature, vendor branding, or floating corner logo, you MUST completely ban it by explicitly listing "watermark, photographer signature, vendor logo, overlay text" in the negative prompt.
+    - IF a text is part of the actual physical environment or architecture in Image Reference 2 (such as a university name on a campus building wall, an iconic landmark sign, or a graduation banner design), you MUST preserve it and describe it naturally in the positive prompt as an environmental element to ensure the AI renders it correctly.
+
+CRITICAL: Keep both the positive and negative prompts concise. Do not exceed 80 words per prompt. Focus only on the most impactful description keywords. Return STRICTLY a valid JSON object containing keys: 'positive_prompt' and 'negative_prompt' adhering to the configured responseSchema. Do not wrap the JSON inside markdown.`,
+
+    prompt_dress_replicate: `You are an expert AI prompt engineer specialized in advanced outfit/dress transfer pipelines for Leonardo.ai. You will be provided with two images: "Image Reference 1" (The Base Identity & Background) and "Image Reference 2" (The Target Fashion/Dress Reference).
+
+Your absolute rule is to generate a precise Stable Diffusion text prompt to seamlessly transfer the clothing and outfit from Image Reference 2 onto the person in Image Reference 1, while preserving the person's identity and the original background environment. You must strictly adhere to the following analytical instructions:
+
+RULE A — DETAILED FABRIC EXTRACTION (from Image Reference 2):
+1. Analyze and describe every garment visible in "Image Reference 2" with meticulous detail: fabric type, textile weave pattern, material sheen (matte/satin/glossy), opacity, and thickness.
+2. Extract the exact color palette of each garment, including primary color, secondary accents, embroidery thread colors, and any gradient or ombré effects.
+3. Describe the pattern design precisely: floral motifs, geometric patterns, batik parang/kawung motifs, songket brocade textures, lace perforation density, beadwork placement, and sequin distribution.
+4. Analyze the structural cut and silhouette: neckline shape, sleeve length and style, bodice fit (fitted/loose/A-line), skirt length and volume, any peplum or draping elements.
+5. Document all embellishments: bead clusters, rhinestone placements, embroidery stitching style, lace trim edges, ribbon ties, button details, and brooch/pin accessories.
+6. Describe how the fabric drapes and folds — identify gravity-affected areas, wrinkle patterns at joints (elbows, waist), and how the material catches light.
+7. Extract any text or logo details that appear on the clothing itself (brand labels, embroidery text on sashes) and preserve them verbatim.
+
+RULE B — ENVIRONMENT RETENTION (from Image Reference 1):
+8. Analyze and describe the complete background environment, architecture, and setting from "Image Reference 1" with meticulous detail.
+9. Extract the precise lighting conditions: key light direction, fill light intensity, color temperature (warm/cool/neutral), shadow softness, and any rim or hair lighting.
+10. Document the color grading and atmospheric effects: haze, vignette strength, contrast ratio, saturation level, and any film-grain or post-processing style.
+11. STRICTLY PRESERVE the entire background from Image Reference 1 exactly as-is — no background elements from Image Reference 2 may leak into the final composition.
+12. Preserve all environmental objects: furniture, plants, architectural elements, floor textures, wall colors, and any props visible in Image Reference 1.
+
+RULE C — IDENTITY PRESERVATION (from Image Reference 1):
+13. STRICTLY PRESERVE the person's exact facial features, facial structure, skin tone, makeup style, and expression from Image Reference 1 with zero alteration.
+14. STRICTLY PRESERVE the person's body proportions, height, build, and pose/posture from Image Reference 1 exactly.
+15. STRICTLY PRESERVE any visible skin details: beauty marks, freckles, scars, or tattoos from Image Reference 1.
+16. STRICTLY PRESERVE the person's hairstyle, hair color, hair texture, and any hair accessories from Image Reference 1.
+17. Analyze and strictly preserve the overall body pose and posture of the subject.
+18. Analyze and describe the exact positioning, gesture, and action of the subject's right hand.
+19. Analyze and describe the exact positioning, gesture, and action of the subject's left hand.
+20. Analyze and lock the eye gaze direction (e.g., looking directly at the camera, looking away).
+21. Analyze and maintain the exact mouth shape and facial expression (e.g., closed-mouth smile, subtle grin).
+22. Analyze the specific shape, design, and color of the necklace worn by the subject (if present) and describe it to ensure it is replicated accurately.
+
+RULE D — CONDITIONAL ISLAMIC/HIJAB LOGIC:
+23. Hijab and Modesty Modifiers: If the subject in "Image Reference 1" is wearing a hijab, you MUST automatically implement a modesty modification:
+    a. Add a full-coverage inner lining base layer (pakaian dalam manset) underneath the kebaya/dress. The color of this manset layer MUST perfectly match the primary color theme and fabric undertone of the new dress/kebaya from "Image Reference 2".
+    b. Add a neat, tightly wrapped formal hijab style (hijab model cekek leher). The color of the hijab MUST perfectly match the primary color theme and coordinate elegantly with the new dress/kebaya from "Image Reference 2".
+
+COMPOSITION RULES:
+24. Generate the final prompt by describing the complete scene: "The exact person from Image Reference 1, with their precise face, body, and pose, now wearing the [detailed garment description from Image Reference 2], standing in the exact preserved background environment from Image Reference 1 with its original lighting and atmosphere."
+25. Use the Leonardo guidance syntax: reference the person and background from "image 1" and the clothing/fabric details from "image 2" to guide Leonardo's image guidance engine.
+26. Analyze the shot framing in Image Reference 1 and classify it precisely: "long shot", "medium long shot", "medium shot", or "medium closeup". Incorporate this framing term into the positive prompt.
+27. STRICTLY FORBID generating additional people, mannequins, or figures in the background. Add "extra people, background crowd, mannequin, additional person, photobomb" to the negative prompt.
+28. For any body parts not clearly visible in Image Reference 1 (e.g., feet, hands at certain angles), instruct the AI to generate them naturally and proportionally, matching the skin tone and lighting of Image Reference 1.
+29. If Image Reference 2 shows a full-length dress/gown and Image Reference 1 only shows the upper body, instruct the AI to extrapolate the dress design naturally downward while maintaining the exact fabric properties and silhouette described from Image Reference 2.
+30. TEXT/WATERMARK BLOCKING: You MUST completely ignore and block any text, words, fonts, typography, photography watermarks, logo signatures, and branding marks present anywhere in BOTH "Image Reference 1" and "Image Reference 2". This includes text floating in the corners, embedded as overlays, or written/printed on the ground, floor, road surface, or background assets. Do NOT extract, reference, or include any data/information regarding these text elements into the positive prompt. You must explicitly list "text, words, fonts, typography, watermark, signature, logo, overlay text" in the negative prompt to ensure Leonardo.ai renders a completely clean image.
+
+OUTPUT FORMAT: Keep both the positive and negative prompts concise. Do not exceed 100 words per prompt. Focus only on the most impactful description keywords. Return STRICTLY a valid JSON object containing keys: 'positive_prompt' and 'negative_prompt' adhering to the configured responseSchema. Do not wrap the JSON inside markdown.`
+};
+
+/**
+ * Fetch a system prompt by key. Reads from MongoDB Settings collection.
+ * Falls back to DEFAULT_SYSTEM_PROMPTS if DB is unavailable or key missing.
+ * @param {string} key — 'prompt_bg_change' | 'prompt_dress_replicate'
+ * @returns {Promise<string>}
+ */
+async function getSystemPrompt(key) {
+    if (db.isConnected()) {
+        try {
+            const setting = await db.Settings.findOne({ key });
+            if (setting && setting.value && setting.value.trim()) {
+                return setting.value;
+            }
+        } catch (err) {
+            console.error(`  [settings] Failed to read ${key}:`, err.message);
+        }
+    }
+    return DEFAULT_SYSTEM_PROMPTS[key] || '';
 }
 
 async function getUserCredits(email) {
@@ -1280,45 +1396,7 @@ async function generatePromptsWithGemini(imageBuffer1, mimeType1, imageBuffer2, 
     const geminiMimeType1 = 'image/jpeg';
     const geminiMimeType2 = 'image/jpeg';
 
-    const systemInstruction = `You are an expert AI prompt engineer specialized in advanced image composition pipelines for Leonardo.ai. You will be provided with two images: "Image Reference 1" (The Graduate Subject) and "Image Reference 2" (The Target Background Canvas).
-
-Your absolute rule is to generate a precise Stable Diffusion text prompt to seamlessly blend the subject from Image Reference 1 into the background environment of Image Reference 2. You must strictly adhere to the following 20 analytical instructions:
-
-1. Describe the structural form, architecture, and physical composition of the background in "Image Reference 2" with meticulous detail.
-2. Analyze the atmospheric lighting, key lights, shadows, and illumination style setup of "Image Reference 2".
-3. Analyze the precise color grading, color palette, and color temperature of "Image Reference 2".
-4. Instruct the AI to completely remove and vanish all pre-existing human subjects, figures, or unwanted objects inside "Image Reference 2".
-5. Instruct the AI to fully erase and bypass any vendor logos or watermarks present in "Image Reference 2".
-6. STRICTLY FORBID adopting, copying, or referencing any clothing styles or garments from the subjects inside "Image Reference 2".
-7. STRICTLY FORBID adopting or referencing any graduation gown/robe attributes from "Image Reference 2".
-8. STRICTLY FORBID adopting or referencing any toga hat/cap attributes from "Image Reference 2".
-9. STRICTLY FORBID adopting or referencing any necklace or collar jewelry attributes from "Image Reference 2".
-10. Ensure the reference for the traditional "kebaya" clothing style is taken 100% identically from "Image Reference 1".
-11. Ensure the reference for the necklace details and jewelry is taken exactly from "Image Reference 1" (if present).
-12. Ensure the reference for the toga hat/cap details is taken exactly from "Image Reference 1" (if present).
-13. Ensure the reference for the graduation gown/robe details is taken exactly from "Image Reference 1" (if present).
-14. Ensure the reference for the diploma folder/cover details is taken exactly from "Image Reference 1" (if present).
-15. Ensure the text details on the diploma folder/cover are rendered clearly and legibly, derived from "Image Reference 1" (if present).
-16. Ensure the reference for the graduation sash (selempang) details is taken exactly from "Image Reference 1" (if present).
-17. Ensure the text details on the graduation sash (selempang) are rendered sharply and legibly, derived from "Image Reference 1" (if present).
-18. Ensure the exact facial expression, features, makeup, and full face details are extracted flawlessly from "Image Reference 1".
-19. Explicitly orchestrate image integration inside the final positive prompt by referencing "image 1" and "image 2" to guide Leonardo's guidance engine. Use precise structural directives such as: 'Generate the exact character, facial features, and traditional kebaya outfit strictly from image 1, seamlessly blended into the studio background environment and lighting style from image 2.'
-20. Analyze the scale of the background framing in "Image Reference 2" and classify it precisely using one of these photography terms: "long shot", "medium long shot", "medium shot", or "medium closeup". Incorporate this framing term into the positive prompt.
-
-21. Detect the physical interaction and spatial positioning of any human subjects originally inside "Image Reference 2":
-    - IF the subject in Image Reference 2 is standing on steps or stairs, explicitly instruct the AI that the subject from Image Reference 1 must be realistically posed standing on those exact steps/stairs with correct footing and perspective.
-    - IF the subject in Image Reference 2 is in a sitting/seated pose on a chair, sofa, or bench, explicitly instruct the AI that the subject from Image Reference 1 must be seamlessly generated in a sitting position matching that exact seating furniture.
-    - IF the subject in Image Reference 2 is standing on a flat floor, ensure the final prompt reflects a standard full-body standing posture.
-
-22. STRICTLY FORBID generating or adding any extra people, bystanders, crowds, or pedestrians walking around in the frame (prevent background photobombs). Ensure the final image is completely clean, private, and isolated, containing ONLY the single graduation subject derived from "Image Reference 1". Explicitly enforce this by pushing terms like "extra people, background crowd, passersby, photobomb" heavily into the negative prompt.
-
-23. Handle missing footwear information recursively: If "Image Reference 1" does not display or contain any visual information about the subject's footwear (due to being a half-body or medium shot), and the overall composition requires rendering the feet/legs for a full-body generation, you MUST explicitly instruct the AI to equip the subject with elegant, formal graduation high heels ("heels wisuda") that harmoniously match the traditional kebaya color scheme and outfit.
-
-24. Perform semantic text segregation on "Image Reference 2" to filter out metadata text while preserving environmental text:
-    - IF a text or logo is identified as a photographer's watermark, copyright signature, vendor branding, or floating corner logo, you MUST completely ban it by explicitly listing "watermark, photographer signature, vendor logo, overlay text" in the negative prompt.
-    - IF a text is part of the actual physical environment or architecture in Image Reference 2 (such as a university name on a campus building wall, an iconic landmark sign, or a graduation banner design), you MUST preserve it and describe it naturally in the positive prompt as an environmental element to ensure the AI renders it correctly.
-
-CRITICAL: Keep both the positive and negative prompts concise. Do not exceed 80 words per prompt. Focus only on the most impactful description keywords. Return STRICTLY a valid JSON object containing keys: 'positive_prompt' and 'negative_prompt' adhering to the configured responseSchema. Do not wrap the JSON inside markdown.`;
+    const systemInstruction = await getSystemPrompt('prompt_bg_change');
 
     console.log(`  [gemini] Sending dual-image input to Gemini (Ref1 compressed: ${(compressedBuffer1.length / 1024).toFixed(1)} KB, Ref2 compressed: ${(compressedBuffer2.length / 1024).toFixed(1)} KB)…`);
     console.log(`  [gemini] Base64-encoded payload sizes — Ref1: ${(base64Image1.length / 1024).toFixed(1)} KB, Ref2: ${(base64Image2.length / 1024).toFixed(1)} KB`);
@@ -2402,53 +2480,7 @@ async function generateDressSwapPromptsWithGemini(imageBuffer1, mimeType1, image
     const base64Image1 = imageBuffer1.toString('base64');
     const base64Image2 = imageBuffer2.toString('base64');
 
-    const systemInstruction = `You are an expert AI prompt engineer specialized in advanced outfit/dress transfer pipelines for Leonardo.ai. You will be provided with two images: "Image Reference 1" (The Base Identity & Background) and "Image Reference 2" (The Target Fashion/Dress Reference).
-
-Your absolute rule is to generate a precise Stable Diffusion text prompt to seamlessly transfer the clothing and outfit from Image Reference 2 onto the person in Image Reference 1, while preserving the person's identity and the original background environment. You must strictly adhere to the following analytical instructions:
-
-RULE A — DETAILED FABRIC EXTRACTION (from Image Reference 2):
-1. Analyze and describe every garment visible in "Image Reference 2" with meticulous detail: fabric type, textile weave pattern, material sheen (matte/satin/glossy), opacity, and thickness.
-2. Extract the exact color palette of each garment, including primary color, secondary accents, embroidery thread colors, and any gradient or ombré effects.
-3. Describe the pattern design precisely: floral motifs, geometric patterns, batik parang/kawung motifs, songket brocade textures, lace perforation density, beadwork placement, and sequin distribution.
-4. Analyze the structural cut and silhouette: neckline shape, sleeve length and style, bodice fit (fitted/loose/A-line), skirt length and volume, any peplum or draping elements.
-5. Document all embellishments: bead clusters, rhinestone placements, embroidery stitching style, lace trim edges, ribbon ties, button details, and brooch/pin accessories.
-6. Describe how the fabric drapes and folds — identify gravity-affected areas, wrinkle patterns at joints (elbows, waist), and how the material catches light.
-7. Extract any text or logo details that appear on the clothing itself (brand labels, embroidery text on sashes) and preserve them verbatim.
-
-RULE B — ENVIRONMENT RETENTION (from Image Reference 1):
-8. Analyze and describe the complete background environment, architecture, and setting from "Image Reference 1" with meticulous detail.
-9. Extract the precise lighting conditions: key light direction, fill light intensity, color temperature (warm/cool/neutral), shadow softness, and any rim or hair lighting.
-10. Document the color grading and atmospheric effects: haze, vignette strength, contrast ratio, saturation level, and any film-grain or post-processing style.
-11. STRICTLY PRESERVE the entire background from Image Reference 1 exactly as-is — no background elements from Image Reference 2 may leak into the final composition.
-12. Preserve all environmental objects: furniture, plants, architectural elements, floor textures, wall colors, and any props visible in Image Reference 1.
-
-RULE C — IDENTITY PRESERVATION (from Image Reference 1):
-13. STRICTLY PRESERVE the person's exact facial features, facial structure, skin tone, makeup style, and expression from Image Reference 1 with zero alteration.
-14. STRICTLY PRESERVE the person's body proportions, height, build, and pose/posture from Image Reference 1 exactly.
-15. STRICTLY PRESERVE any visible skin details: beauty marks, freckles, scars, or tattoos from Image Reference 1.
-16. STRICTLY PRESERVE the person's hairstyle, hair color, hair texture, and any hair accessories from Image Reference 1.
-17. Analyze and strictly preserve the overall body pose and posture of the subject.
-18. Analyze and describe the exact positioning, gesture, and action of the subject's right hand.
-19. Analyze and describe the exact positioning, gesture, and action of the subject's left hand.
-20. Analyze and lock the eye gaze direction (e.g., looking directly at the camera, looking away).
-21. Analyze and maintain the exact mouth shape and facial expression (e.g., closed-mouth smile, subtle grin).
-22. Analyze the specific shape, design, and color of the necklace worn by the subject (if present) and describe it to ensure it is replicated accurately.
-
-RULE D — CONDITIONAL ISLAMIC/HIJAB LOGIC:
-23. Hijab and Modesty Modifiers: If the subject in "Image Reference 1" is wearing a hijab, you MUST automatically implement a modesty modification:
-    a. Add a full-coverage inner lining base layer (pakaian dalam manset) underneath the kebaya/dress. The color of this manset layer MUST perfectly match the primary color theme and fabric undertone of the new dress/kebaya from "Image Reference 2".
-    b. Add a neat, tightly wrapped formal hijab style (hijab model cekek leher). The color of the hijab MUST perfectly match the primary color theme and coordinate elegantly with the new dress/kebaya from "Image Reference 2".
-
-COMPOSITION RULES:
-24. Generate the final prompt by describing the complete scene: "The exact person from Image Reference 1, with their precise face, body, and pose, now wearing the [detailed garment description from Image Reference 2], standing in the exact preserved background environment from Image Reference 1 with its original lighting and atmosphere."
-25. Use the Leonardo guidance syntax: reference the person and background from "image 1" and the clothing/fabric details from "image 2" to guide Leonardo's image guidance engine.
-26. Analyze the shot framing in Image Reference 1 and classify it precisely: "long shot", "medium long shot", "medium shot", or "medium closeup". Incorporate this framing term into the positive prompt.
-27. STRICTLY FORBID generating additional people, mannequins, or figures in the background. Add "extra people, background crowd, mannequin, additional person, photobomb" to the negative prompt.
-28. For any body parts not clearly visible in Image Reference 1 (e.g., feet, hands at certain angles), instruct the AI to generate them naturally and proportionally, matching the skin tone and lighting of Image Reference 1.
-29. If Image Reference 2 shows a full-length dress/gown and Image Reference 1 only shows the upper body, instruct the AI to extrapolate the dress design naturally downward while maintaining the exact fabric properties and silhouette described from Image Reference 2.
-30. TEXT/WATERMARK BLOCKING: You MUST completely ignore and block any text, words, fonts, typography, photography watermarks, logo signatures, and branding marks present anywhere in BOTH "Image Reference 1" and "Image Reference 2". This includes text floating in the corners, embedded as overlays, or written/printed on the ground, floor, road surface, or background assets. Do NOT extract, reference, or include any data/information regarding these text elements into the positive prompt. You must explicitly list "text, words, fonts, typography, watermark, signature, logo, overlay text" in the negative prompt to ensure Leonardo.ai renders a completely clean image.
-
-OUTPUT FORMAT: Keep both the positive and negative prompts concise. Do not exceed 100 words per prompt. Focus only on the most impactful description keywords. Return STRICTLY a valid JSON object containing keys: 'positive_prompt' and 'negative_prompt' adhering to the configured responseSchema. Do not wrap the JSON inside markdown.`;
+    const systemInstruction = await getSystemPrompt('prompt_dress_replicate');
 
     console.log(`  [gemini:dress-swap] Sending dual-image input to Gemini (Ref1: ${(imageBuffer1.length / 1024).toFixed(1)} KB, Ref2: ${(imageBuffer2.length / 1024).toFixed(1)} KB)…`);
 
@@ -4841,6 +4873,79 @@ app.post('/api/admin/users/gift', requireAdminApi, async (req, res) => {
 // Admin User Management page (PROTECTED)
 app.get('/admin-users', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_users.html')));
 app.get('/admin_users', requireAdminPage, (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'admin_users.html')));
+
+// ------------------------------------------------------------------
+// Admin System Prompts API (PROTECTED)
+// ------------------------------------------------------------------
+
+/**
+ * GET /api/admin/system-prompts
+ * Returns the current values for prompt_bg_change and prompt_dress_replicate.
+ * Falls back to DEFAULT_SYSTEM_PROMPTS if DB is unavailable or keys missing.
+ */
+app.get('/api/admin/system-prompts', requireAdminApi, async (_req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.json({ prompt_bg_change: DEFAULT_SYSTEM_PROMPTS.prompt_bg_change, prompt_dress_replicate: DEFAULT_SYSTEM_PROMPTS.prompt_dress_replicate });
+        }
+
+        const [bg, dress] = await Promise.all([
+            db.Settings.findOne({ key: 'prompt_bg_change' }),
+            db.Settings.findOne({ key: 'prompt_dress_replicate' })
+        ]);
+
+        res.json({
+            prompt_bg_change: (bg && bg.value) ? bg.value : DEFAULT_SYSTEM_PROMPTS.prompt_bg_change,
+            prompt_dress_replicate: (dress && dress.value) ? dress.value : DEFAULT_SYSTEM_PROMPTS.prompt_dress_replicate
+        });
+    } catch (err) {
+        console.error('[/api/admin/system-prompts GET] Error:', err);
+        res.status(500).json({ error: 'Failed to fetch system prompts.' });
+    }
+});
+
+/**
+ * POST /api/admin/system-prompts
+ * Updates the system prompt values. Accepts JSON body:
+ *   { prompt_bg_change?: string, prompt_dress_replicate?: string }
+ */
+app.post('/api/admin/system-prompts', requireAdminApi, async (req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
+        const { prompt_bg_change, prompt_dress_replicate } = req.body;
+        const updates = [];
+
+        if (typeof prompt_bg_change === 'string' && prompt_bg_change.trim()) {
+            updates.push(
+                db.Settings.findOneAndUpdate(
+                    { key: 'prompt_bg_change' },
+                    { $set: { key: 'prompt_bg_change', value: prompt_bg_change.trim(), updated_at: new Date() } },
+                    { upsert: true, returnDocument: 'after' }
+                )
+            );
+        }
+
+        if (typeof prompt_dress_replicate === 'string' && prompt_dress_replicate.trim()) {
+            updates.push(
+                db.Settings.findOneAndUpdate(
+                    { key: 'prompt_dress_replicate' },
+                    { $set: { key: 'prompt_dress_replicate', value: prompt_dress_replicate.trim(), updated_at: new Date() } },
+                    { upsert: true, returnDocument: 'after' }
+                )
+            );
+        }
+
+        await Promise.all(updates);
+        console.log('  [settings] System prompts updated by admin');
+        res.json({ success: true, message: 'System prompts updated successfully.' });
+    } catch (err) {
+        console.error('[/api/admin/system-prompts POST] Error:', err);
+        res.status(500).json({ error: 'Failed to update system prompts.' });
+    }
+});
 
 // ------------------------------------------------------------------
 // Global error handlers
