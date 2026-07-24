@@ -722,9 +722,9 @@
 
                 var imageHtml = '';
                 if (t.image_url) {
-                    imageHtml = '<div class="mt-4 -mx-1">' +
+                    imageHtml = '<div class="mt-4">' +
                         '<img src="' + escapeHtml(t.image_url) + '" alt="Testimonial photo" ' +
-                        'class="card-image w-full rounded-xl border border-slate-800 object-cover max-h-64" ' +
+                        'class="card-image w-full h-auto rounded-xl border border-slate-800" ' +
                         'onclick="openLightbox(\'' + escapeAttr(t.image_url) + '\')" ' +
                         'loading="lazy" onerror="this.style.display=\'none\'">' +
                         '</div>';

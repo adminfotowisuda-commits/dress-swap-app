@@ -563,7 +563,7 @@
                 if (t.image_url) {
                     imageHtml = '<div class="shrink-0 ml-4">' +
                         '<a href="' + escapeHtml(t.image_url) + '" target="_blank" rel="noopener">' +
-                        '<img src="' + escapeHtml(t.image_url) + '" alt="Foto testimoni" class="w-20 h-20 object-cover rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer" loading="lazy">' +
+                        '<img src="' + escapeHtml(t.image_url) + '" alt="Foto testimoni" class="w-20 h-auto rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer" loading="lazy" onerror="this.style.display=\'none\'">' +
                         '</a></div>';
                 }
 
