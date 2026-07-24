@@ -220,7 +220,7 @@
                 <p class="text-[10px] uppercase tracking-widest text-text-secondary mb-2">Filter Cover Preview</p>
                 <div class="-mx-8 grid grid-cols-2 gap-2.5">
                     <!-- BEFORE -->
-                    <div class="aspect-[2/3] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-l-none overflow-hidden relative flex items-center justify-center">
+                    <div class="aspect-[4/5] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-l-none overflow-hidden relative flex items-center justify-center">
                         <img id="modal-before-preview" src="" alt="Before"
                              class="w-full h-full object-cover hidden" />
                         <span id="modal-before-placeholder" class="material-symbols-outlined text-3xl text-text-secondary">person</span>
@@ -229,7 +229,7 @@
                         </div>
                     </div>
                     <!-- AFTER -->
-                    <div class="aspect-[2/3] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-r-none overflow-hidden relative flex items-center justify-center">
+                    <div class="aspect-[4/5] bg-surface-container-lowest border border-border-subtle rounded-xl rounded-r-none overflow-hidden relative flex items-center justify-center">
                         <img id="modal-cover-preview" src="" alt="Filter cover preview"
                              class="w-full h-full object-cover hidden" />
                         <span id="modal-cover-placeholder" class="material-symbols-outlined text-3xl text-text-secondary">image</span>
@@ -348,9 +348,9 @@
                 const r = w / h;
                 if (r > 1.2) return 'aspect-[4/3]';
                 if (r > 0.7) return 'aspect-[4/5]';
-                return 'aspect-[2/3]';
+                return 'aspect-[4/5]';
             }
-            return 'aspect-[2/3]';
+            return 'aspect-[4/5]';
         }
 
         const state = {
