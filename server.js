@@ -797,9 +797,20 @@ async function checkAndExpireCredits(email) {
     return { expired: false, balance: user.credits_balance };
 }
 
-// ------------------------------------------------------------------
-// DOKU API Helpers — SNAP BI signature + B2B token flow
-// ------------------------------------------------------------------
+// ═══ DOKU Timestamp Helper ══════════════════════════════════════════
+// DOKU SNAP BI requires ISO 8601 UTC WITHOUT milliseconds.
+// Format: 2026-07-23T10:59:54Z
+// Using toISOString() directly includes milliseconds (.612Z) which
+// causes signature-validation failures on DOKU's side.
+// B2B (RSA) flow uses +00:00 offset; Checkout (HMAC) flow uses Z suffix.
+// ═══════════════════════════════════════════════════════════════════════
+function dokuTimestampISO() {
+    return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+function dokuTimestampB2B() {
+    return new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00');
+}
 
 let _cachedDokuToken = null;
 let _dokuTokenExpiry = 0;
@@ -917,7 +928,7 @@ async function requestDokuB2BToken() {
         throw new Error('DOKU_CLIENT_ID not configured. Set it in .env');
     }
 
-    const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00');
+    const timestamp = dokuTimestampB2B();
     const stringToSign = DOKU_CLIENT_ID + '|' + timestamp;
     const signature = createDokuSignature(stringToSign, 'rsa');
 
@@ -982,7 +993,7 @@ async function createDokuCheckout(orderData) {
     });
 
     // ── HMAC-SHA256 signature (DOKU Checkout spec) ──
-    const checkoutTimestamp = new Date().toISOString();
+    const checkoutTimestamp = dokuTimestampISO();
     const digestBase64 = crypto.createHash('sha256').update(requestBody).digest('base64');
     const stringToSign =
         'Client-Id:' + DOKU_CLIENT_ID + '\n' +
