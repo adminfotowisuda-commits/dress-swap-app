@@ -385,7 +385,7 @@
                         imgSrc = API_BASE + '/' + imgSrc.replace(/^\//, '');
                     }
                     card.innerHTML = `
-                        <div class="w-full ${getAspectClass(record)} overflow-hidden">
+                        <div class="w-full aspect-[4/5] overflow-hidden">
                             <img src="${imgSrc}"
                                  alt="${safeTitle}"
                                  class="w-full h-full object-cover object-top"
@@ -395,8 +395,7 @@
                         <div class="p-3 space-y-1">
                             <h3 class="filter-title text-xs text-text-primary font-semibold truncate">${safeTitle}</h3>
                             ${tagsHtml}
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-text-secondary">${formatDimensions(record)}</span>
+                            <div class="flex items-center justify-end">
                                 <span class="text-[10px] text-electric-cyan">Click to use &rarr;</span>
                             </div>
                         </div>

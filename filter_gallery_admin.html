@@ -658,7 +658,7 @@
                         // Title + dimensions
                         '<div class="preview-trigger flex-1 min-w-0 cursor-pointer">' +
                           '<p class="text-sm font-semibold text-white truncate">' + safeTitle + '</p>' +
-                          '<p class="text-[10px] text-text-secondary mt-0.5">' + escapeHtml(dims) + (active ? '' : ' <span class="text-amber-400 ml-1">(Hidden)</span>') + '</p>' +
+                          (active ? '' : '<p class="text-[10px] text-amber-400 mt-0.5">(Hidden)</p>') +
                         '</div>' +
                         // Usage count (desktop)
                         '<span class="w-16 text-center text-sm text-text-secondary font-mono hidden sm:block">' + (record.usageCount || 0) + '</span>' +
