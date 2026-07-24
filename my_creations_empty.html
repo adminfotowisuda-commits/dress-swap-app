@@ -337,7 +337,7 @@ function renderAuth() {
     '</div>';
   } else {
     c.innerHTML = '<button onclick="openLogin()" style="width:100%;padding:10px;background:#0a0c10;border:1px solid #30363D;color:#c4b5fd;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">'+
-      '<i class="fa-solid fa-right-to-bracket"></i> Masuk Sesi</button>';
+      '<i class="fa-solid fa-right-to-bracket"></i> Login</button>';
   }
   var badge = document.getElementById('user-badge');
   var shortName = email ? email.split('@')[0].split('.')[0] : '';
@@ -367,9 +367,9 @@ async function loadGallery() {
   if (!email) {
     grid.innerHTML = '<div class="empty">'+
       '<i class="fa-solid fa-lock"></i>'+
-      '<h3>Silakan Masuk Sesi</h3>'+
+      '<h3>Silakan Login</h3>'+
       '<p>Masuk sesi terlebih dahulu menggunakan email Anda untuk melihat hasil kreasi foto wisuda.</p>'+
-      '<button class="btn btn-primary" onclick="openLogin()"><i class="fa-solid fa-right-to-bracket"></i> Masuk Sesi</button>'+
+      '<button class="btn btn-primary" onclick="openLogin()"><i class="fa-solid fa-right-to-bracket"></i> Login</button>'+
     '</div>';
     if (status) status.style.display = 'none';
     if (count) count.textContent = '0';

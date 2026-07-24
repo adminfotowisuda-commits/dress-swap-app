@@ -19,7 +19,7 @@ var NAV_LINKS = [
     { id: 'filter-gallery', href: '/filter-gallery', label: 'Filter Gallery',    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M2 19a1 1 0 0 0 1 1h12a1 1 0 0 0 .8-.4l-5.3-7.1a1.5 1.5 0 0 0-2.4 0L2.2 18.2A1 1 0 0 0 2 19z"/><path d="M11 19.5h9a1 1 0 0 0 .8-.4l-3.3-4.4a1.5 1.5 0 0 0-2.4 0l-1.3 1.7"/><circle cx="14" cy="6" r="2" fill="currentColor" stroke="none"/></svg>', auth: true },
     { id: 'my-creations',   href: '/my-creations',    label: 'My Creations',      icon: '<i class="fa-solid fa-images text-base w-5 shrink-0 text-center"></i>', auth: true },
     { id: 'pricing',        href: '/pricing',         label: 'Pricing / Top-Up',   icon: '<i class="fa-solid fa-coins text-base w-5 shrink-0 text-center" style="color:#fbbf24;"></i>' },
-    { id: 'profile',         href: '/profile',          label: 'Masuk Sesi',         icon: '<i class="fa-solid fa-user text-base w-5 shrink-0 text-center"></i>' }
+    { id: 'profile',         href: '/profile',          label: 'Login',         icon: '<i class="fa-solid fa-user text-base w-5 shrink-0 text-center"></i>' }
 ];
 
 // ═══ LocalStorage helpers ═══
@@ -123,7 +123,7 @@ function renderUserProfile() {
     // Update Profile nav link label
     var profileLink = document.querySelector('#unified-sidebar nav a[href=\"/profile\"] span');
     if (profileLink) {
-        profileLink.textContent = email ? 'Profile' : 'Masuk Sesi';
+        profileLink.textContent = email ? 'Profile' : 'Login';
     }
 
     if (email) {
@@ -143,7 +143,7 @@ function renderUserProfile() {
         '</div>';
     } else {
         el.innerHTML = '<button onclick="window._openLogin()" style="width:100%;padding:10px;background:#0a0c10;border:1px solid #30363D;color:#c4b5fd;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">' +
-            '<i class="fa-solid fa-right-to-bracket"></i> Masuk Sesi</button>';
+            '<i class="fa-solid fa-right-to-bracket"></i> Login</button>';
     }
 }
 
