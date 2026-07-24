@@ -17,6 +17,7 @@ var NAV_LINKS = [
     { id: 'swap-bg',        href: '/swap-bg',        label: 'Background Change', icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="9" y="9" width="13" height="13" rx="2.5"/><path d="M9 19.5l4.5-4.5 5 5"/><circle cx="17.5" cy="13" r="0.5" fill="currentColor" stroke="none"/><circle cx="7.5" cy="7.5" r="4.5"/><path d="M6 7.5h3M7.5 6l1.5 1.5-1.5 1.5"/></svg>', auth: true },
     { id: 'dress-swap',     href: '/dress-swap',      label: 'Dress Replicate',   icon: '<i class="fa-solid fa-shirt text-base w-5 shrink-0 text-center"></i>', auth: true },
     { id: 'filter-gallery', href: '/filter-gallery', label: 'Filter Gallery',    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M2 19a1 1 0 0 0 1 1h12a1 1 0 0 0 .8-.4l-5.3-7.1a1.5 1.5 0 0 0-2.4 0L2.2 18.2A1 1 0 0 0 2 19z"/><path d="M11 19.5h9a1 1 0 0 0 .8-.4l-3.3-4.4a1.5 1.5 0 0 0-2.4 0l-1.3 1.7"/><circle cx="14" cy="6" r="2" fill="currentColor" stroke="none"/></svg>', auth: true },
+    { id: 'testimonials',  href: '/testimonials',  label: 'Testimoni',         icon: '<i class="fa-solid fa-star text-base w-5 shrink-0 text-center"></i>', auth: false },
     { id: 'my-creations',   href: '/my-creations',    label: 'My Creations',      icon: '<i class="fa-solid fa-images text-base w-5 shrink-0 text-center"></i>', auth: true },
     { id: 'pricing',        href: '/pricing',         label: 'Pricing / Top-Up',   icon: '<i class="fa-solid fa-coins text-base w-5 shrink-0 text-center" style="color:#fbbf24;"></i>' },
     { id: 'profile',         href: '/profile',          label: 'Login',         icon: '<i class="fa-solid fa-user text-base w-5 shrink-0 text-center"></i>' }
@@ -69,7 +70,7 @@ function injectSidebarHTML() {
         }
         html += '</a>';
         // Separator between Generators and Account sections
-        if (link.id === 'filter-gallery') {
+        if (link.id === 'testimonials') {
             html += '<div style="margin:4px 0;padding-top:4px;border-top:1px solid rgba(48,54,61,0.4);"></div>';
             html += '<span style="font-size:9px;font-weight:700;color:#5c6370;text-transform:uppercase;letter-spacing:0.15em;padding:4px 0 2px 0;display:block;">👤 Akun</span>';
         }

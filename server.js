@@ -424,6 +424,9 @@ function sendHtmlNoCache(res, filePath) {
     res.sendFile(filePath);
 }
 
+// Testimonials (Public)
+app.get('/testimonials', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'testimonials.html')));
+
 // Filter Gallery (Public)
 app.get('/filter-gallery', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'filter_gallery.html')));
 app.get('/pricing', (_req, res) => sendHtmlNoCache(res, path.join(__dirname, 'pricing.html')));
@@ -2256,6 +2259,104 @@ app.patch('/api/creations/:id/toggle-favorite', async (req, res) => {
     } catch (err) {
         console.error('[/api/creations/:id/toggle-favorite] Error:', err);
         res.status(500).json({ error: 'Failed to toggle favorite' });
+    }
+});
+
+// ------------------------------------------------------------------
+// Testimonials API endpoints
+// ------------------------------------------------------------------
+
+/**
+ * GET /api/testimonials
+ * ------------------------------------------------------------------
+ * PUBLIC — Returns all testimonials sorted newest-first.
+ */
+app.get('/api/testimonials', async (_req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+        const testimonials = await db.Testimonial.find()
+            .sort({ created_at: -1 })
+            .lean();
+        res.json(testimonials);
+    } catch (err) {
+        console.error('[/api/testimonials] Error:', err);
+        res.status(500).json({ error: 'Failed to fetch testimonials.' });
+    }
+});
+
+// Multer setup for testimonial image uploads (max 5 MB)
+const testimonialUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) return cb(null, true);
+        cb(new Error('Only image files are allowed.'));
+    }
+});
+
+/**
+ * POST /api/testimonials
+ * ------------------------------------------------------------------
+ * PROTECTED (auth-gated by frontend) — Submit a new testimonial.
+ * Accepts multipart/form-data:
+ *   rating   (text, required 1-5)
+ *   message  (text, required)
+ *   image    (file, optional)
+ *   user_email, user_name, user_avatar — from request headers or body
+ */
+app.post('/api/testimonials', testimonialUpload.single('image'), async (req, res) => {
+    try {
+        if (!db.isConnected()) {
+            return res.status(503).json({ error: 'Database unavailable.' });
+        }
+
+        const rating = parseInt(req.body.rating, 10);
+        const message = (req.body.message || '').trim();
+        const userEmail = req.headers['x-user-email'] || req.body.user_email || '';
+        const userName = req.headers['x-user-name'] || req.body.user_name || 'Anonymous';
+        const userAvatar = req.headers['x-user-avatar'] || req.body.user_avatar || '';
+
+        // Validate required fields
+        if (!userEmail) {
+            return res.status(401).json({ error: 'Login diperlukan untuk mengirim testimoni.' });
+        }
+        if (!message) {
+            return res.status(400).json({ error: 'Pesan testimoni tidak boleh kosong.' });
+        }
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ error: 'Rating harus antara 1 dan 5.' });
+        }
+
+        // Handle optional image upload to Cloudinary
+        let imageUrl = '';
+        if (req.file) {
+            const uploadResult = await db.uploadToCloudinary(
+                req.file.buffer,
+                'testimonials',
+                `testimonial_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+            );
+            if (uploadResult && uploadResult.url) {
+                imageUrl = uploadResult.url;
+            }
+        }
+
+        const testimonial = await db.Testimonial.create({
+            user_email: userEmail.trim().toLowerCase(),
+            user_name: userName,
+            user_avatar: userAvatar,
+            rating: rating,
+            message: message,
+            image_url: imageUrl,
+            created_at: new Date()
+        });
+
+        console.log(`  [testimonial] New testimonial from ${userEmail} — rating: ${rating}/5`);
+        res.status(201).json(testimonial);
+    } catch (err) {
+        console.error('[/api/testimonials POST] Error:', err);
+        res.status(500).json({ error: 'Gagal menyimpan testimoni.' });
     }
 });
 

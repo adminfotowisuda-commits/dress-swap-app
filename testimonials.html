@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Testimoni — fotowisuda.ai</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script id="tailwind-config">
+        try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-secondary": "#430089", "on-tertiary-fixed": "#171c23", "tertiary-fixed-dim": "#c2c7d0",
+                            "on-surface-variant": "#bbc9cf", "text-secondary": "#8B949E", "tertiary-fixed": "#dee2ec",
+                            "surface-container": "#1e2024", "inverse-surface": "#e2e2e8", "secondary-container": "#6205c3",
+                            "outline": "#859399", "surface-dim": "#111318", "on-error": "#690005",
+                            "on-error-container": "#ffdad6", "on-tertiary": "#2c3138", "inverse-on-surface": "#2f3035",
+                            "on-background": "#e2e2e8", "outline-variant": "#3c494e", "primary-fixed": "#b7eaff",
+                            "on-tertiary-fixed-variant": "#42474f", "tertiary": "#d8dce6", "surface-variant": "#333539",
+                            "surface-container-lowest": "#0c0e12", "vivid-purple": "#9D5BFF",
+                            "on-secondary-fixed": "#280057", "on-primary-container": "#00566a", "background": "#111318",
+                            "error": "#ffb4ab", "secondary-fixed-dim": "#d6baff", "surface-container-high": "#282a2e",
+                            "on-tertiary-container": "#494e57", "surface-background": "#0A0C10", "secondary-fixed": "#ecdcff",
+                            "primary-container": "#00d1ff", "surface-tint": "#4cd6ff", "surface-card": "#161B22",
+                            "primary-fixed-dim": "#4cd6ff", "secondary": "#d6baff", "on-surface": "#e2e2e8",
+                            "on-secondary-container": "#cba9ff", "surface-container-low": "#1a1c20", "surface-bright": "#37393e",
+                            "on-primary-fixed-variant": "#004e60", "electric-cyan": "#00D1FF",
+                            "tertiary-container": "#bcc0ca", "border-subtle": "#30363D", "surface": "#111318",
+                            "inverse-primary": "#00677f", "primary": "#a4e6ff", "surface-container-highest": "#333539",
+                            "text-primary": "#F0F6FC", "on-primary-fixed": "#001f28", "on-primary": "#003543",
+                            "error-container": "#93000a", "on-secondary-fixed-variant": "#6000bf"
+                        },
+                        "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                        "spacing": { "margin-desktop": "32px", "gutter": "24px", "base-unit": "4px", "container-max-width": "1440px", "margin-mobile": "16px" },
+                        "fontFamily": { "headline-xl": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Geist"], "label-md": ["Geist"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"] },
+                        "fontSize": {
+                            "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                        }
+                    },
+                },
+            }
+        } catch (_e) {}
+    </script>
+
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Masonry columns */
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 1.5rem;
+        }
+        @media (min-width: 768px) { .masonry-grid { column-count: 2; } }
+        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+
+        .masonry-card {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .masonry-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 209, 255, 0.08);
+        }
+
+        /* Star rating interactive */
+        .star-rating .star {
+            font-size: 1.75rem;
+            color: #334155;
+            cursor: pointer;
+            transition: color 0.15s ease, transform 0.15s ease;
+            margin-right: 2px;
+        }
+        .star-rating .star:hover,
+        .star-rating .star.hover {
+            color: #fbbf24;
+            transform: scale(1.15);
+        }
+        .star-rating .star.selected {
+            color: #f59e0b;
+        }
+        .star-rating.readonly .star {
+            cursor: default;
+            font-size: 0.875rem;
+            margin-right: 1px;
+        }
+        .star-rating.readonly .star:hover {
+            transform: none;
+        }
+
+        /* Display stars (non-interactive, gold) */
+        .display-stars {
+            color: #f59e0b;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            background: rgba(10, 12, 16, 0.85);
+            backdrop-filter: blur(8px);
+        }
+        .modal-panel {
+            background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate-in { animation: modalIn 0.3s ease-out forwards; }
+
+        /* Toast */
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastSlideOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-12px); }
+        }
+
+        /* Upload preview */
+        .upload-preview-img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.75rem;
+        }
+
+        /* Skeleton loading */
+        @keyframes pulse-skeleton {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .skeleton {
+            animation: pulse-skeleton 1.5s ease-in-out infinite;
+            background: #1e293b;
+            border-radius: 0.5rem;
+        }
+
+        /* Image lightbox on card image click */
+        .card-image {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .card-image:hover {
+            transform: scale(1.02);
+        }
+    </style>
+    <script src="/sidebar.js"></script>
+</head>
+
+<body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
+        <div class="flex items-center gap-3">
+            <button id="sidebar-toggle-btn" class="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none" aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <a href="/" class="font-headline-md text-white font-bold tracking-tight text-lg hover:opacity-80 transition-opacity">fotowisuda.ai</a>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] p-6 md:p-8">
+        <!-- Header Section -->
+        <div class="mb-10">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-white mb-2">Testimoni</h2>
+                    <p class="text-text-secondary text-sm max-w-lg">Cerita dari pengguna kami tentang pengalaman mereka menggunakan fotowisuda.ai</p>
+                </div>
+                <button id="write-review-btn" onclick="openReviewModal()" class="shrink-0 px-6 py-3 bg-gradient-to-r from-electric-cyan to-vivid-purple text-white rounded-2xl font-semibold text-sm hover:shadow-lg hover:shadow-electric-cyan/20 transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Tulis Pengalamanmu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Masonry Grid -->
+        <div id="testimonials-grid" class="masonry-grid">
+            <!-- Populated dynamically -->
+        </div>
+
+        <!-- Loading skeleton -->
+        <div id="grid-loading" class="masonry-grid">
+            <div class="masonry-card skeleton" style="height:200px;"></div>
+            <div class="masonry-card skeleton" style="height:280px;"></div>
+            <div class="masonry-card skeleton" style="height:180px;"></div>
+            <div class="masonry-card skeleton" style="height:240px;"></div>
+            <div class="masonry-card skeleton" style="height:300px;"></div>
+            <div class="masonry-card skeleton" style="height:200px;"></div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="empty-state" style="display:none;" class="text-center py-20">
+            <div class="text-5xl mb-4 opacity-30">💬</div>
+            <h3 class="text-xl font-bold text-white mb-2">Belum ada testimoni</h3>
+            <p class="text-text-secondary text-sm mb-6">Jadilah yang pertama berbagi pengalaman!</p>
+            <button onclick="openReviewModal()" class="px-6 py-3 bg-electric-cyan/10 border border-electric-cyan/20 text-electric-cyan rounded-2xl font-semibold text-sm hover:bg-electric-cyan/20 transition-all">
+                Tulis Testimoni Pertama
+            </button>
+        </div>
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- REVIEW MODAL -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div id="review-modal" style="display:none; position:fixed; inset:0; z-index:200;" class="modal-overlay flex items-center justify-center p-4">
+        <div class="modal-panel rounded-2xl p-6 md:p-8 w-full max-w-lg modal-animate-in" onclick="event.stopPropagation()">
+            <!-- Close button -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-white">Tulis Testimoni</h3>
+                <button onclick="closeReviewModal()" class="text-slate-400 hover:text-white transition-colors text-xl leading-none">&times;</button>
+            </div>
+
+            <!-- Star Rating -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-slate-300 mb-3">Rating Kamu</label>
+                <div class="star-rating flex items-center gap-1" id="star-rating">
+                    <i class="fa-solid fa-star star" data-value="1"></i>
+                    <i class="fa-solid fa-star star" data-value="2"></i>
+                    <i class="fa-solid fa-star star" data-value="3"></i>
+                    <i class="fa-solid fa-star star" data-value="4"></i>
+                    <i class="fa-solid fa-star star" data-value="5"></i>
+                </div>
+                <input type="hidden" id="selected-rating" value="0">
+                <p id="rating-hint" class="text-xs text-text-secondary mt-1">Klik bintang untuk memberi rating</p>
+            </div>
+
+            <!-- Review Text -->
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-slate-300 mb-2" for="review-message">Ceritakan Pengalamanmu</label>
+                <textarea id="review-message" rows="4" maxlength="1000" placeholder="Bagaimana pengalamanmu menggunakan fotowisuda.ai? Ceritakan hasil foto yang kamu dapatkan..."
+                    class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-4 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-electric-cyan/50 focus:ring-1 focus:ring-electric-cyan/30 transition-all resize-none"></textarea>
+                <p class="text-xs text-text-secondary mt-1 text-right"><span id="char-count">0</span>/1000</p>
+            </div>
+
+            <!-- Optional Image Upload -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Foto (Opsional)</label>
+                <div class="relative">
+                    <input type="file" id="review-image" accept="image/*" onchange="handleImagePreview(event)" class="hidden">
+                    <button onclick="document.getElementById('review-image').click()" id="upload-trigger" class="w-full border-2 border-dashed border-slate-700 rounded-xl p-6 text-center text-slate-400 hover:border-electric-cyan/40 hover:text-electric-cyan transition-all cursor-pointer">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block"></i>
+                        <span class="text-sm">Klik untuk upload foto hasil generate-mu</span>
+                        <span class="text-xs text-slate-500 block mt-1">JPEG, PNG, WebP (max 5 MB)</span>
+                    </button>
+                    <div id="image-preview-container" style="display:none;" class="mt-3 relative">
+                        <img id="image-preview" src="" alt="Preview" class="w-full h-40 object-cover rounded-xl border border-slate-700">
+                        <button onclick="removeImagePreview()" class="absolute top-2 right-2 w-7 h-7 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-xs transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit / Cancel -->
+            <div class="flex gap-3">
+                <button onclick="closeReviewModal()" class="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl font-medium text-sm hover:bg-slate-700 transition-colors">
+                    Batal
+                </button>
+                <button id="submit-review-btn" onclick="submitReview()" class="flex-1 px-4 py-3 bg-gradient-to-r from-electric-cyan to-vivid-purple text-white rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-electric-cyan/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="submit-btn-text">Kirim Testimoni</span>
+                    <span id="submit-btn-spinner" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i> Mengirim...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- LOGIN MODAL (shown when guest tries to write a review) -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div id="login-modal" style="display:none; position:fixed; inset:0; z-index:250;" class="modal-overlay flex items-center justify-center p-4">
+        <div class="modal-panel rounded-2xl p-6 md:p-8 w-full max-w-sm modal-animate-in text-center" onclick="event.stopPropagation()">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors text-xl leading-none">&times;</button>
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-electric-cyan/20 to-vivid-purple/20 border-2 border-electric-cyan/30 flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-lock text-electric-cyan"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Login Diperlukan</h3>
+            <p class="text-sm text-text-secondary mb-6">Kamu perlu login dengan akun Google untuk menulis testimoni.</p>
+            <div id="g_id_signin_wrapper" class="flex justify-center min-h-[44px] mb-3"></div>
+            <button onclick="closeLoginModal()" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl font-medium text-sm hover:bg-slate-700 transition-colors mt-2">
+                Nanti Saja
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- IMAGE LIGHTBOX -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div id="lightbox" style="display:none; position:fixed; inset:0; z-index:300;" class="modal-overlay flex items-center justify-center p-4" onclick="closeLightbox()">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white/70 hover:text-white text-3xl leading-none z-10">&times;</button>
+        <img id="lightbox-img" src="" alt="Testimonial image" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <script>
+    // ═══ Initialize Sidebar ═══
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.initUnifiedSidebar) {
+            window.initUnifiedSidebar('testimonials');
+        }
+        loadTestimonials();
+        setupStarRating();
+        setupCharCounter();
+    });
+
+    // ═══ State ═══
+    var API_BASE = window.location.origin;
+    var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
+    var selectedRating = 0;
+    var selectedImageFile = null;
+    var gsiInitialized = false;
+
+    // ═══ Helpers ═══
+    function getEmail() {
+        try { return localStorage.getItem('active_user_email') || ''; } catch(_) { return ''; }
+    }
+
+    function getUserName() {
+        var email = getEmail();
+        if (!email) return 'Anonymous';
+        var namePart = email.split('@')[0].split('.')[0];
+        return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+
+    function getUserAvatar(email) {
+        if (!email) return '';
+        var initials = email.split('@')[0].substring(0, 2).toUpperCase();
+        // Return a data URI SVG for the avatar
+        return '';
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        var day = d.getDate();
+        var month = months[d.getMonth()];
+        var year = d.getFullYear();
+        var now = new Date();
+        var diffMs = now - d;
+        var diffSec = Math.floor(diffMs / 1000);
+        var diffMin = Math.floor(diffSec / 60);
+        var diffHour = Math.floor(diffMin / 60);
+        var diffDay = Math.floor(diffHour / 24);
+
+        if (diffSec < 60) return 'Baru saja';
+        if (diffMin < 60) return diffMin + ' menit lalu';
+        if (diffHour < 24) return diffHour + ' jam lalu';
+        if (diffDay < 7) return diffDay + ' hari lalu';
+        if (year === now.getFullYear()) return day + ' ' + month;
+        return day + ' ' + month + ' ' + year;
+    }
+
+    // ═══ Star Rating ═══
+    function setupStarRating() {
+        var stars = document.querySelectorAll('#star-rating .star');
+        var container = document.getElementById('star-rating');
+
+        stars.forEach(function(star) {
+            star.addEventListener('mouseenter', function() {
+                var value = parseInt(this.getAttribute('data-value'));
+                highlightStars(value);
+            });
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.getAttribute('data-value'));
+                document.getElementById('selected-rating').value = selectedRating;
+                highlightStars(selectedRating, true);
+                var hints = ['', 'Sangat Buruk', 'Kurang', 'Cukup', 'Bagus', 'Luar Biasa!'];
+                document.getElementById('rating-hint').textContent = hints[selectedRating] || '';
+                document.getElementById('rating-hint').style.color = '#f59e0b';
+            });
+        });
+
+        if (container) {
+            container.addEventListener('mouseleave', function() {
+                if (selectedRating > 0) {
+                    highlightStars(selectedRating, true);
+                } else {
+                    clearStars();
+                }
+            });
+        }
+    }
+
+    function highlightStars(count, selected) {
+        var stars = document.querySelectorAll('#star-rating .star');
+        stars.forEach(function(star) {
+            var value = parseInt(star.getAttribute('data-value'));
+            star.classList.remove('hover', 'selected');
+            if (value <= count) {
+                star.classList.add(selected ? 'selected' : 'hover');
+                star.classList.remove('fa-regular');
+                star.classList.add('fa-solid');
+            } else {
+                star.classList.add('fa-regular');
+                star.classList.remove('fa-solid');
+            }
+        });
+    }
+
+    function clearStars() {
+        var stars = document.querySelectorAll('#star-rating .star');
+        stars.forEach(function(star) {
+            star.classList.remove('hover', 'selected');
+            star.classList.add('fa-regular');
+            star.classList.remove('fa-solid');
+        });
+        document.getElementById('rating-hint').textContent = 'Klik bintang untuk memberi rating';
+        document.getElementById('rating-hint').style.color = '';
+    }
+
+    // ═══ Character Counter ═══
+    function setupCharCounter() {
+        var textarea = document.getElementById('review-message');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                document.getElementById('char-count').textContent = this.value.length;
+            });
+        }
+    }
+
+    // ═══ Image Preview ═══
+    function handleImagePreview(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('Ukuran file maksimal 5 MB', 'error');
+            event.target.value = '';
+            return;
+        }
+        selectedImageFile = file;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('image-preview').src = e.target.result;
+            document.getElementById('image-preview-container').style.display = 'block';
+            document.getElementById('upload-trigger').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeImagePreview() {
+        selectedImageFile = null;
+        document.getElementById('review-image').value = '';
+        document.getElementById('image-preview-container').style.display = 'none';
+        document.getElementById('upload-trigger').style.display = 'block';
+    }
+
+    // ═══ Toast ═══
+    function showToast(message, type) {
+        type = type || 'success';
+        var existing = document.getElementById('custom-toast');
+        if (existing) existing.remove();
+
+        var bgColor = type === 'success' ? 'rgba(34,197,94,0.06)' : (type === 'error' ? 'rgba(239,68,68,0.06)' : 'rgba(251,191,36,0.06)');
+        var borderColor = type === 'success' ? 'rgba(34,197,94,0.25)' : (type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(251,191,36,0.25)');
+        var iconColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#fbbf24');
+        var textColor = type === 'success' ? '#bbf7d0' : (type === 'error' ? '#fecaca' : '#fde68a');
+        var icon = type === 'success' ? '✔' : (type === 'error' ? '✖' : '⚠');
+
+        var toast = document.createElement('div');
+        toast.id = 'custom-toast';
+        toast.style.cssText = 'position:fixed;top:24px;left:50%;z-index:9999;padding:14px 24px;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:14px;font-size:14px;font-weight:600;color:' + textColor + ';display:flex;align-items:center;gap:10px;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.4);pointer-events:none;white-space:nowrap;animation:toastSlideIn 0.3s ease-out;';
+        toast.innerHTML = '<span style="font-size:16px;color:' + iconColor + ';">' + icon + '</span><span>' + message + '</span>';
+        document.body.appendChild(toast);
+
+        setTimeout(function() {
+            if (toast.parentNode) {
+                toast.style.animation = 'toastSlideOut 0.3s ease-in forwards';
+                setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
+            }
+        }, 3000);
+    }
+
+    // ═══ Modal Controls ═══
+    function openReviewModal() {
+        var email = getEmail();
+        if (!email) {
+            openLoginModal();
+            return;
+        }
+        // Reset form
+        selectedRating = 0;
+        selectedImageFile = null;
+        document.getElementById('selected-rating').value = '0';
+        document.getElementById('review-message').value = '';
+        document.getElementById('char-count').textContent = '0';
+        document.getElementById('review-image').value = '';
+        document.getElementById('image-preview-container').style.display = 'none';
+        document.getElementById('upload-trigger').style.display = 'block';
+        document.getElementById('rating-hint').textContent = 'Klik bintang untuk memberi rating';
+        document.getElementById('rating-hint').style.color = '';
+        clearStars();
+        document.getElementById('review-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReviewModal() {
+        document.getElementById('review-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function openLoginModal() {
+        document.getElementById('login-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        // Initialize Google Sign-In if not already
+        if (!gsiInitialized) {
+            initGoogleSignIn();
+        }
+    }
+
+    function closeLoginModal() {
+        document.getElementById('login-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Close modals on overlay click
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'review-modal') closeReviewModal();
+        if (e.target.id === 'login-modal') closeLoginModal();
+    });
+
+    // Escape key to close
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeReviewModal();
+            closeLoginModal();
+            closeLightbox();
+        }
+    });
+
+    // ═══ Lightbox ═══
+    function openLightbox(url) {
+        document.getElementById('lightbox-img').src = url;
+        document.getElementById('lightbox').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // ═══ Google Sign-In ═══
+    function initGoogleSignIn() {
+        if (window.google && google.accounts && google.accounts.id) {
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleCredential,
+                context: 'signin',
+                ux_mode: 'popup'
+            });
+            google.accounts.id.renderButton(
+                document.getElementById('g_id_signin_wrapper'),
+                { type: 'standard', theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'rectangular', width: '260' }
+            );
+            gsiInitialized = true;
+            console.log('[GSI] Google Sign-In initialized on testimonials page');
+        } else {
+            setTimeout(initGoogleSignIn, 500);
+        }
+    }
+
+    async function handleGoogleCredential(response) {
+        console.log('[GSI] Credential received, verifying...');
+        try {
+            var resp = await fetch(API_BASE + '/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken: response.credential })
+            });
+            var data = await resp.json();
+
+            if (!data.success) {
+                showToast('Login gagal: ' + (data.error || 'Unknown error'), 'error');
+                return;
+            }
+
+            // Save email to localStorage
+            try { localStorage.setItem('active_user_email', data.email); } catch(_) {}
+
+            // Update sidebar
+            if (window._refreshCredits) window._refreshCredits();
+            if (window._renderUserProfile) window._renderUserProfile();
+
+            // Close login modal and open review modal
+            closeLoginModal();
+            showToast('Login Berhasil!', 'success');
+
+            // Short delay then open review modal
+            setTimeout(function() {
+                openReviewModal();
+            }, 500);
+        } catch (err) {
+            console.error('[GSI] Error:', err.message);
+            showToast('Kesalahan jaringan: ' + err.message, 'error');
+        }
+    }
+
+    // ═══ Submit Review ═══
+    async function submitReview() {
+        var email = getEmail();
+        if (!email) {
+            showToast('Login diperlukan untuk mengirim testimoni', 'error');
+            return;
+        }
+        if (selectedRating < 1 || selectedRating > 5) {
+            showToast('Pilih rating bintang terlebih dahulu', 'warning');
+            return;
+        }
+        var message = document.getElementById('review-message').value.trim();
+        if (!message) {
+            showToast('Tulis pesan testimoni terlebih dahulu', 'warning');
+            return;
+        }
+
+        // Disable button
+        var btn = document.getElementById('submit-review-btn');
+        btn.disabled = true;
+        document.getElementById('submit-btn-text').style.display = 'none';
+        document.getElementById('submit-btn-spinner').style.display = 'inline';
+
+        try {
+            var formData = new FormData();
+            formData.append('rating', selectedRating);
+            formData.append('message', message);
+            formData.append('user_email', email);
+            formData.append('user_name', getUserName());
+            if (selectedImageFile) {
+                formData.append('image', selectedImageFile);
+            }
+
+            var resp = await fetch(API_BASE + '/api/testimonials', {
+                method: 'POST',
+                headers: {
+                    'x-user-email': email,
+                    'x-user-name': getUserName()
+                },
+                body: formData
+            });
+
+            if (!resp.ok) {
+                var errData = await resp.json().catch(function() { return {}; });
+                throw new Error(errData.error || 'Gagal mengirim testimoni');
+            }
+
+            showToast('Testimoni berhasil dikirim! 🎉', 'success');
+            closeReviewModal();
+            loadTestimonials(); // Refresh grid
+
+        } catch (err) {
+            console.error('[submitReview] Error:', err.message);
+            showToast(err.message || 'Gagal mengirim testimoni', 'error');
+        } finally {
+            btn.disabled = false;
+            document.getElementById('submit-btn-text').style.display = 'inline';
+            document.getElementById('submit-btn-spinner').style.display = 'none';
+        }
+    }
+
+    // ═══ Load Testimonials ═══
+    async function loadTestimonials() {
+        var grid = document.getElementById('testimonials-grid');
+        var loading = document.getElementById('grid-loading');
+        var empty = document.getElementById('empty-state');
+
+        try {
+            var resp = await fetch(API_BASE + '/api/testimonials?_=' + Date.now(), { cache: 'no-cache' });
+            if (!resp.ok) throw new Error('Failed to fetch');
+            var testimonials = await resp.json();
+
+            // Hide loading skeleton
+            if (loading) loading.style.display = 'none';
+
+            if (!testimonials || testimonials.length === 0) {
+                if (empty) empty.style.display = 'block';
+                if (grid) grid.innerHTML = '';
+                return;
+            }
+
+            if (empty) empty.style.display = 'none';
+
+            // Build card HTML
+            var html = '';
+            testimonials.forEach(function(t) {
+                var initials = (t.user_name || 'A').substring(0, 2).toUpperCase();
+                var avatarHtml = '';
+                if (t.user_avatar) {
+                    avatarHtml = '<img src="' + escapeHtml(t.user_avatar) + '" alt="' + escapeHtml(t.user_name) + '" class="w-9 h-9 rounded-full object-cover border border-slate-700 shrink-0">';
+                } else {
+                    avatarHtml = '<div class="w-9 h-9 rounded-full bg-gradient-to-br from-electric-cyan to-vivid-purple flex items-center justify-center text-white text-xs font-bold shrink-0">' + initials + '</div>';
+                }
+
+                var starsHtml = '';
+                for (var i = 1; i <= 5; i++) {
+                    if (i <= t.rating) {
+                        starsHtml += '<i class="fa-solid fa-star"></i>';
+                    } else {
+                        starsHtml += '<i class="fa-regular fa-star"></i>';
+                    }
+                }
+
+                var imageHtml = '';
+                if (t.image_url) {
+                    imageHtml = '<div class="mt-4 -mx-1">' +
+                        '<img src="' + escapeHtml(t.image_url) + '" alt="Testimonial photo" ' +
+                        'class="card-image w-full rounded-xl border border-slate-800 object-cover max-h-64" ' +
+                        'onclick="openLightbox(\'' + escapeAttr(t.image_url) + '\')" ' +
+                        'loading="lazy" onerror="this.style.display=\'none\'">' +
+                        '</div>';
+                }
+
+                html += '<div class="masonry-card bg-slate-900/50 border border-slate-800/60 rounded-2xl p-5 hover:border-slate-700/60 transition-colors">' +
+                    '<div class="flex items-center gap-3 mb-3">' +
+                        avatarHtml +
+                        '<div class="min-w-0">' +
+                            '<p class="text-white font-semibold text-sm truncate">' + escapeHtml(t.user_name || 'Anonymous') + '</p>' +
+                            '<div class="display-stars">' + starsHtml + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<p class="text-slate-300 text-sm leading-relaxed whitespace-pre-line">' + escapeHtml(t.message) + '</p>' +
+                    imageHtml +
+                    '<p class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-800/40">' + formatDate(t.created_at) + '</p>' +
+                '</div>';
+            });
+
+            grid.innerHTML = html;
+        } catch (err) {
+            console.error('[loadTestimonials] Error:', err.message);
+            if (loading) loading.style.display = 'none';
+            if (grid) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-text-secondary text-sm">Gagal memuat testimoni. Silakan coba lagi.</p></div>';
+            }
+        }
+    }
+
+    // ═══ Utility ═══
+    function escapeHtml(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    </script>
+</body>
+</html>
