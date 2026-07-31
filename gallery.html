@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Creations — fotowisuda.ai</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creations - fotowisuda.ai</title>
 
     <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
@@ -116,7 +116,7 @@
 
     <style>
         /* ============================================================
-           Gallery-specific styles — glassmorphic overlays, animations
+           Gallery-specific styles Ã¢â‚¬â€ glassmorphic overlays, animations
            ============================================================ */
 
         /* Hide scrollbar for sidebar */
@@ -244,7 +244,7 @@
         .modal-overlay.active .modal-card { transform: translateY(0); }
 
         /* Pinterest-style masonry layout via CSS columns */
-        /* CSS Grid layout — horizontal row flow, no column-count collapse */
+        /* CSS Grid layout Ã¢â‚¬â€ horizontal row flow, no column-count collapse */
         .masonry-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -266,7 +266,7 @@
             .masonry-container.masonry-3 { grid-template-columns: repeat(3, 1fr); }
         }
 
-        /* Cards inside CSS Grid — no masonry-specific properties needed */
+        /* Cards inside CSS Grid Ã¢â‚¬â€ no masonry-specific properties needed */
         .pinterest-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -322,7 +322,7 @@
 <body class="bg-surface-background text-text-primary font-body-md custom-scrollbar overflow-x-hidden">
 
     <!-- ============================================================
-         TOP NAVIGATION BAR — Full-width, glassmorphic
+         TOP NAVIGATION BAR Ã¢â‚¬â€ Full-width, glassmorphic
          ============================================================ -->
     <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
         <div class="flex items-center gap-3">
@@ -334,13 +334,13 @@
         <div class="flex items-center gap-3">
             <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm bg-surface-container border border-border-subtle text-text-secondary text-xs">
                 <span id="sidebar-status-dot" class="w-1.5 h-1.5 rounded-full bg-text-secondary"></span>
-                <span id="sidebar-status-label">Checking server…</span>
+                <span id="sidebar-status-label">Checking serverÃ¢â‚¬Â¦</span>
             </span>
         </div>
     </header>
 
     <!-- ============================================================
-         PERSISTENT SIDEBAR — Fixed left, 260px, dark theme
+         PERSISTENT SIDEBAR Ã¢â‚¬â€ Fixed left, 260px, dark theme
          ============================================================ -->
     <aside id="sidebar" class="fixed top-0 left-[-280px] w-[280px] h-full bg-[#131418] border-r border-border-subtle flex flex-col z-[100] overflow-y-auto hide-scrollbar transition-[left] duration-300 ease-out">
         <!-- Sidebar Header with close button -->
@@ -353,8 +353,8 @@
 
         <!-- Nav Items -->
         <nav class="flex-1 px-3 py-4 space-y-1">
-            <!-- ═══ Section 1 — User Generators ═══ -->
-            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">✨ Generators</p>
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Section 1 Ã¢â‚¬â€ User Generators Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">Ã¢Å“Â¨ Generators</p>
 
             <a href="/"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
@@ -393,10 +393,10 @@
                 <span>Filter Gallery</span>
             </a>
 
-            <!-- ═══ Divider ═══ -->
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Divider Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
             <div class="my-3 border-t border-slate-800/60"></div>
 
-            <!-- ═══ Section 2 — User Gallery ═══ -->
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Section 2 Ã¢â‚¬â€ User Gallery Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
 
             <a href="/my-creations"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
@@ -411,7 +411,7 @@
         <div class="px-4 py-4 border-t border-border-subtle/50 space-y-3">
             <div class="flex items-center gap-2 text-[9px] text-text-secondary/40 uppercase tracking-wider">
                 <span class="w-1 h-1 rounded-full bg-emerald-500/40"></span>
-                <span>v2.0 — Creations</span>
+                <span>v2.0 Ã¢â‚¬â€ Creations</span>
             </div>
         </div>
     </aside>
@@ -420,7 +420,7 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
     <!-- ============================================================
-         MAIN CONTENT AREA — Offset for sidebar + header
+         MAIN CONTENT AREA Ã¢â‚¬â€ Offset for sidebar + header
          ============================================================ -->
     <main class="mt-16 ml-0 flex flex-col bg-surface-background overflow-hidden relative min-h-[calc(100vh-64px)]">
 
@@ -438,7 +438,7 @@
                     <div>
                         <h2 class="font-headline-lg text-headline-lg text-text-primary mb-1">Creations</h2>
                         <div class="flex items-center gap-2 text-text-secondary font-label-md">
-                            <span id="gallery-count" class="text-electric-cyan font-bold">—</span>
+                            <span id="gallery-count" class="text-electric-cyan font-bold">Ã¢â‚¬â€</span>
                             <span>Generations stored</span>
                         </div>
                     </div>
@@ -475,7 +475,7 @@
                             </button>
                         </div>
 
-                        <!-- Refresh button — icon only -->
+                        <!-- Refresh button Ã¢â‚¬â€ icon only -->
                         <button id="refresh-btn"
                                 class="flex items-center justify-center w-9 h-9 bg-surface-card border border-border-subtle rounded-lg text-text-secondary hover:text-electric-cyan hover:border-electric-cyan/50 transition-all flex-shrink-0"
                                 title="Refresh gallery">
@@ -485,14 +485,14 @@
                 </div>
 
                 <!-- ================================================
-                     MASONRY LAYOUT — Pinterest-style columns
+                     MASONRY LAYOUT Ã¢â‚¬â€ Pinterest-style columns
                      ================================================ -->
                 <div id="gallery-grid" class="masonry-container masonry-3">
                     <!-- Cards rendered dynamically via JavaScript -->
                 </div>
 
                 <!-- ================================================
-                     EMPTY STATE — shown when no records exist
+                     EMPTY STATE Ã¢â‚¬â€ shown when no records exist
                      ================================================ -->
                 <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center animate-fade-in">
                     <i class="fa-solid fa-wand-magic-sparkles text-slate-600 text-3xl mb-3 animate-pulse"></i>
@@ -544,7 +544,7 @@
                 return record.width + ' x ' + record.height + ' px';
             }
             var d = (record.dimensions || '');
-            var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            var pxMatch = d.match(/^(\d+)\s*[xÃƒâ€”]\s*(\d+)/i);
             if (pxMatch) {
                 return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
             }
@@ -567,11 +567,11 @@
             gridLayout: 3,        // 1 | 2 | 3 columns
             isLoading: false,
             favoriteIds: new Set(), // Set of generation_ids marked as favorite
-            pendingGenerations: new Map()  // genId → { status, timer, cardEl, progressEl, barEl, statusEl, detailEl }
+            pendingGenerations: new Map()  // genId Ã¢â€ â€™ { status, timer, cardEl, progressEl, barEl, statusEl, detailEl }
         };
 
         // =====================================================
-        // PENDING GENERATION — URL param parser
+        // PENDING GENERATION Ã¢â‚¬â€ URL param parser
         // =====================================================
         function parsePendingFromURL() {
             const params = new URLSearchParams(window.location.search);
@@ -769,7 +769,7 @@
                 pendingData.timerEl.textContent = formatStopwatch(baseOffsetMs);
             }
 
-            // Cleanup helper — clears both poll + stopwatch timers
+            // Cleanup helper Ã¢â‚¬â€ clears both poll + stopwatch timers
             function clearPendingTimers() {
                 if (pendingData.timer)          { clearInterval(pendingData.timer);          pendingData.timer = null; }
                 if (pendingData.stopwatchTimer) { clearInterval(pendingData.stopwatchTimer); pendingData.stopwatchTimer = null; }
@@ -800,7 +800,7 @@
                             pendingData.barEl.classList.add('bg-amber-500');
                         }
                         if (pendingData.statusEl) {
-                            pendingData.statusEl.textContent = 'Gagal Memproses ⚠️';
+                            pendingData.statusEl.textContent = 'Gagal Memproses Ã¢Å¡Â Ã¯Â¸Â';
                             pendingData.statusEl.classList.remove('text-electric-cyan');
                             pendingData.statusEl.classList.add('text-amber-400');
                         }
@@ -822,11 +822,11 @@
                     }
                 }
 
-                // --- Timeout check (6 min local — absolute last resort) ---
+                // --- Timeout check (6 min local Ã¢â‚¬â€ absolute last resort) ---
                 if (elapsed > MAX_TIME) {
                     clearPendingTimers();
                     state.pendingGenerations.delete(generationId);
-                    if (pendingData.statusEl) pendingData.statusEl.textContent = 'Waktu Habis ⏰';
+                    if (pendingData.statusEl) pendingData.statusEl.textContent = 'Waktu Habis Ã¢ÂÂ°';
                     if (pendingData.detailEl) pendingData.detailEl.textContent = 'Proses melebihi batas 6 menit. Silakan coba lagi.';
                     if (pendingData.spinnerEl) pendingData.spinnerEl.classList.add('hidden');
                     if (pendingData.barEl) pendingData.barEl.style.width = '100%';
@@ -839,11 +839,11 @@
                 // --- Time-based progress + Indonesian status stages ---
                 let cosmeticPct = 0;
                 if (elapsed < 30000) {
-                    cosmeticPct = (elapsed / 30000) * 30;          // 0–30s → 0–30%
+                    cosmeticPct = (elapsed / 30000) * 30;          // 0Ã¢â‚¬â€œ30s Ã¢â€ â€™ 0Ã¢â‚¬â€œ30%
                 } else if (elapsed < 120000) {
-                    cosmeticPct = 30 + ((elapsed - 30000) / 90000) * 45; // 30–120s → 30–75%
+                    cosmeticPct = 30 + ((elapsed - 30000) / 90000) * 45; // 30Ã¢â‚¬â€œ120s Ã¢â€ â€™ 30Ã¢â‚¬â€œ75%
                 } else {
-                    cosmeticPct = 75 + ((elapsed - 120000) / (MAX_TIME - 120000)) * 15; // 120s+ → 75–90%
+                    cosmeticPct = 75 + ((elapsed - 120000) / (MAX_TIME - 120000)) * 15; // 120s+ Ã¢â€ â€™ 75Ã¢â‚¬â€œ90%
                 }
                 cosmeticPct = Math.min(90, cosmeticPct);
                 if (pendingData.barEl) {
@@ -863,7 +863,7 @@
                     const data = await resp.json();
                     const { status, imageUrl, error } = data;
 
-                    // Skip RETRYING status — our local progress animation handles the UX
+                    // Skip RETRYING status Ã¢â‚¬â€ our local progress animation handles the UX
                     if (status && status.startsWith('RETRYING')) return;
 
                     pendingData.status = status;
@@ -878,8 +878,8 @@
                                 pendingData.barEl.style.transition = 'width 0.4s ease-out';
                                 pendingData.barEl.style.width = '100%';
                             }
-                            if (pendingData.statusEl) pendingData.statusEl.textContent = 'Selesai! ✨';
-                            if (pendingData.detailEl) pendingData.detailEl.textContent = 'Memuat hasil akhir…';
+                            if (pendingData.statusEl) pendingData.statusEl.textContent = 'Selesai! Ã¢Å“Â¨';
+                            if (pendingData.detailEl) pendingData.detailEl.textContent = 'Memuat hasil akhirÃ¢â‚¬Â¦';
                             if (pendingData.spinnerEl) pendingData.spinnerEl.classList.add('hidden');
 
                             // After a brief pause, refresh the gallery to pick up the real record
@@ -888,7 +888,7 @@
                                 if (cardEl.parentNode) {
                                     cardEl.classList.add('pending-resolve');
                                 }
-                                // Reload gallery data — the new record is now in database.json
+                                // Reload gallery data Ã¢â‚¬â€ the new record is now in database.json
                                 await loadGallery(true);
                                 // Remove the pending card (it'll be replaced by the real one)
                                 setTimeout(() => {
@@ -923,7 +923,7 @@
                                     pendingData.barEl.classList.add('bg-error');
                                 }
                                 if (pendingData.statusEl) {
-                                    pendingData.statusEl.textContent = 'Gagal — Server Sibuk 😞';
+                                    pendingData.statusEl.textContent = 'Gagal Ã¢â‚¬â€ Server Sibuk Ã°Å¸ËœÅ¾';
                                     pendingData.statusEl.classList.remove('text-electric-cyan');
                                     pendingData.statusEl.classList.add('text-error');
                                 }
@@ -941,7 +941,7 @@
                                         inner.innerHTML = '<i class="fa-solid fa-circle-xmark text-2xl text-rose-500" style="animation: heartPop 0.4s ease-out forwards;"></i>';
                                     }
                                 }
-                                // Keep card visible indefinitely — user must dismiss manually
+                                // Keep card visible indefinitely Ã¢â‚¬â€ user must dismiss manually
                                 break;
                             }
 
@@ -952,7 +952,7 @@
                                 pendingData.barEl.classList.add('bg-error');
                             }
                             if (pendingData.statusEl) {
-                                pendingData.statusEl.textContent = 'Gagal — Error Server 😞';
+                                pendingData.statusEl.textContent = 'Gagal Ã¢â‚¬â€ Error Server Ã°Å¸ËœÅ¾';
                                 pendingData.statusEl.classList.remove('text-electric-cyan');
                                 pendingData.statusEl.classList.add('text-error');
                             }
@@ -978,8 +978,8 @@
                             break;
                     }
                 } catch (_pollErr) {
-                    // Network glitch — silently retry next interval
-                    console.warn('Pending poll attempt failed, retrying…');
+                    // Network glitch Ã¢â‚¬â€ silently retry next interval
+                    console.warn('Pending poll attempt failed, retryingÃ¢â‚¬Â¦');
                 }
             }, POLL_INTERVAL);
         }
@@ -989,7 +989,7 @@
         // =====================================================
 
         /**
-         * Initial load — fetch first page and render.
+         * Initial load Ã¢â‚¬â€ fetch first page and render.
          */
         async function loadGallery(reset = true) {
             if (state.isLoading) return;
@@ -1082,7 +1082,7 @@
             if (state.sortOrder === 'oldest') {
                 filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             } else {
-                // 'newest' (or 'favorite' within newest) — already sorted by server, re-sort after filter
+                // 'newest' (or 'favorite' within newest) Ã¢â‚¬â€ already sorted by server, re-sort after filter
                 filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             }
 
@@ -1090,7 +1090,7 @@
             const hasPendingCards = state.pendingGenerations.size > 0;
 
             if (filtered.length === 0 && !hasPendingCards) {
-                // No complete records AND no active polling cards → show empty state
+                // No complete records AND no active polling cards Ã¢â€ â€™ show empty state
                 if (DOM.galleryGrid) {
                     DOM.galleryGrid.innerHTML = '';
                     DOM.galleryGrid.classList.add('hidden');
@@ -1117,7 +1117,7 @@
 
             // --- Update count ---
             // Failed pending generations are deleted from the Map on FAILED,
-            // so .size naturally excludes them — only active jobs are counted.
+            // so .size naturally excludes them Ã¢â‚¬â€ only active jobs are counted.
             if (DOM.galleryCount) {
                 const renderedCount = filtered.length + state.pendingGenerations.size;
                 DOM.galleryCount.textContent = renderedCount.toLocaleString();
@@ -1157,7 +1157,7 @@
                 : '';
 
             const lightingBadge = record.lighting
-                ? `<span class="absolute bottom-2 right-2 z-10 px-2 py-0.5 bg-black/50 backdrop-blur-sm rounded-full text-[9px] text-vivid-purple font-semibold border border-vivid-purple/20 opacity-0 group-hover:opacity-100 transition-opacity">⚡ ${escapeHtml(record.lighting)}</span>`
+                ? `<span class="absolute bottom-2 right-2 z-10 px-2 py-0.5 bg-black/50 backdrop-blur-sm rounded-full text-[9px] text-vivid-purple font-semibold border border-vivid-purple/20 opacity-0 group-hover:opacity-100 transition-opacity">Ã¢Å¡Â¡ ${escapeHtml(record.lighting)}</span>`
                 : '';
 
             return `
@@ -1198,10 +1198,10 @@
          * Progressive Indonesian status messages keyed by estimated phase.
          */
         const PROGRESS_STAGES = [
-            { atSec: 0,   status: 'Menganalisa struktur wajah kamu… 🔍',  detail: 'AI sedang mendeteksi fitur wajah dari foto referensi' },
-            { atSec: 20,  status: 'Menyelaraskan kebaya/toga wisuda pilihan… 👔', detail: 'Menyesuaikan pose & busana dengan latar tujuan' },
-            { atSec: 60,  status: 'Menata pencahayaan latar studio foto… 📸', detail: 'Mengomposisikan tata cahaya & bayangan natural' },
-            { atSec: 120, status: 'Sentuhan akhir… Foto wisudamu siap meluncur! ✨', detail: 'Merender hasil akhir dalam kualitas HD penuh' }
+            { atSec: 0,   status: 'Menganalisa struktur wajah kamuÃ¢â‚¬Â¦ Ã°Å¸â€Â',  detail: 'AI sedang mendeteksi fitur wajah dari foto referensi' },
+            { atSec: 20,  status: 'Menyelaraskan kebaya/toga wisuda pilihanÃ¢â‚¬Â¦ Ã°Å¸â€˜â€', detail: 'Menyesuaikan pose & busana dengan latar tujuan' },
+            { atSec: 60,  status: 'Menata pencahayaan latar studio fotoÃ¢â‚¬Â¦ Ã°Å¸â€œÂ¸', detail: 'Mengomposisikan tata cahaya & bayangan natural' },
+            { atSec: 120, status: 'Sentuhan akhirÃ¢â‚¬Â¦ Foto wisudamu siap meluncur! Ã¢Å“Â¨', detail: 'Merender hasil akhir dalam kualitas HD penuh' }
         ];
 
         /**
@@ -1236,7 +1236,7 @@
             return `
             <div class="pending-card bg-surface-card border border-electric-cyan/20 rounded-xl overflow-hidden flex flex-col animate-fade-in shadow-[0_0_20px_rgba(0,209,255,0.08)]"
                  data-pending-id="${escapedId}">
-                <!-- Card Body — pulsing gradient ring + status -->
+                <!-- Card Body Ã¢â‚¬â€ pulsing gradient ring + status -->
                 <div class="relative aspect-[3/4] bg-surface-container-low overflow-hidden flex items-center justify-center">
                     <div class="flex flex-col items-center gap-4 z-10 px-4">
                         <!-- Premium pulsing gradient spinner ring (always visible) -->
@@ -1247,7 +1247,7 @@
                             </div>
                         </div>
                         <p class="pending-hideable text-electric-cyan text-sm font-semibold tracking-wide text-center"
-                           id="pending-status-${escapedId}">Menganalisa struktur wajah kamu… 🔍</p>
+                           id="pending-status-${escapedId}">Menganalisa struktur wajah kamuÃ¢â‚¬Â¦ Ã°Å¸â€Â</p>
                     </div>
                     <!-- Subtle shimmer overlay -->
                     <div class="pending-hideable absolute inset-0 bg-gradient-to-b from-transparent via-electric-cyan/5 to-transparent animate-pulse pointer-events-none"></div>
@@ -1257,7 +1257,7 @@
                              id="pending-bar-${escapedId}" style="width: 0%"></div>
                     </div>
                 </div>
-                <!-- Card Footer — job type + dynamic detail + stopwatch -->
+                <!-- Card Footer Ã¢â‚¬â€ job type + dynamic detail + stopwatch -->
                 <div class="pending-hideable p-4 flex flex-col gap-2">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-electric-cyan animate-pulse shadow-[0_0_6px_#00D1FF]"></span>
@@ -1272,10 +1272,10 @@
         }
 
         // =====================================================
-        // CARD EVENT HANDLERS — click to open detail modal
+        // CARD EVENT HANDLERS Ã¢â‚¬â€ click to open detail modal
         // =====================================================
         function bindCardEvents() {
-            // Heart/favorite button — stop propagation so it doesn't open the modal
+            // Heart/favorite button Ã¢â‚¬â€ stop propagation so it doesn't open the modal
             document.querySelectorAll('.card-favorite-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1284,7 +1284,7 @@
                 });
             });
 
-            // Card click → open detail modal — resolve by gen-id, not DOM index
+            // Card click Ã¢â€ â€™ open detail modal Ã¢â‚¬â€ resolve by gen-id, not DOM index
             document.querySelectorAll('.pinterest-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const genId = card.getAttribute('data-gen-id');
@@ -1304,7 +1304,7 @@
 
         /**
          * Navigate the detail modal to the next or previous record.
-         * @param {number} direction — -1 for previous, +1 for next
+         * @param {number} direction Ã¢â‚¬â€ -1 for previous, +1 for next
          */
         function navigateDetailModal(direction) {
             if (!state.records || state.records.length === 0) return;
@@ -1338,7 +1338,7 @@
                 img.src = coverUrl;
             }
 
-            // Favorite heart icon — sync with current state
+            // Favorite heart icon Ã¢â‚¬â€ sync with current state
             const favBtn = document.getElementById('detail-modal-favorite');
             if (favBtn) {
                 favBtn.setAttribute('data-gen-id', record.generation_id);
@@ -1349,7 +1349,7 @@
             const dimsEl = document.getElementById('detail-modal-dims');
             if (dimsEl) dimsEl.textContent = formatDimensions(record);
 
-            // Lighting — hide row when value is empty or N/A
+            // Lighting Ã¢â‚¬â€ hide row when value is empty or N/A
             const lightingRow = document.getElementById('detail-modal-lighting-row');
             const lightingEl  = document.getElementById('detail-modal-lighting');
             const hasLighting  = record.lighting && record.lighting !== 'N/A';
@@ -1364,7 +1364,7 @@
                     : 'Unknown';
             }
 
-            // Reference images — prefer Cloudinary URLs (survive redeploys), fall back to local paths
+            // Reference images Ã¢â‚¬â€ prefer Cloudinary URLs (survive redeploys), fall back to local paths
             const refsEl = document.getElementById('detail-modal-refs');
             if (refsEl) {
                 let refsHtml = '';
@@ -1429,7 +1429,7 @@
          */
         async function downloadImage(imageUrl) {
             try {
-                showToast('Downloading…', 'info');
+                showToast('DownloadingÃ¢â‚¬Â¦', 'info');
                 const resp = await fetch(imageUrl);
                 const blob = await resp.blob();
                 const blobUrl = URL.createObjectURL(blob);
@@ -1554,8 +1554,8 @@
         }
 
         /**
-         * Grid layout switcher — 1, 2, or 3 columns via CSS grid.
-         * Mobile: 1-col; tablet (≤1023px): 2-col max; desktop: as selected.
+         * Grid layout switcher Ã¢â‚¬â€ 1, 2, or 3 columns via CSS grid.
+         * Mobile: 1-col; tablet (Ã¢â€°Â¤1023px): 2-col max; desktop: as selected.
          */
         function setGridLayout(cols) {
             state.gridLayout = cols;
@@ -1570,7 +1570,7 @@
                     }
                 });
             }
-            // Apply Pinterest masonry column class — fluid on all screen sizes
+            // Apply Pinterest masonry column class Ã¢â‚¬â€ fluid on all screen sizes
             if (DOM.galleryGrid) {
                 DOM.galleryGrid.className = `masonry-container masonry-${cols}`;
             }
@@ -1591,7 +1591,7 @@
         }
 
         /**
-         * Toggle the favorite flag for a generation — calls the server,
+         * Toggle the favorite flag for a generation Ã¢â‚¬â€ calls the server,
          * then updates local state and all visible heart icons from the response.
          */
         async function toggleFavorite(generationId) {
@@ -1627,7 +1627,7 @@
 
         /**
          * Apply a known favorite state to all heart icons for a generation.
-         * Explicitly adds/removes classes — no fragile regex replacements.
+         * Explicitly adds/removes classes Ã¢â‚¬â€ no fragile regex replacements.
          */
         function applyFavoriteState(generationId, isFav) {
             const fillState = isFav ? 1 : 0;
@@ -1922,7 +1922,7 @@
         }
 
         // =====================================================
-        // SIMULATED LOGIN SYSTEM — localStorage sandbox-safe
+        // SIMULATED LOGIN SYSTEM Ã¢â‚¬â€ localStorage sandbox-safe
         // =====================================================
 
         var safeStorage = {
@@ -2032,7 +2032,7 @@
                     });
                 });
             }
-            // Restore saved column preference (1–3 only) or default to 3
+            // Restore saved column preference (1Ã¢â‚¬â€œ3 only) or default to 3
             const savedColumns = parseInt(localStorage.getItem('creations_grid_columns'), 10) || 3;
             state.gridLayout = Math.min(savedColumns, 3);
             setGridLayout(state.gridLayout);
@@ -2065,7 +2065,7 @@
                 });
             }
 
-            // Keyboard shortcuts — Escape closes modals, Arrow keys navigate
+            // Keyboard shortcuts Ã¢â‚¬â€ Escape closes modals, Arrow keys navigate
             document.addEventListener('keydown', (e) => {
                 // Arrow key navigation (only when detail modal is open)
                 const detailModal = document.getElementById('detail-modal');
@@ -2095,7 +2095,7 @@
 
             // Health check
             const healthy = await checkBackendHealth();
-            console.log(healthy ? '✓ Server connected' : '✗ Server offline');
+            console.log(healthy ? 'Ã¢Å“â€œ Server connected' : 'Ã¢Å“â€” Server offline');
 
             // Load gallery data
             await loadGallery(true);
@@ -2113,7 +2113,7 @@
             // 1) Check URL param (from a redirect like /my-creations?pending=gen_xxx)
             const urlPendingId = parsePendingFromURL();
             if (urlPendingId) {
-                console.log('Resuming from URL — pending:', urlPendingId);
+                console.log('Resuming from URL Ã¢â‚¬â€ pending:', urlPendingId);
                 if (window.history && window.history.replaceState) {
                     window.history.replaceState({}, '', '/gallery');
                 }
@@ -2125,7 +2125,7 @@
                         const createdAt = data.createdAt || Date.now();
                         startPendingPoll(urlPendingId, createdAt);
                     } else {
-                        // Server doesn't know this ID — try without offset
+                        // Server doesn't know this ID Ã¢â‚¬â€ try without offset
                         startPendingPoll(urlPendingId);
                     }
                 } catch (_e) {
@@ -2141,12 +2141,12 @@
                     for (const gen of active) {
                         // Don't double-poll the URL one
                         if (gen.generationId === urlPendingId) continue;
-                        console.log('Resuming from server — pending:', gen.generationId, gen.status);
+                        console.log('Resuming from server Ã¢â‚¬â€ pending:', gen.generationId, gen.status);
                         startPendingPoll(gen.generationId, gen.createdAt);
                     }
                 }
             } catch (_e) {
-                // Server unreachable — skip resume
+                // Server unreachable Ã¢â‚¬â€ skip resume
             }
         }
 
@@ -2241,7 +2241,7 @@
     </script>
 
     <!-- ============================================================
-         DETAIL MODAL — opens on card click
+         DETAIL MODAL Ã¢â‚¬â€ opens on card click
          ============================================================ -->
     <div id="detail-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-4 sm:p-6">
         <div class="detail-modal-overlay absolute inset-0" id="detail-modal-bg"></div>
@@ -2257,7 +2257,7 @@
                 <span class="material-symbols-outlined">close</span>
             </button>
 
-            <!-- Left: large image with nav arrows — black theater frame -->
+            <!-- Left: large image with nav arrows Ã¢â‚¬â€ black theater frame -->
             <div class="lg:w-[60%] bg-black flex items-center justify-center min-h-[200px] max-h-[320px] p-4 relative rounded-t-2xl">
                 <div class="w-full aspect-[3/4] max-h-[280px] overflow-hidden bg-black relative flex items-center justify-center">
                     <img id="detail-modal-image" src="" alt="Generated artwork"
@@ -2326,7 +2326,7 @@
 
 
 <!-- ============================================================
-     MOCK LOGIN MODAL — Email + Password simulation
+     MOCK LOGIN MODAL Ã¢â‚¬â€ Email + Password simulation
      ============================================================ -->
 <div id="mock-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
     <div class="bg-slate-900 border border-slate-800 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-sm w-full text-center flex flex-col gap-4 transition-all transform scale-95 duration-300">
@@ -2346,7 +2346,7 @@
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kata Sandi</label>
-                <input type="password" id="mock-password-input" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                <input type="password" id="mock-password-input" required placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
             </div>
             <div class="flex gap-2 mt-2">
                 <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-95 shadow-lg shadow-cyan-500/10">

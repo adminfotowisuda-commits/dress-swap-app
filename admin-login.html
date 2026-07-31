@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Admin Login — fotowisuda.ai</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - fotowisuda.ai</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -53,13 +53,13 @@
 var API_BASE = window.location.origin;
 var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
 
-// ═══ Custom Toast Notification ═══
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Custom Toast Notification Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 function showToast(message, type) {
     type = type || 'error';
     var existing = document.getElementById('custom-toast');
     if (existing) existing.remove();
 
-    var icon = type === 'success' ? '✔' : (type === 'error' ? '✖' : '⚠');
+    var icon = type === 'success' ? 'Ã¢Å“â€' : (type === 'error' ? 'Ã¢Å“â€“' : 'Ã¢Å¡Â ');
     var bgColor = type === 'success' ? 'rgba(34,197,94,0.06)' : (type === 'error' ? 'rgba(239,68,68,0.06)' : 'rgba(251,191,36,0.06)');
     var borderColor = type === 'success' ? 'rgba(34,197,94,0.25)' : (type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(251,191,36,0.25)');
     var iconColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#fbbf24');
@@ -89,7 +89,7 @@ function dismissToast(delay, callback) {
     }, delay || 3000);
 }
 
-// ═══ Initialize Google Sign-In ═══
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Initialize Google Sign-In Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 function initGoogleSignIn() {
     if (window.google && google.accounts && google.accounts.id) {
         google.accounts.id.initialize({
@@ -108,7 +108,7 @@ function initGoogleSignIn() {
     }
 }
 
-// ═══ Handle Google Credential Response ═══
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Handle Google Credential Response Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 async function handleAdminCredentialResponse(response) {
     console.log('[ADMIN LOGIN] Credential received, verifying...');
     var errorEl = document.getElementById('error-msg');
@@ -122,8 +122,8 @@ async function handleAdminCredentialResponse(response) {
         var data = await resp.json();
 
         if (resp.status === 403 || !data.success) {
-            // Access denied — not the admin email
-            errorEl.textContent = '🚫 Akses Ditolak: Anda bukan Admin! Hanya admin.fotowisuda@gmail.com yang diizinkan.';
+            // Access denied Ã¢â‚¬â€ not the admin email
+            errorEl.textContent = 'Ã°Å¸Å¡Â« Akses Ditolak: Anda bukan Admin! Hanya admin.fotowisuda@gmail.com yang diizinkan.';
             errorEl.style.display = 'block';
             console.error('[ADMIN LOGIN] Access denied:', data.error);
             showToast('Akses Ditolak: Anda bukan Admin!', 'error');
@@ -132,15 +132,15 @@ async function handleAdminCredentialResponse(response) {
         }
 
         if (!data.success) {
-            errorEl.textContent = '❌ ' + (data.error || 'Autentikasi gagal.');
+            errorEl.textContent = 'Ã¢ÂÅ’ ' + (data.error || 'Autentikasi gagal.');
             errorEl.style.display = 'block';
             showToast(data.error || 'Autentikasi gagal.', 'error');
             dismissToast(3500);
             return;
         }
 
-        // Success — redirect to admin dashboard
-        console.log('[ADMIN LOGIN] Authenticated — redirecting to /admin');
+        // Success Ã¢â‚¬â€ redirect to admin dashboard
+        console.log('[ADMIN LOGIN] Authenticated Ã¢â‚¬â€ redirecting to /admin');
         showToast('Admin Login Berhasil! Mengalihkan...', 'success');
         dismissToast(1200, function() {
             window.location.href = '/admin';
@@ -148,17 +148,17 @@ async function handleAdminCredentialResponse(response) {
 
     } catch (err) {
         console.error('[ADMIN LOGIN] Network error:', err.message);
-        errorEl.textContent = '⚠️ Kesalahan jaringan: ' + err.message;
+        errorEl.textContent = 'Ã¢Å¡Â Ã¯Â¸Â Kesalahan jaringan: ' + err.message;
         errorEl.style.display = 'block';
         showToast('Kesalahan jaringan: ' + err.message, 'error');
         dismissToast(3500);
     }
 }
 
-// ═══ Boot ═══
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Boot Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 (function boot() {
     initGoogleSignIn();
-    console.log('[ADMIN LOGIN] Page loaded — waiting for Google Sign-In');
+    console.log('[ADMIN LOGIN] Page loaded Ã¢â‚¬â€ waiting for Google Sign-In');
 })();
 </script>
 </body>

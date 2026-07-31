@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
+    <meta charset="UTF-8">
     <script>
         if (!localStorage.getItem('active_user_email')) {
             window.location.href = '/';
         }
     </script>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Filter Gallery Factory — fotowisuda.ai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Gallery Factory - fotowisuda.ai</title>
 
     <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
@@ -160,7 +160,7 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
             animation: shimmer 2s infinite;
         }
-        /* Collapsible sidebar — translate-based for reliable mobile toggle */
+        /* Collapsible sidebar Ã¢â‚¬â€ translate-based for reliable mobile toggle */
         #sidebar {
             transform: translateX(-100%);
             transition: transform 0.3s ease-out;
@@ -201,7 +201,7 @@
     </header>
 
     <!-- ============================================================
-         PERSISTENT SIDEBAR — Fixed left, 260px
+         PERSISTENT SIDEBAR Ã¢â‚¬â€ Fixed left, 260px
          ============================================================ -->
     <aside id="sidebar" class="fixed top-0 left-0 w-[280px] h-full bg-[#131418] border-r border-border-subtle flex flex-col z-[100] overflow-y-auto hide-scrollbar">
         <div class="px-5 py-6 border-b border-border-subtle/50 flex items-center justify-between">
@@ -211,8 +211,8 @@
             </button>
         </div>
         <nav class="flex-1 px-3 py-4 space-y-1">
-            <!-- ═══ Section 1 — User Generators ═══ -->
-            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">✨ Generators</p>
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Section 1 Ã¢â‚¬â€ User Generators Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary/60">Ã¢Å“Â¨ Generators</p>
 
             <a href="/"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
@@ -251,10 +251,10 @@
                 <span>Filter Gallery</span>
             </a>
 
-            <!-- ═══ Divider ═══ -->
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Divider Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
             <div class="my-3 border-t border-slate-800/60"></div>
 
-            <!-- ═══ Section 2 — User Gallery ═══ -->
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Section 2 Ã¢â‚¬â€ User Gallery Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
 
             <a href="/my-creations"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-text-secondary hover:text-white hover:bg-white/[0.04] group">
@@ -262,12 +262,12 @@
                 <span>My Creations</span>
             </a>
 
-            <!-- ═══ Divider ═══ -->
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Divider Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
             <div class="my-3 border-t border-slate-800/60"></div>
 
-            <!-- ═══ Section 3 — Admin & Power Tools ═══ -->
+            <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Section 3 Ã¢â‚¬â€ Admin & Power Tools Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
             <div id="admin-menu-section" class="">
-            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-purple-400/60">⚡ Power Tools</p>
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-purple-400/60">Ã¢Å¡Â¡ Power Tools</p>
 
             <a href="/generate"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-600/20 border border-purple-500/50 text-purple-300 shadow-lg shadow-purple-500/5">
@@ -288,7 +288,7 @@
             <div id="auth-container"></div>
             <div class="flex items-center gap-2 text-[9px] text-text-secondary/40 uppercase tracking-wider">
                 <span class="w-1 h-1 rounded-full bg-emerald-500/40"></span>
-                <span>v2.0 — Filter Gallery Factory</span>
+                <span>v2.0 Ã¢â‚¬â€ Filter Gallery Factory</span>
             </div>
         </div>
     </aside>
@@ -297,11 +297,11 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
     <!-- ============================================================
-         MAIN WORKSPACE — Centered dashboard
+         MAIN WORKSPACE Ã¢â‚¬â€ Centered dashboard
          ============================================================ -->
     <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex flex-col lg:flex-row">
 
-        <!-- LEFT PANEL — Configuration -->
+        <!-- LEFT PANEL Ã¢â‚¬â€ Configuration -->
         <section class="border-r border-border-subtle bg-surface-dim overflow-y-auto hide-scrollbar p-8 lg:w-1/2 w-full">
             <div class="mx-auto space-y-8">
 
@@ -327,7 +327,7 @@
                         <textarea
                             id="prompt-textarea"
                             class="w-full h-40 bg-surface-container-lowest border border-border-subtle rounded-xl p-4 text-body-md focus:ring-1 focus:ring-electric-cyan focus:border-electric-cyan transition-all placeholder:text-text-secondary resize-none"
-                            placeholder="Describe the image you want to generate in detail…"
+                            placeholder="Describe the image you want to generate in detailÃ¢â‚¬Â¦"
                         ></textarea>
                     </div>
                 </div>
@@ -342,7 +342,7 @@
                             type="text"
                             id="filter-title-input"
                             class="w-full bg-surface-container-lowest border border-border-subtle rounded-xl px-4 py-3 text-body-md focus:ring-1 focus:ring-electric-cyan focus:border-electric-cyan transition-all placeholder:text-text-secondary"
-                            placeholder="Nama preset filter ini…"
+                            placeholder="Nama preset filter iniÃ¢â‚¬Â¦"
                             maxlength="60"
                         />
                         <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-text-secondary/50" id="filter-title-hint">Maks. 60 karakter</span>
@@ -468,7 +468,7 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL — Dynamic states -->
+        <!-- RIGHT PANEL Ã¢â‚¬â€ Dynamic states -->
         <section class="bg-surface-background relative flex flex-col p-8 lg:w-1/2 w-full min-h-[600px]">
 
             <div class="flex justify-between items-center mb-8">
@@ -796,7 +796,7 @@
 
                 const { jobId } = await genResp.json();
                 state.generationId = jobId;
-                updateProgress(10, 'Pipeline initialized — polling Leonardo...', 'Generating AI image...');
+                updateProgress(10, 'Pipeline initialized Ã¢â‚¬â€ polling Leonardo...', 'Generating AI image...');
                 updateStatus('PROCESSING');
                 await pollGenerationStatus(jobId);
 
@@ -997,7 +997,7 @@
         }
 
         // =====================================================
-        // SIMULATED LOGIN SYSTEM — localStorage sandbox-safe
+        // SIMULATED LOGIN SYSTEM Ã¢â‚¬â€ localStorage sandbox-safe
         // =====================================================
 
         var safeStorage = {
@@ -1126,7 +1126,7 @@
             try { applyAdminVisibility(); } catch(e) { console.error('[Factory] applyAdminVisibility failed:', e); }
         }
 
-        // OLD SESSION CODE REMOVED — using safeStorage above
+        // OLD SESSION CODE REMOVED Ã¢â‚¬â€ using safeStorage above
         var _old_session_removed_
             var USERS_KEY = 'simulated_users';
             var CREATIONS_KEY = 'my_creations';
@@ -1346,7 +1346,7 @@
 
 
 <!-- ============================================================
-     MOCK LOGIN MODAL — Email + Password simulation
+     MOCK LOGIN MODAL Ã¢â‚¬â€ Email + Password simulation
      ============================================================ -->
 <div id="mock-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
     <div class="bg-slate-900 border border-slate-800 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-sm w-full text-center flex flex-col gap-4 transition-all transform scale-95 duration-300">
@@ -1366,7 +1366,7 @@
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kata Sandi</label>
-                <input type="password" id="mock-password-input" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                <input type="password" id="mock-password-input" required placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-all">
             </div>
             <div class="flex gap-2 mt-2">
                 <button type="submit" class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-95 shadow-lg shadow-cyan-500/10">

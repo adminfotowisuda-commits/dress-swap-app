@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
+    <meta charset="UTF-8">
     <script>
         if (!localStorage.getItem('active_user_email')) {
             window.location.href = '/';
         }
     </script>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Dress Replicate â€" fotowisuda.ai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dress Replicate - fotowisuda.ai</title>
 
     <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
@@ -147,7 +147,7 @@
 
     <style>
         /* ============================================================
-           Custom Styles â€" Dress Swap Tool
+           Custom Styles ÃƒÂ¢Ã¢â€šÂ¬" Dress Swap Tool
            ============================================================ */
 
         .ratio-slider {
@@ -193,7 +193,7 @@
             box-shadow: 0 0 50px 10px rgba(157, 91, 255, 0.7) !important;
         }
 
-        /* Upload preview image styling â€" fill the portrait card completely */
+        /* Upload preview image styling ÃƒÂ¢Ã¢â€šÂ¬" fill the portrait card completely */
         .upload-preview-img {
             object-fit: cover;
             width: 100%;
@@ -294,38 +294,38 @@
             text-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
         }
 
-        /* Before-After Slideshow Animation â€" Cinema Zoom-Out Crossfade (4s cycle) */
+        /* Before-After Slideshow Animation ÃƒÂ¢Ã¢â€šÂ¬" Cinema Zoom-Out Crossfade (4s cycle) */
         @keyframes zoomOutBefore {
-            /* 0sâ€"1.5s: Stable BEFORE hold */
+            /* 0sÃƒÂ¢Ã¢â€šÂ¬"1.5s: Stable BEFORE hold */
             0%, 37.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 1.5sâ€"2.0s: Zoom-out + fade out â†' AFTER reveals */
-            /* 2.0sâ€"3.5s: Fully hidden behind AFTER */
+            /* 1.5sÃƒÂ¢Ã¢â€šÂ¬"2.0s: Zoom-out + fade out ÃƒÂ¢Ã¢â‚¬Â ' AFTER reveals */
+            /* 2.0sÃƒÂ¢Ã¢â€šÂ¬"3.5s: Fully hidden behind AFTER */
             50%, 87.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 3.5sâ€"4.0s: Zoom-in + fade in â†' BEFORE returns */
+            /* 3.5sÃƒÂ¢Ã¢â€šÂ¬"4.0s: Zoom-in + fade in ÃƒÂ¢Ã¢â‚¬Â ' BEFORE returns */
             100% {
                 opacity: 1;
                 transform: scale(1);
             }
         }
         @keyframes zoomOutAfter {
-            /* 0sâ€"1.5s: Fully hidden behind BEFORE */
+            /* 0sÃƒÂ¢Ã¢â€šÂ¬"1.5s: Fully hidden behind BEFORE */
             0%, 37.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 1.5sâ€"2.0s: Zoom-in + fade in â†' AFTER reveals */
-            /* 2.0sâ€"3.5s: Stable AFTER hold */
+            /* 1.5sÃƒÂ¢Ã¢â€šÂ¬"2.0s: Zoom-in + fade in ÃƒÂ¢Ã¢â‚¬Â ' AFTER reveals */
+            /* 2.0sÃƒÂ¢Ã¢â€šÂ¬"3.5s: Stable AFTER hold */
             50%, 87.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 3.5sâ€"4.0s: Fade out â†' BEFORE returns */
+            /* 3.5sÃƒÂ¢Ã¢â€šÂ¬"4.0s: Fade out ÃƒÂ¢Ã¢â‚¬Â ' BEFORE returns */
             100% {
                 opacity: 0;
                 transform: scale(1.25);
@@ -353,7 +353,7 @@
     <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-2 pointer-events-none"></div>
 
     <!-- ============================================================
-         TOP NAVIGATION BAR â€" Full-width, glassmorphic
+         TOP NAVIGATION BAR ÃƒÂ¢Ã¢â€šÂ¬" Full-width, glassmorphic
          ============================================================ -->
     <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
         <div class="flex items-center gap-3">
@@ -367,12 +367,12 @@
     </header>
 
     <!-- ============================================================
-         MAIN WORKSPACE â€" Centered dashboard
+         MAIN WORKSPACE ÃƒÂ¢Ã¢â€šÂ¬" Centered dashboard
          ============================================================ -->
     <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex items-start justify-center">
 
         <!-- ========================================================
-             MAIN CONFIG PANEL â€" Centered, focused dashboard layout
+             MAIN CONFIG PANEL ÃƒÂ¢Ã¢â€šÂ¬" Centered, focused dashboard layout
              ======================================================== -->
         <section class="w-full max-w-[480px] bg-surface-dim overflow-y-auto hide-scrollbar p-6 flex flex-col">
             <div class="flex-1 flex flex-col dress-ba-parent">
@@ -385,19 +385,19 @@
 
                 <hr class="border-purple-900 my-6">
                 <div id="ba-slider-container" class="relative overflow-hidden rounded-xl max-w-md mx-auto aspect-[3/4] select-none shadow-xl border-4 border-purple-500 touch-action-none my-6" style="display: block !important; visibility: visible !important; min-height: 400px; background: #111;">
-                  <!-- BEFORE IMAGE (clipped overlay — LEFT side) -->
+                  <!-- BEFORE IMAGE (clipped overlay Ã¢â‚¬â€ LEFT side) -->
                   <img src="/Image_display_dress_replicate/after_dress_rep_2.jpg" class="absolute inset-0 w-full h-full object-cover pointer-events-none" id="ba-before-img" style="display: block;" />
                   <span class="absolute top-3 left-3 bg-black/80 text-white text-xs font-bold px-2 py-1 rounded z-20">BEFORE</span>
                   <span class="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded z-20">AFTER</span>
 
-                  <!-- AFTER IMAGE OVERLAY (full background — RIGHT side) -->
+                  <!-- AFTER IMAGE OVERLAY (full background Ã¢â‚¬â€ RIGHT side) -->
                   <div id="ba-after-wrapper" class="absolute inset-0 h-full overflow-hidden z-10" style="width: 50%; left: 0;">
                     <img src="/Image_display_dress_replicate/before_dress_rep_2.jpg" class="absolute inset-0 h-full object-cover pointer-events-none" id="ba-after-img" style="width: 448px; max-width: none; height: 100%;" />
                   </div>
 
                   <!-- SLIDER HANDLE -->
                   <div id="ba-slider-handle" class="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize flex items-center justify-center z-30" style="left: 50%; transform: translateX(-50%);">
-                    <div class="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-purple-500 text-purple-600 font-bold text-sm">↔</div>
+                    <div class="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-purple-500 text-purple-600 font-bold text-sm">Ã¢â€ â€</div>
                   </div>
                 </div>
                 <hr class="border-purple-900 my-6">
@@ -437,7 +437,7 @@
                 <!-- 3. STEP 1 - THE GRADUATE -->
                 <div>
                     <div class="text-center mb-3">
-                        <p class="font-bold text-sm tracking-wide text-white">STEP 1 — THE GRADUATE</p>
+                        <p class="font-bold text-sm tracking-wide text-white">STEP 1 Ã¢â‚¬â€ THE GRADUATE</p>
                         <p class="text-xs text-slate-400 font-medium mt-1">IMAGE REFERENCE 1</p>
                     </div>
                     <div id="upload-zone-1"
@@ -463,7 +463,7 @@
                 <!-- 4. STEP 2 - BAJU KEBAYA -->
                 <div>
                     <div class="text-center mb-3">
-                        <p class="font-bold text-sm tracking-wide text-white">STEP 2 — BAJU KEBAYA</p>
+                        <p class="font-bold text-sm tracking-wide text-white">STEP 2 Ã¢â‚¬â€ BAJU KEBAYA</p>
                         <p class="text-xs text-slate-400 font-medium mt-1">IMAGE REFERENCE 2</p>
                     </div>
                     <div id="upload-zone-2"
@@ -528,16 +528,16 @@
         // CONFIGURATION
         // =====================================================
 
-        /** API base URL â€" always the same server that served this page. */
+        /** API base URL ÃƒÂ¢Ã¢â€šÂ¬" always the same server that served this page. */
         const API_BASE = window.location.origin;
 
         /**
-         * Aspect ratio â†' pixel dimensions:
-         *   1:1  â†' 2048 x 2048   (Photo Profile)
-         *   2:3  â†' 1696 x 2528   (Portrait)
-         *   4:5  â†' 1856 x 2304   (Feed IG)
-         *   9:16 â†' 1536 x 2752   (Story IG)
-         *   3:2  â†' 2528 x 1696   (Landscape)
+         * Aspect ratio ÃƒÂ¢Ã¢â‚¬Â ' pixel dimensions:
+         *   1:1  ÃƒÂ¢Ã¢â‚¬Â ' 2048 x 2048   (Photo Profile)
+         *   2:3  ÃƒÂ¢Ã¢â‚¬Â ' 1696 x 2528   (Portrait)
+         *   4:5  ÃƒÂ¢Ã¢â‚¬Â ' 1856 x 2304   (Feed IG)
+         *   9:16 ÃƒÂ¢Ã¢â‚¬Â ' 1536 x 2752   (Story IG)
+         *   3:2  ÃƒÂ¢Ã¢â‚¬Â ' 2528 x 1696   (Landscape)
          */
         const RATIO_LABELS = {
             '1:1':  'Photo Profile',
@@ -877,7 +877,7 @@
             state.isGenerating = true;
             disableGenerateButton(true);
 
-            // ── Show full-screen loading overlay ──
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Show full-screen loading overlay Ã¢â€â‚¬Ã¢â€â‚¬
             showGeneratingOverlay();
             try {
                 // --- Build FormData ---------------------------------
@@ -900,16 +900,16 @@
 
                 if (!genResp.ok) {
                     await hideGeneratingOverlay();
-                    // 402 Payment Required â€" insufficient credits
+                    // 402 Payment Required ÃƒÂ¢Ã¢â€šÂ¬" insufficient credits
                     if (genResp.status === 402) {
                         const errData = await genResp.json().catch(() => ({}));
                         showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
                         return;
                     }
-                    // 503 Service Unavailable â€" show friendly Indonesian modal, block redirect
+                    // 503 Service Unavailable ÃƒÂ¢Ã¢â€šÂ¬" show friendly Indonesian modal, block redirect
                     if (genResp.status === 503) {
                         showErrorModal503();
-                        return; // stop â€" no polling, user can retry
+                        return; // stop ÃƒÂ¢Ã¢â€šÂ¬" no polling, user can retry
                     }
                     const errData = await genResp.json().catch(() => ({}));
                     throw new Error(errData.error || `Server returned ${genResp.status}`);
@@ -995,7 +995,7 @@
 
                         updateStatus(status);
 
-                        // Handle retrying states â€" extract attempt number for user-friendly display
+                        // Handle retrying states ÃƒÂ¢Ã¢â€šÂ¬" extract attempt number for user-friendly display
                         if (status && status.startsWith('RETRYING_ATTEMPT_')) {
                             const attemptNum = status.replace('RETRYING_ATTEMPT_', '');
                             progressTarget = Math.min(15, progressTarget + 1);
@@ -1056,7 +1056,7 @@
         }
 
         // =====================================================
-        // RESULT ACTIONS â€" Download HD, Copy Prompt, Delete
+        // RESULT ACTIONS ÃƒÂ¢Ã¢â€šÂ¬" Download HD, Copy Prompt, Delete
         // =====================================================
 
         function enableResultActions() {
@@ -1325,7 +1325,7 @@
         }
 
         // =====================================================
-        // SIMULATED LOGIN SYSTEM â€" localStorage sandbox-safe
+        // SIMULATED LOGIN SYSTEM ÃƒÂ¢Ã¢â€šÂ¬" localStorage sandbox-safe
         // =====================================================
 
         var safeStorage = {
@@ -1409,7 +1409,7 @@
 
             console.log('Dress Swap Tool initialized.');
             console.log(`API base: ${API_BASE}`);
-            console.log(`Default aspect ratio: ${state.selectedRatio} â†' ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
+            console.log(`Default aspect ratio: ${state.selectedRatio} ÃƒÂ¢Ã¢â‚¬Â ' ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
         }
 
         // =====================================================
@@ -1474,9 +1474,9 @@
 <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('dress-swap');});</script>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
+<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      GENERATING LOADING OVERLAY
-     ═══════════════════════════════════════════════════════════════ -->
+     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
 <style>
     @keyframes genOverlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes genOverlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
@@ -1499,7 +1499,7 @@
         <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid rgba(157,91,255,0.12);"></div>
         <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid transparent; border-bottom-color:#9D5BFF; animation:genSpin 1.2s linear infinite reverse;"></div>
         <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-            <span style="font-size:22px;">✨</span>
+            <span style="font-size:22px;">Ã¢Å“Â¨</span>
         </div>
     </div>
     <div style="text-align:center; max-width:320px;">
@@ -1519,7 +1519,7 @@ var _genOverlayMessages = [
     'AI sedang bekerja sihirnya...',
     'Menyiapkan mahakarya Anda...',
     'Mengomposisikan pencahayaan...',
-    'Sentuhan akhir — hampir selesai!'
+    'Sentuhan akhir Ã¢â‚¬â€ hampir selesai!'
 ];
 var _genOverlayMsgIdx = 0;
 var _genOverlayMsgTimer = null;

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
+    <meta charset="UTF-8">
     <script>
         if (!localStorage.getItem('active_user_email')) {
             window.location.href = '/';
         }
     </script>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Background Change â€" fotowisuda.ai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Change - fotowisuda.ai</title>
 
     <!-- Fonts: Inter (UI), Geist (Labels/Mono), Material Symbols (Icons) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
@@ -147,7 +147,7 @@
 
     <style>
         /* ============================================================
-           Custom Styles â€" Background Swap Tool
+           Custom Styles ÃƒÂ¢Ã¢â€šÂ¬" Background Swap Tool
            ============================================================ */
 
         .ratio-slider {
@@ -268,38 +268,38 @@
             text-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
         }
 
-        /* Before-After Slideshow Animation â€" Cinema Zoom-Out Crossfade (4s cycle) */
+        /* Before-After Slideshow Animation ÃƒÂ¢Ã¢â€šÂ¬" Cinema Zoom-Out Crossfade (4s cycle) */
         @keyframes zoomOutBefore {
-            /* 0sâ€"1.5s: Stable BEFORE hold */
+            /* 0sÃƒÂ¢Ã¢â€šÂ¬"1.5s: Stable BEFORE hold */
             0%, 37.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 1.5sâ€"2.0s: Zoom-out + fade out â†' AFTER reveals */
-            /* 2.0sâ€"3.5s: Fully hidden behind AFTER */
+            /* 1.5sÃƒÂ¢Ã¢â€šÂ¬"2.0s: Zoom-out + fade out ÃƒÂ¢Ã¢â‚¬Â ' AFTER reveals */
+            /* 2.0sÃƒÂ¢Ã¢â€šÂ¬"3.5s: Fully hidden behind AFTER */
             50%, 87.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 3.5sâ€"4.0s: Zoom-in + fade in â†' BEFORE returns */
+            /* 3.5sÃƒÂ¢Ã¢â€šÂ¬"4.0s: Zoom-in + fade in ÃƒÂ¢Ã¢â‚¬Â ' BEFORE returns */
             100% {
                 opacity: 1;
                 transform: scale(1);
             }
         }
         @keyframes zoomOutAfter {
-            /* 0sâ€"1.5s: Fully hidden behind BEFORE */
+            /* 0sÃƒÂ¢Ã¢â€šÂ¬"1.5s: Fully hidden behind BEFORE */
             0%, 37.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 1.5sâ€"2.0s: Zoom-in + fade in â†' AFTER reveals */
-            /* 2.0sâ€"3.5s: Stable AFTER hold */
+            /* 1.5sÃƒÂ¢Ã¢â€šÂ¬"2.0s: Zoom-in + fade in ÃƒÂ¢Ã¢â‚¬Â ' AFTER reveals */
+            /* 2.0sÃƒÂ¢Ã¢â€šÂ¬"3.5s: Stable AFTER hold */
             50%, 87.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 3.5sâ€"4.0s: Fade out â†' BEFORE returns */
+            /* 3.5sÃƒÂ¢Ã¢â€šÂ¬"4.0s: Fade out ÃƒÂ¢Ã¢â‚¬Â ' BEFORE returns */
             100% {
                 opacity: 0;
                 transform: scale(1.25);
@@ -324,7 +324,7 @@
 <body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
 
     <!-- ============================================================
-         TOP NAVIGATION BAR â€" Full-width, glassmorphic
+         TOP NAVIGATION BAR ÃƒÂ¢Ã¢â€šÂ¬" Full-width, glassmorphic
          ============================================================ -->
     <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
         <div class="flex items-center gap-3">
@@ -340,11 +340,11 @@
     <!-- ============================================================
 
     <!-- ============================================================
-         MAIN WORKSPACE â€" Offset for sidebar + header
+         MAIN WORKSPACE ÃƒÂ¢Ã¢â€šÂ¬" Offset for sidebar + header
          ============================================================ -->
     <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] flex items-start justify-center">
         <!-- ========================================================
-             MAIN CONFIG PANEL â€" Centered, focused dashboard layout
+             MAIN CONFIG PANEL ÃƒÂ¢Ã¢â€šÂ¬" Centered, focused dashboard layout
              ======================================================== -->
         <section class="w-full max-w-[480px] bg-surface-dim overflow-y-auto hide-scrollbar p-6 flex flex-col">
             <div class="flex-1 space-y-6">
@@ -356,7 +356,7 @@
                 </header>
 
                 <!-- Before-After Comparison Slider -->
-                <!-- Animated Before-After Slideshow â€" Cinema Zoom-Out Crossfade -->
+                <!-- Animated Before-After Slideshow ÃƒÂ¢Ã¢â€šÂ¬" Cinema Zoom-Out Crossfade -->
                 <div class="aspect-[2/3] bg-slate-950 border border-slate-800/80 rounded-3xl overflow-hidden relative shadow-2xl shadow-cyan-500/5 mx-auto max-w-[280px]">
                     <!-- BEFORE image -->
                     <img src="/Image_display_background_change/before_bg_change_2.jpg"
@@ -377,7 +377,7 @@
                 <!-- STEP 1: THE GRADUATE -->
                 <div>
                     <div class="text-center mb-3">
-                        <p class="font-bold text-sm tracking-wide text-white">STEP 1 — THE GRADUATE</p>
+                        <p class="font-bold text-sm tracking-wide text-white">STEP 1 Ã¢â‚¬â€ THE GRADUATE</p>
                         <p class="text-xs text-slate-400 font-medium mt-1">IMAGE REFERENCE 1</p>
                     </div>
                     <div id="upload-zone-1"
@@ -406,7 +406,7 @@
                 <!-- STEP 2: THE BACKGROUND -->
                 <div>
                     <div class="text-center mb-3">
-                        <p class="font-bold text-sm tracking-wide text-white">STEP 2 — THE BACKGROUND</p>
+                        <p class="font-bold text-sm tracking-wide text-white">STEP 2 Ã¢â‚¬â€ THE BACKGROUND</p>
                         <p class="text-xs text-slate-400 font-medium mt-1">IMAGE REFERENCE 2</p>
                     </div>
                     <div id="upload-zone-2"
@@ -497,16 +497,16 @@
         // CONFIGURATION
         // =====================================================
 
-        /** API base URL â€" always the same server that served this page. */
+        /** API base URL ÃƒÂ¢Ã¢â€šÂ¬" always the same server that served this page. */
         const API_BASE = window.location.origin;
 
         /**
-         * Aspect ratio â†' pixel dimensions:
-         *   1:1  â†' 2048 x 2048   (Photo Profile)
-         *   2:3  â†' 1696 x 2528   (Portrait)
-         *   4:5  â†' 1856 x 2304   (Feed IG)
-         *   9:16 â†' 1536 x 2752   (Story IG)
-         *   3:2  â†' 2528 x 1696   (Landscape)
+         * Aspect ratio ÃƒÂ¢Ã¢â‚¬Â ' pixel dimensions:
+         *   1:1  ÃƒÂ¢Ã¢â‚¬Â ' 2048 x 2048   (Photo Profile)
+         *   2:3  ÃƒÂ¢Ã¢â‚¬Â ' 1696 x 2528   (Portrait)
+         *   4:5  ÃƒÂ¢Ã¢â‚¬Â ' 1856 x 2304   (Feed IG)
+         *   9:16 ÃƒÂ¢Ã¢â‚¬Â ' 1536 x 2752   (Story IG)
+         *   3:2  ÃƒÂ¢Ã¢â‚¬Â ' 2528 x 1696   (Landscape)
          */
         const RATIO_LABELS = {
             '1:1':  'Photo Profile',
@@ -816,7 +816,7 @@
             state.isGenerating = true;
             disableGenerateButton(true);
 
-            // ── Show full-screen loading overlay ──
+            // Ã¢â€â‚¬Ã¢â€â‚¬ Show full-screen loading overlay Ã¢â€â‚¬Ã¢â€â‚¬
             showGeneratingOverlay();
             try {
                 // --- Build FormData ---------------------------------
@@ -833,7 +833,7 @@
                     method: 'POST',
                     headers: { 'X-User-Email': activeEmail },
                     body: formData
-                    // NOTE: Do NOT set Content-Type â€" browser auto-sets
+                    // NOTE: Do NOT set Content-Type ÃƒÂ¢Ã¢â€šÂ¬" browser auto-sets
                     //       the multipart boundary for FormData.
                 });
                 const timerPromise = new Promise(function(r) { setTimeout(r, MIN_DISPLAY_MS); });
@@ -841,16 +841,16 @@
 
                 if (!genResp.ok) {
                     await hideGeneratingOverlay();
-                    // 402 Payment Required â€" insufficient credits
+                    // 402 Payment Required ÃƒÂ¢Ã¢â€šÂ¬" insufficient credits
                     if (genResp.status === 402) {
                         const errData = await genResp.json().catch(() => ({}));
                         showCustomAlert(errData.message || 'Kredit tidak mencukupi. Silakan isi ulang kredit Anda.');
                         return;
                     }
-                    // 503 Service Unavailable â€" show friendly Indonesian modal, block redirect
+                    // 503 Service Unavailable ÃƒÂ¢Ã¢â€šÂ¬" show friendly Indonesian modal, block redirect
                     if (genResp.status === 503) {
                         showErrorModal503();
-                        return; // stop â€" no redirect, user can retry
+                        return; // stop ÃƒÂ¢Ã¢â€šÂ¬" no redirect, user can retry
                     }
                     const errData = await genResp.json().catch(() => ({}));
                     throw new Error(errData.error || `Server returned ${genResp.status}`);
@@ -1196,7 +1196,7 @@
         }
 
         // =====================================================
-        // SIMULATED LOGIN SYSTEM â€" localStorage sandbox-safe
+        // SIMULATED LOGIN SYSTEM ÃƒÂ¢Ã¢â€šÂ¬" localStorage sandbox-safe
         // =====================================================
 
         var safeStorage = {
@@ -1280,7 +1280,7 @@
 
             console.log('Background Swap Tool initialized.');
             console.log(`API base: ${API_BASE}`);
-            console.log(`Default aspect ratio: ${state.selectedRatio} â†' ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
+            console.log(`Default aspect ratio: ${state.selectedRatio} ÃƒÂ¢Ã¢â‚¬Â ' ${state.selectedDimensions.width}x${state.selectedDimensions.height}`);
         }
 
         // =====================================================
@@ -1343,11 +1343,11 @@
 <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('swap-bg');});</script>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
+<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      GENERATING LOADING OVERLAY
      Full-screen overlay shown while AI processes the generation.
      Uses Promise.all(apiCall, minTimer) to guarantee smooth UX.
-     ═══════════════════════════════════════════════════════════════ -->
+     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
 <style>
     @keyframes genOverlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes genOverlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
@@ -1371,7 +1371,7 @@
         <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid rgba(157,91,255,0.12);"></div>
         <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid transparent; border-bottom-color:#9D5BFF; animation:genSpin 1.2s linear infinite reverse;"></div>
         <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-            <span style="font-size:22px;">✨</span>
+            <span style="font-size:22px;">Ã¢Å“Â¨</span>
         </div>
     </div>
 
@@ -1390,13 +1390,13 @@
 </div>
 
 <script>
-// ═══ Generating Overlay Controller ═══
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Generating Overlay Controller Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 var _genOverlayVisible = false;
 var _genOverlayMessages = [
     'AI sedang bekerja sihirnya...',
     'Menyiapkan mahakarya Anda...',
     'Mengomposisikan pencahayaan...',
-    'Sentuhan akhir — hampir selesai!'
+    'Sentuhan akhir Ã¢â‚¬â€ hampir selesai!'
 ];
 var _genOverlayMsgIdx = 0;
 var _genOverlayMsgTimer = null;

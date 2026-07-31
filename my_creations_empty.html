@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>My Creations — fotowisuda.ai</title>
+<title>My Creations - fotowisuda.ai</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -46,7 +46,7 @@
   .preview-nav.prev{left:16px} .preview-nav.next{right:16px}
   .preview-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(30,32,36,0.8);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .preview-counter{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(30,32,36,0.8);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
-  /* Chrome fade: UI elements only — image stays 100% opaque outside this wrapper */
+  /* Chrome fade: UI elements only â€” image stays 100% opaque outside this wrapper */
   .preview-chrome{position:absolute;inset:0;opacity:0;transition:opacity 0.3s ease;pointer-events:none;z-index:2}
   .preview-chrome.visible{opacity:1}
   /* Buttons inside chrome must be clickable when visible */
@@ -56,7 +56,7 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .spinner{width:40px;height:40px;border:3px solid #30363D;border-top-color:#9D5BFF;border-radius:50%;animation:spin 0.8s linear infinite}
 
-  /* â”€â”€ Processing Card Animations â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Processing Card Animations Ã¢â€â‚¬Ã¢â€â‚¬ */
   @keyframes shimmer{
     0%{transform:translateX(-100%)}
     100%{transform:translateX(100%)}
@@ -204,7 +204,7 @@
     </button>
     <span style="font-size:20px;font-weight:700;color:#fff;">fotowisuda.ai</span>
   </div>
-  <span style=”font-size:11px;color:#8B949E;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;” id=”user-badge”>—</span>
+  <span style=â€font-size:11px;color:#8B949E;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;â€ id=â€user-badgeâ€>â€”</span>
 </header>
 
 <!-- MAIN -->
@@ -212,7 +212,7 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
     <div>
       <h2 style="font-size:24px;font-weight:700;margin:0;">My Creations</h2>
-      <p style="color:#8B949E;font-size:13px;margin:4px 0 0 0;"><span id="gallery-count" style="color:#00D1FF;font-weight:700;">—</span> Generations stored</p>
+      <p style="color:#8B949E;font-size:13px;margin:4px 0 0 0;"><span id="gallery-count" style="color:#00D1FF;font-weight:700;">â€”</span> Generations stored</p>
     </div>
     <button onclick="loadGallery()" style="background:#161B22;border:1px solid #30363D;color:#8B949E;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;">Refresh</button>
   </div>
@@ -223,7 +223,7 @@
   <div class="grid" id="creations-grid"></div>
 </main>
 
-<!-- PREVIEW OVERLAY — carousel track for real-time swipe -->
+<!-- PREVIEW OVERLAY â€” carousel track for real-time swipe -->
 <div class="preview-overlay" id="preview-overlay" onclick="closePreview()">
   <!-- Carousel viewport: clips to one slide at a time, fills overlay -->
   <div id="preview-viewport" style="overflow:hidden;width:100%;height:100%;z-index:1;">
@@ -240,12 +240,12 @@
       </div>
     </div>
   </div>
-  <!-- Chrome: UI elements only — fades in/out independently -->
+  <!-- Chrome: UI elements only â€” fades in/out independently -->
   <div class="preview-chrome" id="preview-chrome" style="z-index:2;">
     <button class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
     <button class="preview-nav prev" onclick="event.stopPropagation();navPreview(-1)"><i class="fa-solid fa-chevron-left"></i></button>
     <button class="preview-nav next" onclick="event.stopPropagation();navPreview(1)"><i class="fa-solid fa-chevron-right"></i></button>
-    <span class="preview-counter" id="preview-counter">—</span>
+    <span class="preview-counter" id="preview-counter">â€”</span>
     <div id="preview-actions" style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:2;" onclick="event.stopPropagation()">
       <button id="preview-dl" class="btn btn-primary" onclick="event.stopPropagation();downloadCurrentPreview()"><i class="fa-solid fa-download"></i> <span id="preview-dl-text">Download</span></button>
       <button class="btn btn-outline" onclick="deleteCurrentPreview()" style="color:#ffb4ab;border-color:rgba(255,180,171,0.3);"><i class="fa-solid fa-trash-can"></i></button>
@@ -271,7 +271,7 @@
 
 <script>
 // ============================================================
-// SIMPLE, DIRECT GALLERY — no IIFE closures, no Tailwind tricks
+// SIMPLE, DIRECT GALLERY â€” no IIFE closures, no Tailwind tricks
 // ============================================================
 var _creations = [];
 var _previewIdx = -1;
@@ -385,7 +385,7 @@ async function loadGallery() {
     if (status) status.style.display = 'none';
 
     if (data.length === 0) {
-      // Clear grid — defer empty-state decision until after mergeProcessingCards()
+      // Clear grid â€” defer empty-state decision until after mergeProcessingCards()
       grid.innerHTML = '';
     } else {
       var html = '';
@@ -397,7 +397,7 @@ async function loadGallery() {
             '<div class="card-img-wrap"><img src="'+imgUrl+'" alt="'+data[i].name+'" onerror="this.parentElement.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#5c6370;font-size:40px;>?</div>\'"></div>'+
           '</div>';
         } else {
-          // PENDING / no image yet — show spinner placeholder
+          // PENDING / no image yet â€” show spinner placeholder
           html += '<div class="card" style="pointer-events:none;cursor:default;">'+
             '<div class="card-img-wrap" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0c0e12,#111318,#0c0e12);background-size:200% 200%;animation:gradientFlow 4s ease infinite;">'+
               '<div class="spinner"></div>'+
@@ -411,7 +411,7 @@ async function loadGallery() {
     if (status) { status.innerHTML = '<p style="color:#ffb4ab;">Error: '+e.message+'</p>'; status.style.display = 'block'; }
   }
 
-  // â”€â”€ Merge processing items from localStorage + URL pending param â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Merge processing items from localStorage + URL pending param Ã¢â€â‚¬Ã¢â€â‚¬
     mergeProcessingCards();
 
   // Deferred empty-state: only show if truly nothing to display
@@ -458,10 +458,10 @@ function formatTimer(ms) {
 }
 
 var _statusMessages = [
-  { atSec:0,   status:'Menganalisa struktur wajah kamu…', sub:'AI sedang mendeteksi fitur wajah dari foto referensi' },
-  { atSec:20,  status:'Menyelaraskan kebaya/toga wisuda…', sub:'Menyesuaikan pose & busana dengan latar tujuan' },
-  { atSec:60,  status:'Menata pencahayaan latar studio…', sub:'Mengomposisikan tata cahaya & bayangan natural' },
-  { atSec:120, status:'Sentuhan akhir — siap meluncur!', sub:'Merender hasil akhir dalam kualitas HD penuh' }
+  { atSec:0,   status:'Menganalisa struktur wajah kamuâ€¦', sub:'AI sedang mendeteksi fitur wajah dari foto referensi' },
+  { atSec:20,  status:'Menyelaraskan kebaya/toga wisudaâ€¦', sub:'Menyesuaikan pose & busana dengan latar tujuan' },
+  { atSec:60,  status:'Menata pencahayaan latar studioâ€¦', sub:'Mengomposisikan tata cahaya & bayangan natural' },
+  { atSec:120, status:'Sentuhan akhir â€” siap meluncur!', sub:'Merender hasil akhir dalam kualitas HD penuh' }
 ];
 
 function getStatusMessage(elapsedMs) {
@@ -483,7 +483,7 @@ function buildProcessingCardHtml(item) {
         '<span class="processing-label" id="status-'+genId+'" style="font-size:11px;color:#8B949E;text-align:center;max-width:140px;">Memproses AI...</span>'+
       '</div>'+
     '</div>'+
-    // Timer — absolutely positioned bottom-right, above the placeholder background
+    // Timer â€” absolutely positioned bottom-right, above the placeholder background
     '<div style="position:absolute;bottom:0;right:0;padding:4px 8px;z-index:2;">'+
       '<span style="font-size:10px;color:rgba(0,209,255,0.45);font-family:monospace;" id="timer-'+genId+'">00:00.00</span>'+
     '</div>'+
@@ -591,7 +591,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
     timerEl.textContent = formatTimer(baseOffsetMs);
   }
 
-  // â”€â”€ Stopwatch tick (every 100ms) â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Stopwatch tick (every 100ms) Ã¢â€â‚¬Ã¢â€â‚¬
   // Cycling status messages (every 2.5s)
   var _cycleMsgs = ['Memproses AI...', 'Menganalisa gambar...', 'Menyempurnakan detail...', 'Hampir selesai...'];
   var _cycleIdx = 0;
@@ -613,7 +613,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
     pollAttempts++;
     var elapsed = baseOffsetMs + (performance.now() - startHr);
 
-    // â”€â”€ Timeout check â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Timeout check Ã¢â€â‚¬Ã¢â€â‚¬
     if (elapsed > MAX_TIME) {
       clearTimers(generationId);
       if (statusEl) { statusEl.textContent = 'Waktu Habis'; statusEl.style.color = '#ffb4ab'; }
@@ -622,7 +622,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
       return;
     }
 
-    // â”€â”€ Stale check (5 min based on server time) â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Stale check (5 min based on server time) Ã¢â€â‚¬Ã¢â€â‚¬
     if (serverCreatedAt && (Date.now() - serverCreatedAt) > 300000) {
       clearTimers(generationId);
       if (statusEl) { statusEl.textContent = 'Gagal'; statusEl.style.color = '#fbbf24'; }
@@ -638,8 +638,8 @@ function startProcessingPoll(generationId, serverCreatedAt) {
       return;
     }
 
-    // â”€â”€ Progressive status messages â”€â”€
-    // â”€â”€ Fetch real status â”€â”€
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Progressive status messages Ã¢â€â‚¬Ã¢â€â‚¬
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Fetch real status Ã¢â€â‚¬Ã¢â€â‚¬
     var endpoint = getStatusEndpoint(generationId) + generationId;
     fetch(endpoint).then(function(r) { return r.json(); }).then(function(data) {
       var status = data.status;
@@ -658,7 +658,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
           window.history.replaceState({}, '', u.toString());
         }
 
-        // ── Single-card swap — no full grid re-render ──────────
+        // â”€â”€ Single-card swap â€” no full grid re-render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Instead of calling loadGallery() which flashes the entire grid,
         // fetch only the completed record and swap the placeholder in-place.
         cardEl.classList.add('resolving');
@@ -689,10 +689,10 @@ function startProcessingPoll(generationId, serverCreatedAt) {
                 if (statusEl) statusEl.textContent = '';
               } else if (retries < MAX_RETRIES) {
                 retries++;
-                if (statusEl) statusEl.textContent = 'Menyelaraskan… (' + retries + '/' + MAX_RETRIES + ')';
+                if (statusEl) statusEl.textContent = 'Menyelaraskanâ€¦ (' + retries + '/' + MAX_RETRIES + ')';
                 setTimeout(tryFetchAndSwap, 1500);
               } else {
-                // Exhausted retries — fall back to full loadGallery
+                // Exhausted retries â€” fall back to full loadGallery
                 if (cardEl.parentNode) cardEl.remove();
                 updateGalleryCount();
                 loadGallery();
@@ -716,7 +716,7 @@ function startProcessingPoll(generationId, serverCreatedAt) {
         setTimeout(function() { if (cardEl.parentNode) cardEl.remove(); updateGalleryCount(); }, 10000);
       }
     }).catch(function() {
-      // Network glitch — retry next interval
+      // Network glitch â€” retry next interval
     });
   }, POLL_INTERVAL);
 }
@@ -764,12 +764,12 @@ var _flipAnimating = false;  // guard against concurrent animations
 var _flipThumbImg = null;    // the img inside the source card
 var _flipRect = null;        // cached bounding rect of the source card
 
-// ── Carousel helpers ────────────────────────────────────────────
+// â”€â”€ Carousel helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Track is 300% wide. Each slide = 33.333% of track = 1 viewport.
 // translateX is % of track's OWN width, so:
 //   slide 0 (prev):  translateX(0)
-//   slide 1 (curr):  translateX(calc(-100% / 3)) ≈ -33.333%
-//   slide 2 (next):  translateX(calc(-200% / 3)) ≈ -66.667%
+//   slide 1 (curr):  translateX(calc(-100% / 3)) â‰ˆ -33.333%
+//   slide 2 (next):  translateX(calc(-200% / 3)) â‰ˆ -66.667%
 var _carouselIdx = -1;
 
 function getCenterImg() { return document.getElementById('preview-img-1'); }
@@ -814,7 +814,7 @@ function hideChrome() {
   if (chrome) chrome.classList.remove('visible');
 }
 
-// ── FLIP shared-element transition ─────────────────────────────
+// â”€â”€ FLIP shared-element transition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Captures the thumbnail's position, then animates the modal image
 // from that position to its final centered state.
 
@@ -852,7 +852,7 @@ var EASING = 'cubic-bezier(0.25, 1, 0.5, 1)';
 var DURATION_OPEN = 320;
 var DURATION_CLOSE = 250;
 
-// Open preview by item ID — resolves the current array index dynamically
+// Open preview by item ID â€” resolves the current array index dynamically
 // so that onclick handlers survive prepends/unshifts to _creations.
 function openPreviewById(id) {
   var idx = -1;
@@ -964,9 +964,9 @@ function closePreview() {
     if (vp) vp.style.opacity = '0';
     if (thumbImg) thumbImg.style.opacity = '0';
 
-    // ── Create clone wrapper with overflow:hidden ──────────────
+    // â”€â”€ Create clone wrapper with overflow:hidden â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // The wrapper provides continuous clipping as it shrinks.
-    // Inner image uses object-fit:cover → scales automatically.
+    // Inner image uses object-fit:cover â†’ scales automatically.
     var fromRect = img.getBoundingClientRect();
     var clone = document.createElement('div');
     clone.id = 'flip-clone';
@@ -1143,7 +1143,7 @@ function confirmDelete() {
       // Refresh the grid silently
       loadGallery();
     } else {
-      // Server returned non-deleted — show error
+      // Server returned non-deleted â€” show error
       alert('Gagal menghapus: Server tidak dapat menghapus kreasi ini.');
       document.getElementById('confirm-modal').classList.remove('active');
     }
@@ -1201,7 +1201,7 @@ document.addEventListener('touchmove', function(e) {
         resistance = 0.2;
       }
       var vpW = ov.offsetWidth;
-      // Convert drag px → track-relative % (track = 3× viewport, so 1 vpW = 100/3 %)
+      // Convert drag px â†’ track-relative % (track = 3Ã— viewport, so 1 vpW = 100/3 %)
       var deltaPct = (dx / vpW) * (100 / 3) * resistance;
       var basePct = -100 / 3;  // center slide position
       track.style.transform = 'translateX(' + (basePct + deltaPct).toFixed(4) + '%)';
@@ -1216,7 +1216,7 @@ document.addEventListener('touchend', function(e) {
   var dx = e.changedTouches[0].clientX - _touchX;
   var dy = e.changedTouches[0].clientY - _touchY;
 
-  // ── Vertical swipe → close preview ──
+  // â”€â”€ Vertical swipe â†’ close preview â”€â”€
   if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
     closePreview();
     _touchDragging = false;
@@ -1228,7 +1228,7 @@ document.addEventListener('touchend', function(e) {
 
   if (_touchDragging && Math.abs(dx) > SWIPE_THRESHOLD) {
     if ((dir < 0 && _previewIdx <= 0) || (dir > 0 && _previewIdx >= _creations.length - 1)) {
-      // At boundary — spring back
+      // At boundary â€” spring back
       if (track) {
         track.style.transition = 'transform 0.25s ease';
         track.style.transform = 'translateX(' + trackCenter() + ')';
@@ -1249,7 +1249,7 @@ document.addEventListener('touchend', function(e) {
       }, 200);
     }
   } else if (_touchDragging) {
-    // Small drag — spring back to center
+    // Small drag â€” spring back to center
     if (track) {
       track.style.transition = 'transform 0.25s ease';
       track.style.transform = 'translateX(' + trackCenter() + ')';
@@ -1258,7 +1258,7 @@ document.addEventListener('touchend', function(e) {
   _touchDragging = false;
 });
 
-// ── Wheel → close preview (desktop scroll-to-close) ──
+// â”€â”€ Wheel â†’ close preview (desktop scroll-to-close) â”€â”€
 document.addEventListener('wheel', function(e) {
   var ov = document.getElementById('preview-overlay');
   if (!ov || ov.style.display !== 'flex') return;

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>System Prompt — fotowisuda.ai Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Prompt - fotowisuda.ai Admin</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -112,26 +112,26 @@
                 <div>
                     <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-code text-purple-400 text-xs"></i>
-                        System Prompt — Background Change
+                        System Prompt Ã¢â‚¬â€ Background Change
                     </label>
                     <textarea id="prompt-bg-change"
                               rows="14"
                               class="w-full bg-surface-card border border-border-subtle rounded-xl p-5 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 resize-y transition-all font-mono leading-relaxed"
                               placeholder="Loading system prompt..."></textarea>
-                    <p class="text-[10px] text-slate-600 mt-1.5">Used by <code class="text-cyan-400/80">generatePromptsWithGemini()</code> — the Background Change pipeline (Graduate Subject + Target Background).</p>
+                    <p class="text-[10px] text-slate-600 mt-1.5">Used by <code class="text-cyan-400/80">generatePromptsWithGemini()</code> Ã¢â‚¬â€ the Background Change pipeline (Graduate Subject + Target Background).</p>
                 </div>
 
                 <!-- Textarea 2: Dress Replicate -->
                 <div>
                     <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-code text-amber-400 text-xs"></i>
-                        System Prompt — Dress Replicate
+                        System Prompt Ã¢â‚¬â€ Dress Replicate
                     </label>
                     <textarea id="prompt-dress-replicate"
                               rows="14"
                               class="w-full bg-surface-card border border-border-subtle rounded-xl p-5 text-sm text-text-primary placeholder:text-slate-600 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/20 resize-y transition-all font-mono leading-relaxed"
                               placeholder="Loading system prompt..."></textarea>
-                    <p class="text-[10px] text-slate-600 mt-1.5">Used by <code class="text-cyan-400/80">generateDressSwapPromptsWithGemini()</code> — the Dress Replicate pipeline (Base Identity + Target Fashion).</p>
+                    <p class="text-[10px] text-slate-600 mt-1.5">Used by <code class="text-cyan-400/80">generateDressSwapPromptsWithGemini()</code> Ã¢â‚¬â€ the Dress Replicate pipeline (Base Identity + Target Fashion).</p>
                 </div>
 
                 <!-- Action Buttons -->
@@ -232,7 +232,7 @@
 
             // Lock button
             saveBtn.disabled = true;
-            saveBtnText.innerHTML = '<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Menyimpan…';
+            saveBtnText.innerHTML = '<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> MenyimpanÃ¢â‚¬Â¦';
 
             try {
                 const resp = await fetch(API_BASE + '/api/admin/system-prompts', {

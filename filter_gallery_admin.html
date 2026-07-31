@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Filter Gallery — fotowisuda.ai</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Gallery - fotowisuda.ai</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Geist:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -202,7 +202,7 @@
 
 
     <!-- ============================================================
-         MODAL — Execution Panel
+         MODAL Ã¢â‚¬â€ Execution Panel
          ============================================================ -->
     <div id="execution-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
         <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
@@ -216,7 +216,7 @@
                 </button>
             </div>
 
-            <!-- Filter Cover Preview — Before/After -->
+            <!-- Filter Cover Preview Ã¢â‚¬â€ Before/After -->
             <div class="mb-6">
                 <p class="text-[10px] uppercase tracking-widest text-text-secondary mb-2">Filter Cover Preview</p>
                 <div class="-mx-8 grid grid-cols-2 gap-2.5">
@@ -324,7 +324,7 @@
                 return record.width + ' x ' + record.height + ' px';
             }
             var d = (record.dimensions || '');
-            var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
+            var pxMatch = d.match(/^(\d+)\s*[xÃƒâ€”]\s*(\d+)/i);
             if (pxMatch) {
                 return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
             }
@@ -363,7 +363,7 @@
         };
 
         // =====================================================
-        // LOCALSTORAGE — read visibility from admin toggles
+        // LOCALSTORAGE Ã¢â‚¬â€ read visibility from admin toggles
         // =====================================================
 
         function getActiveFilters() {
@@ -382,7 +382,7 @@
         }
 
         // =====================================================
-        // VISIBILITY TOGGLES — admin ON/OFF switches
+        // VISIBILITY TOGGLES Ã¢â‚¬â€ admin ON/OFF switches
         // =====================================================
 
         function getVisibilityStates() {
@@ -424,7 +424,7 @@
         }
 
         // =====================================================
-        // DELETE HANDLER — confirmation modal + localStorage + server
+        // DELETE HANDLER Ã¢â‚¬â€ confirmation modal + localStorage + server
         // =====================================================
 
         let pendingDeleteId = null;
@@ -516,7 +516,7 @@
             }
         }
 
-        // ── Toggle isActive via admin API ──
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Toggle isActive via admin API Ã¢â€â‚¬Ã¢â€â‚¬
         // Sends credentials so the admin session cookie is attached even after
         // a server restart rotates ADMIN_SESSION_SECRET.  On 401 the admin is
         // redirected to re-login so the cookie and secret are aligned again.
@@ -528,7 +528,7 @@
                 });
                 const data = await resp.json();
 
-                // ── Session expired → redirect to login ──
+                // Ã¢â€â‚¬Ã¢â€â‚¬ Session expired Ã¢â€ â€™ redirect to login Ã¢â€â‚¬Ã¢â€â‚¬
                 if (resp.status === 401) {
                     alert('Sesi admin telah berakhir (server restart atau timeout). Silakan login ulang.');
                     window.location.href = '/admin-login';
@@ -541,7 +541,7 @@
                     return;
                 }
                 if (data.success) {
-                    console.log('[Toggle] ' + filterId + ' → isActive=' + data.isActive);
+                    console.log('[Toggle] ' + filterId + ' Ã¢â€ â€™ isActive=' + data.isActive);
                     // Also clear any stale localStorage entry that could block the public gallery
                     try {
                         var states = JSON.parse(localStorage.getItem('filter_visibility_states') || '{}');
@@ -563,7 +563,7 @@
             }
         }
 
-        // ── Delete confirmation (wraps existing modal) ──
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Delete confirmation (wraps existing modal) Ã¢â€â‚¬Ã¢â€â‚¬
         function confirmDeleteFilter(filterId) {
             showDeleteConfirm(filterId);
         }
@@ -571,8 +571,8 @@
         window.toggleFilterActive = toggleFilterActive;
         window.confirmDeleteFilter = confirmDeleteFilter;
 
-        // ── Admin Testing Sandbox: Eye icon opens the full execution modal directly ──
-        // openModal(record) is shared with the public filter gallery — it renders the
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Admin Testing Sandbox: Eye icon opens the full execution modal directly Ã¢â€â‚¬Ã¢â€â‚¬
+        // openModal(record) is shared with the public filter gallery Ã¢â‚¬â€ it renders the
         // Before/After preview, upload zone, aspect ratio, and Generate button.
         // Admin generations hit /api/admin-gallery-filter/swap (no credit deduction).
 
@@ -621,7 +621,7 @@
                 clearTimeout(timeoutId);
 
                 console.log('[Admin] API response status:', resp.status);
-                if (!resp.ok) throw new Error('Failed to load images — status ' + resp.status);
+                if (!resp.ok) throw new Error('Failed to load images Ã¢â‚¬â€ status ' + resp.status);
                 const data = await resp.json();
                 state.records = data.records || [];
                 console.log('[Admin] Records loaded:', state.records.length);
@@ -676,7 +676,7 @@
                     if (listBody) listBody.appendChild(row);
 
                     // Wire preview click handlers via addEventListener (IIFE-safe)
-                    // → opens the full execution modal for admin testing (no credit deduction)
+                    // Ã¢â€ â€™ opens the full execution modal for admin testing (no credit deduction)
                     row.querySelectorAll('.preview-trigger').forEach(function(el) {
                         el.addEventListener('click', function(e) {
                             e.stopPropagation();
@@ -706,7 +706,7 @@
         }
 
         // =====================================================
-        // FILTER PILLS LOGIC — category + lighting
+        // FILTER PILLS LOGIC Ã¢â‚¬â€ category + lighting
         // =====================================================
 
         const filterState = { category: 'all', lighting: '' };
@@ -796,7 +796,7 @@
                     deactivateAllButton();
 
                     if (filterState.category === clickedFilter) {
-                        // Toggle OFF — deselect, fall back to "all"
+                        // Toggle OFF Ã¢â‚¬â€ deselect, fall back to "all"
                         filterState.category = 'all';
                         deactivateAllCategoryPills();
                         checkAutoActivateAll();
@@ -851,7 +851,7 @@
                 modalTitle.textContent = record.title || 'Background Filter';
             }
 
-            // AFTER — filter cover preview (may be Cloudinary URL or local path)
+            // AFTER Ã¢â‚¬â€ filter cover preview (may be Cloudinary URL or local path)
             const coverPreview = document.getElementById('modal-cover-preview');
             const coverPlaceholder = document.getElementById('modal-cover-placeholder');
             const coverUrl = record.cover_image_path || record.image_url;
@@ -873,7 +873,7 @@
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
             }
 
-            // BEFORE — reference image from Cloudinary (survives redeploys) with local-path fallback.
+            // BEFORE Ã¢â‚¬â€ reference image from Cloudinary (survives redeploys) with local-path fallback.
             // reference_image_1_url is the Cloudinary URL; reference_image_1_path is the legacy
             // local path that may have been wiped by a redeploy.
             const beforePreview = document.getElementById('modal-before-preview');
@@ -1059,7 +1059,7 @@
                         console.warn('[Admin] Local save failed (non-fatal, continuing):', saveErr.message);
                     }
 
-                    // Redirect strictly to admin-creations — NEVER to /gallery
+                    // Redirect strictly to admin-creations Ã¢â‚¬â€ NEVER to /gallery
                     window.location.href = `/admin-creations?pending=${encodeURIComponent(jobId)}`;
                     return;
                 }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Kelola Pengguna — fotowisuda.ai</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pengguna - fotowisuda.ai</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
@@ -202,19 +202,19 @@
         <div class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5">
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Pengguna</p>
-                <p id="stat-total-users" class="text-2xl font-extrabold text-white">—</p>
+                <p id="stat-total-users" class="text-2xl font-extrabold text-white">Ã¢â‚¬â€</p>
             </div>
             <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5">
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Pengguna Aktif</p>
-                <p id="stat-active-users" class="text-2xl font-extrabold text-emerald-400">—</p>
+                <p id="stat-active-users" class="text-2xl font-extrabold text-emerald-400">Ã¢â‚¬â€</p>
             </div>
             <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5">
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Pembelian</p>
-                <p id="stat-total-purchases" class="text-2xl font-extrabold text-cyan-400">—</p>
+                <p id="stat-total-purchases" class="text-2xl font-extrabold text-cyan-400">Ã¢â‚¬â€</p>
             </div>
             <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5">
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Omset</p>
-                <p id="stat-total-revenue" class="text-2xl font-extrabold text-amber-400">—</p>
+                <p id="stat-total-revenue" class="text-2xl font-extrabold text-amber-400">Ã¢â‚¬â€</p>
             </div>
         </div>
 
@@ -305,7 +305,7 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-white">Gift Credit</h3>
-                        <p id="gift-target-email" class="text-xs text-slate-400">—</p>
+                        <p id="gift-target-email" class="text-xs text-slate-400">Ã¢â‚¬â€</p>
                     </div>
                 </div>
                 <button onclick="closeGiftModal()" class="text-slate-500 hover:text-white transition-colors text-xl leading-none">&times;</button>
@@ -432,9 +432,9 @@
         }
 
         function formatDate(dateStr) {
-            if (!dateStr) return '—';
+            if (!dateStr) return 'Ã¢â‚¬â€';
             var d = new Date(dateStr);
-            if (isNaN(d.getTime())) return '—';
+            if (isNaN(d.getTime())) return 'Ã¢â‚¬â€';
             return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
@@ -539,7 +539,7 @@
                             '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600/50 flex items-center justify-center text-[10px] font-bold text-slate-400 shrink-0">' +
                                 (u.email ? u.email.substring(0, 2).toUpperCase() : '??') +
                             '</div>' +
-                            '<span class="text-sm font-medium text-white truncate max-w-[200px]" title="' + escapeHtml(u.email || '') + '">' + escapeHtml(u.email || '—') + '</span>' +
+                            '<span class="text-sm font-medium text-white truncate max-w-[200px]" title="' + escapeHtml(u.email || '') + '">' + escapeHtml(u.email || 'Ã¢â‚¬â€') + '</span>' +
                         '</div>' +
                     '</td>' +
                     // Registration date
