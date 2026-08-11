@@ -857,23 +857,43 @@
         window.handleProtectedNavigation = function(event, url) {
             event.preventDefault();
 
-            var activeEmail = safeStorage.getItem('active_user_email');
-            var isGuest = !activeEmail;
+            // Check if the user is a guest (profile section is hidden or doesn't exist)
+            const profileSection = document.getElementById('user-profile-section');
+            const isGuest = !profileSection || profileSection.classList.contains('hidden');
 
             if (isGuest) {
-                // User is not logged in — trigger Google Sign-In
-                if (typeof triggerGoogleSignIn === 'function') {
-                    triggerGoogleSignIn();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else if (window._openLogin && typeof window._openLogin === 'function') {
-                    window._openLogin();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Find the "Profile" menu link in the sidebar dynamically
+                const profileLink = Array.from(document.querySelectorAll('aside a')).find(a =>
+                    a.textContent.trim().toLowerCase() === 'profile' ||
+                    a.href.includes('profile')
+                );
+
+                if (profileLink && profileLink.getAttribute('href') && profileLink.getAttribute('href') !== '#') {
+                    // Redirect to the dedicated Profile page
+                    window.location.href = profileLink.getAttribute('href');
                 } else {
-                    // Last resort — redirect to profile page
-                    window.location.href = '/profile';
+                    // Fallback: If no dedicated profile page URL is found, default to '/profile'
+                    // or trigger the sidebar login button if the profile is managed inside the sidebar.
+                    const loginBtn = document.getElementById('btn-google-login');
+                    if (loginBtn) {
+                        // Open sidebar on mobile
+                        const sidebar = document.querySelector('aside');
+                        const overlay = document.getElementById('sidebar-overlay');
+                        if (sidebar && sidebar.classList.contains('-translate-x-full')) {
+                            sidebar.classList.remove('-translate-x-full');
+                            sidebar.classList.add('translate-x-0');
+                            if (overlay) overlay.classList.remove('hidden');
+                        }
+                        // Highlight and scroll to the login button
+                        loginBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        loginBtn.classList.add('ring-2', 'ring-cyan-500', 'animate-pulse');
+                        setTimeout(() => loginBtn.classList.remove('ring-2', 'ring-cyan-500', 'animate-pulse'), 2000);
+                    } else {
+                        window.location.href = '/profile';
+                    }
                 }
             } else {
-                // User is logged in — redirect safely
+                // User is logged in, redirect successfully to the destination
                 window.location.href = url;
             }
         };
