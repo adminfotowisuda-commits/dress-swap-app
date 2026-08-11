@@ -200,10 +200,10 @@
             <div class="mb-6">
                 <div class="text-center mb-3">
                     <p class="font-bold text-sm tracking-wide text-white">THE GRADUATE</p>
-                    <p class="text-xs text-slate-400 font-medium mt-1">Image Reference 1</p>
+                    <p class="text-xs text-slate-400 font-medium mt-1">Image Reference</p>
                 </div>
                 <div id="modal-upload-zone"
-                     class="border-2 border-dashed border-border-subtle rounded-2xl p-8 flex flex-col items-center justify-center gap-3 group hover:border-electric-cyan/50 transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden min-h-[140px]"
+                     class="border-2 border-dashed border-border-subtle rounded-2xl p-4 flex flex-col items-center justify-center gap-3 group hover:border-electric-cyan/50 transition-all cursor-pointer bg-surface-card/50 relative overflow-hidden w-full max-w-[240px] mx-auto aspect-[4/5]"
                      onclick="document.getElementById('modal-file-input').click()">
                     <div id="modal-upload-placeholder" class="flex flex-col items-center gap-2">
                         <span class="material-symbols-outlined text-3xl text-text-secondary group-hover:text-electric-cyan transition-colors">upload_file</span>
@@ -212,7 +212,7 @@
                             <p class="text-text-secondary text-xs">PNG, JPG or WEBP (Max. 10MB)</p>
                         </div>
                     </div>
-                    <img id="modal-upload-preview" class="upload-preview-img absolute inset-0 hidden" alt="Subject preview" />
+                    <img id="modal-upload-preview" class="absolute inset-0 hidden w-full h-full object-cover object-top" alt="Subject preview" />
                     <button id="modal-upload-remove"
                             class="absolute top-3 right-3 p-1.5 bg-surface-background/90 rounded-full hidden z-10 hover:bg-error-container transition-colors"
                             onclick="event.stopPropagation(); removeModalSubject()" title="Remove">
@@ -773,7 +773,7 @@
                         window._selectedFile = subjectFile;
                         console.log('[FilterGallery] RECOVERED file from DOM input:', subjectFile.name);
                     } else {
-                        showCustomAlert('Silakan unggah foto <strong>THE GRADUATE (Image Reference 1)</strong> terlebih dahulu sebelum memproses.', 'Unggah Foto');
+                        showCustomAlert('Silakan unggah foto <strong>THE GRADUATE (Image Reference)</strong> terlebih dahulu sebelum memproses.', 'Unggah Foto');
                         return;
                     }
                 }
