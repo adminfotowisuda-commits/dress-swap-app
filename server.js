@@ -391,6 +391,7 @@ app.use(express.static(__dirname, {
 // Also serve /public/uploads explicitly so thumbnails + refs are reachable
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 // Serve localized Before-After demo images for the comparison sliders
+app.use('/image_display', express.static(path.join(__dirname, 'image_display')));
 app.use('/Image_display_background_change', express.static(path.join(__dirname, 'Image_display_background_change')));
 app.use('/Image_display_dress_replicate', express.static(path.join(__dirname, 'Image_display_dress_replicate')));
 // Serve user-generated images from the local file‑system store
