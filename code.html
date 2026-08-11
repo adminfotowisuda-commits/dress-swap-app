@@ -458,6 +458,14 @@
                 <!-- Responsive grid container for 14 before-after pairs -->
                 <div id="showcase-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 </div>
+
+                <!-- CTA Button below showcase grid -->
+                <div class="w-full flex justify-center mt-10">
+                    <a href="#" onclick="handleProtectedNavigation(event, '/filter-gallery')" class="flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-lg border border-slate-700 hover:border-cyan-500/50 no-underline">
+                        <span>Eksplor Filter Gallery</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
 
             <!-- ════════════════════════════════════════════════════
@@ -845,6 +853,19 @@
             renderAuthContainer();
         }
 
+        // ═══ Protected Navigation — Gate showcase links behind login ═══
+        window.handleProtectedNavigation = function(event, url) {
+            event.preventDefault();
+            var activeEmail = safeStorage.getItem('active_user_email');
+            if (!activeEmail) {
+                // Guest — trigger Google Sign-In
+                triggerGoogleSignIn();
+            } else {
+                // Logged in — proceed to destination
+                window.location.href = url;
+            }
+        };
+
         // ═══ Showcase Grid — Render 14 before-after pairs ═══
         function renderShowcase() {
             var grid = document.getElementById('showcase-grid');
@@ -855,7 +876,7 @@
                 var beforeSrc = '/image_display/sample_image_filter_gallery/' + i + '_before.jpg';
                 var afterSrc  = '/image_display/sample_image_filter_gallery/' + i + '_after.jpg';
 
-                html += '<a href="/filter-gallery" class="flex w-full rounded-2xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300 border border-slate-800 hover:border-cyan-500/50 cursor-pointer shadow-lg bg-slate-900">' +
+                html += '<a href="#" onclick="handleProtectedNavigation(event, \'/filter-gallery\')" class="flex w-full rounded-2xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300 border border-slate-800 hover:border-cyan-500/50 cursor-pointer shadow-lg bg-slate-900">' +
                     '<!-- LEFT SIDE (BEFORE) - 4:5 Aspect Ratio -->' +
                     '<div class="w-1/2 aspect-[4/5] relative">' +
                         '<img src="' + beforeSrc + '" alt="Before ' + i + '" class="w-full h-full object-cover" loading="lazy" />' +
