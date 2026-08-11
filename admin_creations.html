@@ -114,7 +114,7 @@
                 <div>
                     <h2 class="admin-glowing-title text-3xl md:text-4xl tracking-tight leading-tight mb-2">Admin Creations</h2>
                     <div class="flex items-center gap-2 text-text-secondary font-label-md">
-                        <span id="creations-count" class="text-purple-400 font-bold">Ã¢â‚¬â€</span>
+                        <span id="creations-count" class="text-purple-400 font-bold">—</span>
                         <span>Admin Generations stored</span>
                     </div>
                 </div>
@@ -167,10 +167,10 @@
                     <p id="detail-prompt" class="text-sm text-text-secondary mt-1 line-clamp-3"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-xs">
-                    <div class="flex justify-between"><span class="text-slate-500">Dimensions</span><span id="detail-dims" class="text-white font-semibold">Ã¢â‚¬â€</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Ratio</span><span id="detail-ratio" class="text-white font-semibold">Ã¢â‚¬â€</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Tags</span><span id="detail-tags" class="text-purple-400 font-semibold">Ã¢â‚¬â€</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Created</span><span id="detail-date" class="text-white font-semibold">Ã¢â‚¬â€</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Dimensions</span><span id="detail-dims" class="text-white font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Ratio</span><span id="detail-ratio" class="text-white font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Tags</span><span id="detail-tags" class="text-purple-400 font-semibold">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Created</span><span id="detail-date" class="text-white font-semibold">—</span></div>
                 </div>
                 <div class="flex gap-3 pt-2">
                     <button id="detail-download-btn" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold py-2.5 px-4 rounded-xl transition-all text-xs tracking-wider uppercase flex items-center justify-center gap-2">
@@ -225,7 +225,7 @@
                 return record.width + ' x ' + record.height + ' px';
             }
             var d = (record.dimensions || '');
-            var pxMatch = d.match(/^(\d+)\s*[xÃƒâ€”]\s*(\d+)/i);
+            var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
             if (pxMatch) {
                 return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
             }
@@ -242,7 +242,7 @@
         let currentDetailRecord = null;
 
         // ---- PROCESSING STATE ----
-        var processingItems = {};   // genId Ã¢â€ â€™ { id, title, cardEl, statusEl, spinnerEl, logTimer }
+        var processingItems = {};   // genId → { id, title, cardEl, statusEl, spinnerEl, logTimer }
         var adminLogTexts = [
             'Analyzing subject photo details...',
             'Applying selected graduation backdrop...',
@@ -319,7 +319,7 @@
                             fItem.cardEl.classList.remove('border-purple-500/20', 'animate-pulse');
                             fItem.cardEl.classList.add('border-rose-500/30', 'opacity-60');
                             var logEl = fItem.cardEl.querySelector('.admin-proc-log-' + genId);
-                            if (logEl) { logEl.textContent = 'Gagal Ã¢â‚¬â€ Silakan coba lagi'; logEl.classList.add('text-rose-400'); }
+                            if (logEl) { logEl.textContent = 'Gagal — Silakan coba lagi'; logEl.classList.add('text-rose-400'); }
                             var spinEl = fItem.cardEl.querySelector('.fa-circle-notch');
                             if (spinEl) { spinEl.classList.remove('animate-spin', 'text-purple-400'); spinEl.classList.add('text-rose-400', 'fa-circle-xmark'); }
                         }
@@ -349,7 +349,7 @@
                     if (tItem && tItem.cardEl) {
                         tItem.cardEl.classList.add('opacity-50');
                         var tLogEl = tItem.cardEl.querySelector('.admin-proc-log-' + genId);
-                        if (tLogEl) tLogEl.textContent = 'Waktu habis Ã¢â‚¬â€ Refresh halaman';
+                        if (tLogEl) tLogEl.textContent = 'Waktu habis — Refresh halaman';
                     }
                 }
             }, 2000);
@@ -409,12 +409,12 @@
                 console.warn('[AdminCreations] Server fetch failed (non-fatal):', err.message);
             }
 
-            // Merge: server records take priority (skip processing placeholders Ã¢â‚¬â€
+            // Merge: server records take priority (skip processing placeholders —
             // those are rendered as spinner cards, not as blank "No Preview" cards)
             serverCreations.forEach(function(sr) {
                 const id = sr.generation_id;
                 if (!id) return;
-                // Skip processing records Ã¢â‚¬â€ they have no image and would render as phantom cards
+                // Skip processing records — they have no image and would render as phantom cards
                 if (sr.status === 'processing' || sr.status === 'PENDING') return;
                 seen.set(id, sr);
             });
@@ -452,7 +452,7 @@
                     var agData = await agResp.json();
 
                     (agData.active || []).forEach(function(ag) {
-                        // Server now provides isAdmin/isPublic flags Ã¢â‚¬â€ only process admin jobs
+                        // Server now provides isAdmin/isPublic flags — only process admin jobs
                         if (ag.isPublic === true) return;
                         if (ag.type && (ag.type === 'filter-factory' || ag.type === 'filter-swap')) {
                             var alreadyThere = localProcessing.some(function(p) { return (p.id || p.generation_id) === ag.generationId; });
@@ -544,14 +544,14 @@
                 </div>
             `;
 
-            // Card body click Ã¢â€ â€™ open detail modal
+            // Card body click → open detail modal
             card.addEventListener('click', function(e) {
                 // Ignore clicks on the delete button (handled separately)
                 if (e.target.closest('.admin-card-delete-btn')) return;
                 openDetailModal(record);
             });
 
-            // Delete button click Ã¢â€ â€™ show confirmation
+            // Delete button click → show confirmation
             var deleteBtn = card.querySelector('.admin-card-delete-btn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', function(e) {
@@ -587,10 +587,10 @@
             document.getElementById('detail-prompt').textContent = record.prompt || '';
             document.getElementById('detail-dims').textContent = formatDimensions(record);
             document.getElementById('detail-ratio').textContent = record.ratio || 'N/A';
-            document.getElementById('detail-tags').textContent = Array.isArray(record.tags) ? record.tags.join(' Ã‚Â· ') : 'Ã¢â‚¬â€';
+            document.getElementById('detail-tags').textContent = Array.isArray(record.tags) ? record.tags.join(' · ') : '—';
             document.getElementById('detail-date').textContent = record.created_at
                 ? new Date(record.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })
-                : 'Ã¢â‚¬â€';
+                : '—';
 
             // Wire download
             var downloadBtn = document.getElementById('detail-download-btn');
@@ -725,7 +725,7 @@
                     if (grid) grid.classList.add('hidden');
                 }
 
-                console.log('[AdminCreations] UI synced Ã¢â‚¬â€ ' + allCreations.length + ' creations remaining.');
+                console.log('[AdminCreations] UI synced — ' + allCreations.length + ' creations remaining.');
             }, 260); // slightly longer than the 250ms CSS animation
         }
 

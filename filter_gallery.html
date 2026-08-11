@@ -157,7 +157,7 @@
     </main>
 
     <!-- ============================================================
-         MODAL ÃƒÂ¢Ã¢â€šÂ¬" Execution Panel
+         MODAL — Execution Panel
          ============================================================ -->
     <div id="execution-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
         <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
@@ -171,7 +171,7 @@
                 </button>
             </div>
 
-            <!-- Filter Cover Preview ÃƒÂ¢Ã¢â€šÂ¬" Before/After -->
+            <!-- Filter Cover Preview — Before/After -->
             <div class="mb-6">
                 <p class="text-[10px] uppercase tracking-widest text-text-secondary mb-2">Filter Cover Preview</p>
                 <div class="-mx-8 grid grid-cols-2 gap-2.5">
@@ -280,7 +280,7 @@
                 return record.width + ' x ' + record.height + ' px';
             }
             var dims = (record.dimensions || '');
-            var pxMatch = dims.match(/^(\d+)\s*[xÃƒâ€”]\s*(\d+)/i);
+            var pxMatch = dims.match(/^(\d+)\s*[x×]\s*(\d+)/i);
             if (pxMatch) {
                 return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
             }
@@ -339,7 +339,7 @@
                 clearTimeout(timeoutId);
 
                 console.log('[Gallery] API response status:', resp.status);
-                if (!resp.ok) throw new Error('Failed to load images ÃƒÂ¢Ã¢â€šÂ¬" status ' + resp.status);
+                if (!resp.ok) throw new Error('Failed to load images — status ' + resp.status);
                 const data = await resp.json();
                 state.records = data.records || [];
                 console.log('[Gallery] Records loaded:', state.records.length);
@@ -347,7 +347,7 @@
                 if (loading) loading.classList.add('hidden');
 
                 if (state.records.length === 0) {
-                    console.log('[Gallery] No records ÃƒÂ¢Ã¢â€šÂ¬" showing empty state');
+                    console.log('[Gallery] No records — showing empty state');
                     if (empty) empty.classList.remove('hidden');
                     return;
                 }
@@ -357,7 +357,7 @@
                 state.records.forEach((record, index) => {
                     const filterId = record.generation_id || `filter-${index}`;
 
-                    // Server already filters by isActive: { $ne: false } Ã¢â‚¬â€ no
+                    // Server already filters by isActive: { $ne: false } — no
                     // client-side localStorage gate needed.  (The legacy
                     // filter_visibility_states localStorage check was removed
                     // because stale entries would hide toggled-on filters.)
@@ -401,7 +401,7 @@
                         </div>
                     `;
 
-                    // Click ÃƒÂ¢Ã¢â‚¬Â ' open execution modal (same as admin)
+                    // Click → open execution modal (same as admin)
                     card.addEventListener('click', () => openModal(record));
 
                     if (grid) grid.appendChild(card);
@@ -432,7 +432,7 @@
         }
 
         // =====================================================
-        // FILTER PILLS LOGIC ÃƒÂ¢Ã¢â€šÂ¬" category + lighting
+        // FILTER PILLS LOGIC — category + lighting
         // =====================================================
 
         const filterState = { category: 'all', lighting: '' };
@@ -515,11 +515,11 @@
                         return;
                     }
 
-                    // Non-"All" category pill ÃƒÂ¢Ã¢â‚¬Â ' deactivate "All"
+                    // Non-"All" category pill → deactivate "All"
                     deactivateAllButton();
 
                     if (filterState.category === clickedFilter) {
-                        // Toggle OFF ÃƒÂ¢Ã¢â€šÂ¬" deselect, fall back to "all"
+                        // Toggle OFF — deselect, fall back to "all"
                         filterState.category = 'all';
                         deactivateAllCategoryPills();
                         checkAutoActivateAll();
@@ -574,7 +574,7 @@
                 modalTitle.textContent = record.title || 'Background Filter';
             }
 
-            // AFTER Ã¢â‚¬â€ filter cover preview (may be Cloudinary URL or local relative path)
+            // AFTER — filter cover preview (may be Cloudinary URL or local relative path)
             const coverPreview = document.getElementById('modal-cover-preview');
             const coverPlaceholder = document.getElementById('modal-cover-placeholder');
             const coverUrl = record.cover_image_path || record.image_url;
@@ -597,7 +597,7 @@
                 if (coverPlaceholder) coverPlaceholder.classList.remove('hidden');
             }
 
-            // BEFORE Ã¢â‚¬â€ reference image from Cloudinary (survives redeploys) with local-path fallback.
+            // BEFORE — reference image from Cloudinary (survives redeploys) with local-path fallback.
             // Cloudinary URLs are permanent; local paths (reference_image_*_path) may have been
             // wiped by a redeploy, causing the blank placeholder bug.
             const beforePreview = document.getElementById('modal-before-preview');
@@ -613,7 +613,7 @@
                 }
                 // Set onerror BEFORE src to avoid race condition on immediate 404
                 beforePreview.onerror = function() {
-                    // Image failed to load Ã¢â‚¬â€ fall back to placeholder silently
+                    // Image failed to load — fall back to placeholder silently
                     beforePreview.classList.add('hidden');
                     beforePreview.src = '';
                     if (beforePlaceholder) beforePlaceholder.classList.remove('hidden');
@@ -654,7 +654,7 @@
         }
 
         window.handleModalFileSelect = function(event) {
-            // event.target may be the <input> or could bubble Ã¢â‚¬â€ defensively get files
+            // event.target may be the <input> or could bubble — defensively get files
             var input = event.target;
             var file = (input.files && input.files[0]) || null;
             if (!file) { console.warn('[FilterGallery] handleModalFileSelect: no file found on event.target'); return; }
@@ -750,7 +750,7 @@
                     return;
                 }
 
-                // Ã¢â€â‚¬Ã¢â€â‚¬ Resolve the subject file from EVERY possible source Ã¢â€â‚¬Ã¢â€â‚¬
+                // ── Resolve the subject file from EVERY possible source ──
                 // window._selectedFile is set by handleModalFileSelect (in addition to state.modalSubjectFile).
                 // Use it as the primary reference so a scoping bug in `state` can't lose the file.
                 var subjectFile = window._selectedFile || state.modalSubjectFile || null;
@@ -764,7 +764,7 @@
 
                 if (!state.selectedRecord) { showCustomAlert('Silakan pilih background terlebih dahulu.', 'Pilih Background'); return; }
                 if (!subjectFile) {
-                    console.error('[FilterGallery] BLOCKED: subjectFile is NULL Ã¢â‚¬â€ both window._selectedFile and state.modalSubjectFile are empty');
+                    console.error('[FilterGallery] BLOCKED: subjectFile is NULL — both window._selectedFile and state.modalSubjectFile are empty');
                     // Try to recover: grab the file directly from the DOM input as a last resort
                     var fileInput = document.getElementById('modal-file-input');
                     if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -788,7 +788,7 @@
                 var genBtn = document.getElementById('modal-generate-btn');
                 if (genBtn) { genBtn.disabled = true; genBtn.classList.add('opacity-50'); }
 
-                // Ã¢â€â‚¬Ã¢â€â‚¬ Show full-screen loading overlay Ã¢â€â‚¬Ã¢â€â‚¬
+                // ── Show full-screen loading overlay ──
                 showGeneratingOverlay();
 
                 var formData = new FormData();
@@ -805,7 +805,7 @@
                 var fdEntries = {};
                 formData.forEach(function(v, k) { fdEntries[k] = typeof v === 'object' ? ('[File: ' + v.name + ']') : v; });
                 console.log(JSON.stringify(fdEntries, null, 2));
-                console.log('[FilterGallery] Ã¢â€ â€™ FETCH ' + API_BASE + '/api/filter-gallery/swap with X-User-Email: ' + activeEmail);
+                console.log('[FilterGallery] → FETCH ' + API_BASE + '/api/filter-gallery/swap with X-User-Email: ' + activeEmail);
 
                 // --- Fire API + minimum 3.5s display timer ----------
                 const MIN_DISPLAY_MS = 3500;
@@ -816,7 +816,7 @@
                 });
                 const timerPromise = new Promise(function(r) { setTimeout(r, MIN_DISPLAY_MS); });
                 const [resp] = await Promise.all([apiPromise, timerPromise]);
-                console.log('[FilterGallery] Ã¢â€ Â RESPONSE status:', resp.status);
+                console.log('[FilterGallery] ← RESPONSE status:', resp.status);
 
                 if (resp.status === 202) {
                     const { jobId } = await resp.json();
@@ -964,7 +964,7 @@
             if (fileInput) {
                 fileInput.addEventListener('change', function(evt) {
                     if (!state.modalSubjectFile && !window._selectedFile) {
-                        console.warn('[FilterGallery] Backup change listener: inline onchange did NOT set file Ã¢â‚¬â€ capturing now');
+                        console.warn('[FilterGallery] Backup change listener: inline onchange did NOT set file — capturing now');
                         handleModalFileSelect(evt);
                     }
                 });
@@ -1055,9 +1055,9 @@ document.addEventListener('DOMContentLoaded', function() { initSession(); });
 <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('filter-gallery');});</script>
 
 
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+<!-- ═══════════════════════════════════════════════════════════════
      GENERATING LOADING OVERLAY
-     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+     ═══════════════════════════════════════════════════════════════ -->
 <style>
     @keyframes genOverlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes genOverlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
@@ -1080,7 +1080,7 @@ document.addEventListener('DOMContentLoaded', function() { initSession(); });
         <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid rgba(157,91,255,0.12);"></div>
         <div style="position:absolute; inset:8px; border-radius:50%; border:3px solid transparent; border-bottom-color:#9D5BFF; animation:genSpin 1.2s linear infinite reverse;"></div>
         <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
-            <span style="font-size:22px;">Ã¢Å“Â¨</span>
+            <span style="font-size:22px;">✨</span>
         </div>
     </div>
     <div style="text-align:center; max-width:320px;">
@@ -1100,7 +1100,7 @@ var _genOverlayMessages = [
     'AI sedang bekerja sihirnya...',
     'Menyiapkan mahakarya Anda...',
     'Mengomposisikan pencahayaan...',
-    'Sentuhan akhir Ã¢â‚¬â€ hampir selesai!'
+    'Sentuhan akhir — hampir selesai!'
 ];
 var _genOverlayMsgIdx = 0;
 var _genOverlayMsgTimer = null;

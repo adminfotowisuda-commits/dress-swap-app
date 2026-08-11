@@ -44,7 +44,7 @@
             <p class="text-text-secondary text-sm mt-1">Kelola visibilitas filter untuk publik. Toggle ON/OFF, preview, atau hapus.</p>
         </div>
         <div class="flex items-center gap-3">
-            <span class="text-text-secondary text-sm" id="filter-count">Ã¢â‚¬â€ filters</span>
+            <span class="text-text-secondary text-sm" id="filter-count">— filters</span>
             <button onclick="loadFilters()" class="px-4 py-2 bg-surface-card border border-border-subtle text-text-secondary rounded-lg text-xs font-semibold hover:border-electric-cyan/30 hover:text-white transition-all">
                 <i class="fa-solid fa-rotate mr-1"></i> Refresh
             </button>
@@ -87,29 +87,29 @@
                 </table>
             </div>
         </div>
-        <p class="text-[10px] text-text-secondary text-center mt-3" id="table-footer">Ã¢â‚¬â€</p>
+        <p class="text-[10px] text-text-secondary text-center mt-3" id="table-footer">—</p>
     </div>
 </main>
 
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â PREVIEW MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+<!-- ═══ PREVIEW MODAL ═══ -->
 <div id="preview-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);" onclick="closePreviewModal()">
     <div class="bg-surface-card border border-border-subtle rounded-3xl p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto animate-in" onclick="event.stopPropagation()">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-white" id="preview-title">Ã¢â‚¬â€</h3>
+            <h3 class="text-lg font-bold text-white" id="preview-title">—</h3>
             <button onclick="closePreviewModal()" class="p-2 hover:bg-surface-container rounded-lg transition-colors text-text-secondary hover:text-white">&times;</button>
         </div>
         <img id="preview-cover" src="" class="w-full rounded-xl object-cover max-h-[50vh]" alt="Cover">
         <div class="mt-4 space-y-2 text-sm">
-            <div class="flex justify-between"><span class="text-text-secondary">Tags</span><span class="text-white" id="preview-tags">Ã¢â‚¬â€</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">Dimensions</span><span class="text-white" id="preview-dims">Ã¢â‚¬â€</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Tags</span><span class="text-white" id="preview-tags">—</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Dimensions</span><span class="text-white" id="preview-dims">—</span></div>
             <div class="flex justify-between"><span class="text-text-secondary">Usage Count</span><span class="text-white" id="preview-usage">0</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">Status</span><span id="preview-status">Ã¢â‚¬â€</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">ID</span><span class="text-white text-[10px] font-mono" id="preview-id">Ã¢â‚¬â€</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">Status</span><span id="preview-status">—</span></div>
+            <div class="flex justify-between"><span class="text-text-secondary">ID</span><span class="text-white text-[10px] font-mono" id="preview-id">—</span></div>
         </div>
     </div>
 </div>
 
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â DELETE CONFIRM MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+<!-- ═══ DELETE CONFIRM MODAL ═══ -->
 <div id="delete-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);" onclick="closeDeleteModal()">
     <div class="bg-surface-card border border-border-subtle rounded-2xl p-6 max-w-sm w-full text-center animate-in" onclick="event.stopPropagation()">
         <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -140,7 +140,7 @@ function formatDimensions(record) {
         return record.width + ' x ' + record.height + ' px';
     }
     var d = (record.dimensions || '');
-    var pxMatch = d.match(/^(\d+)\s*[xÃƒâ€”]\s*(\d+)/i);
+    var pxMatch = d.match(/^(\d+)\s*[x×]\s*(\d+)/i);
     if (pxMatch) {
         return pxMatch[1] + ' x ' + pxMatch[2] + ' px';
     }
@@ -151,7 +151,7 @@ function formatDimensions(record) {
     return d || 'N/A';
 }
 
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Load Filters Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// ═══ Load Filters ═══
 async function loadFilters() {
     var loading = document.getElementById('loading-state');
     var error = document.getElementById('error-state');
@@ -239,14 +239,14 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Preview Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// ═══ Preview ═══
 function previewFilter(genId) {
     var f = findFilter(genId);
     if (!f) return;
     var modal = document.getElementById('preview-modal');
     document.getElementById('preview-title').textContent = f.title || 'Untitled';
     document.getElementById('preview-cover').src = f.cover_image_url || f.image_url || '';
-    document.getElementById('preview-tags').textContent = (f.tags && f.tags.length) ? f.tags.join(', ') : 'Ã¢â‚¬â€';
+    document.getElementById('preview-tags').textContent = (f.tags && f.tags.length) ? f.tags.join(', ') : '—';
     document.getElementById('preview-dims').textContent = formatDimensions(f);
     document.getElementById('preview-usage').textContent = f.usageCount || 0;
     document.getElementById('preview-status').innerHTML = f.isActive !== false
@@ -260,7 +260,7 @@ function closePreviewModal() {
     document.getElementById('preview-modal').classList.add('hidden');
 }
 
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Toggle Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// ═══ Toggle ═══
 // Sends credentials so the admin session cookie is attached even after
 // a server restart rotates ADMIN_SESSION_SECRET.  On 401 the admin is
 // redirected to re-login so the cookie and secret are aligned again.
@@ -272,7 +272,7 @@ async function toggleFilter(genId) {
         });
         var data = await resp.json();
 
-        // Ã¢â€â‚¬Ã¢â€â‚¬ Session expired Ã¢â€ â€™ redirect to login Ã¢â€â‚¬Ã¢â€â‚¬
+        // ── Session expired → redirect to login ──
         if (resp.status === 401) {
             alert('Sesi admin telah berakhir (server restart atau timeout). Silakan login ulang.');
             window.location.href = '/admin-login';
@@ -285,7 +285,7 @@ async function toggleFilter(genId) {
             return;
         }
         if (data.success) {
-            console.log('[Toggle] ' + genId + ' Ã¢â€ â€™ isActive=' + data.isActive);
+            console.log('[Toggle] ' + genId + ' → isActive=' + data.isActive);
             // Clear any stale localStorage entry that could block the public gallery
             try {
                 var states = JSON.parse(localStorage.getItem('filter_visibility_states') || '{}');
@@ -309,7 +309,7 @@ async function toggleFilter(genId) {
     }
 }
 
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Delete Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// ═══ Delete ═══
 function confirmDeleteFilter(genId, title) {
     _deleteTarget = genId;
     var modal = document.getElementById('delete-modal');
@@ -350,7 +350,7 @@ function findFilter(genId) {
     return null;
 }
 
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Keyboard Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// ═══ Keyboard ═══
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closePreviewModal();
@@ -358,7 +358,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Init Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+// ═══ Init ═══
 document.getElementById('delete-confirm-btn').addEventListener('click', executeDelete);
 document.addEventListener('DOMContentLoaded', function() {
     initUnifiedSidebar('admin-filters');

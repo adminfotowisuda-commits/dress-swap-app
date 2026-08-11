@@ -123,7 +123,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
 
                 <!-- ======================================
-                     LEFT COLUMN Ã¢â‚¬â€ Input Form (lg:col-span-6)
+                     LEFT COLUMN — Input Form (lg:col-span-6)
                      ====================================== -->
                 <div class="lg:col-span-6">
                     <div class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-8 space-y-8 shadow-2xl">
@@ -133,7 +133,7 @@
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Prompt</label>
                             <textarea id="factory-prompt"
                                       rows="5"
-                                      placeholder="Describe the background scene, lighting, and atmosphere for this filter presetÃ¢â‚¬Â¦"
+                                      placeholder="Describe the background scene, lighting, and atmosphere for this filter preset…"
                                       class="w-full bg-surface-card border border-border-subtle rounded-xl p-4 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 resize-none transition-all"></textarea>
                         </div>
 
@@ -141,11 +141,11 @@
                         <div>
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Filter Preset Name</label>
                             <input type="text" id="factory-title"
-                                   placeholder="e.g. Grand Ballroom, Sunset Garden, Neon StudioÃ¢â‚¬Â¦"
+                                   placeholder="e.g. Grand Ballroom, Sunset Garden, Neon Studio…"
                                    class="w-full bg-surface-card border border-border-subtle rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-slate-600 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 transition-all">
                         </div>
 
-                        <!-- Image Upload Zone 1 Ã¢â‚¬â€ Subject Image (Reference 1) -->
+                        <!-- Image Upload Zone 1 — Subject Image (Reference 1) -->
                         <div>
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Upload Subject Image (Reference 1)</label>
                             <div id="filter-upload-zone-1"
@@ -167,7 +167,7 @@
                             </div>
                         </div>
 
-                        <!-- Image Upload Zone 2 Ã¢â‚¬â€ Background Image (Reference 2) -->
+                        <!-- Image Upload Zone 2 — Background Image (Reference 2) -->
                         <div>
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-2 block">Upload Background Image (Reference 2)</label>
                             <div id="filter-upload-zone-2"
@@ -189,7 +189,7 @@
                             </div>
                         </div>
 
-                        <!-- [B.4] Tag 1 Ã¢â‚¬â€ Category -->
+                        <!-- [B.4] Tag 1 — Category -->
                         <div>
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 block">Category</label>
                             <div id="tag1-group" class="flex flex-wrap gap-2">
@@ -201,7 +201,7 @@
                             </div>
                         </div>
 
-                        <!-- [B.5] Tag 2 Ã¢â‚¬â€ Lighting/Ambient -->
+                        <!-- [B.5] Tag 2 — Lighting/Ambient -->
                         <div>
                             <label class="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-3 block">Lighting &amp; Ambient Style</label>
                             <div id="tag2-group" class="flex flex-wrap gap-2">
@@ -238,13 +238,13 @@
                 </div>
 
                 <!-- ======================================
-                     RIGHT COLUMN Ã¢â‚¬â€ Process & Result Panel (lg:col-span-6)
+                     RIGHT COLUMN — Process & Result Panel (lg:col-span-6)
                      ====================================== -->
                 <div class="lg:col-span-6">
                     <div id="result-panel" class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-6 min-h-[500px] flex flex-col justify-between relative overflow-hidden shadow-2xl">
 
                         <!-- ==================================
-                             STATE A Ã¢â‚¬â€ IDLE (default)
+                             STATE A — IDLE (default)
                              ================================== -->
                         <div id="panel-idle" class="flex flex-col items-center justify-center flex-grow gap-6 text-center">
                             <div class="relative w-24 h-24 flex items-center justify-center">
@@ -260,7 +260,7 @@
                         </div>
 
                         <!-- ==================================
-                             STATE B Ã¢â‚¬â€ PROCESSING (hidden)
+                             STATE B — PROCESSING (hidden)
                              ================================== -->
                         <div id="panel-processing" class="hidden flex flex-col flex-grow gap-6">
                             <div class="flex items-center gap-4">
@@ -269,7 +269,7 @@
                                     <div class="absolute inset-0 border-3 border-transparent border-t-purple-500 rounded-full animate-spin"></div>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-bold text-white">Sedang MemprosesÃ¢â‚¬Â¦</p>
+                                    <p class="text-sm font-bold text-white">Sedang Memproses…</p>
                                     <p id="panel-timer" class="text-xs text-purple-400 font-mono tabular-nums">0.0s</p>
                                 </div>
                             </div>
@@ -284,7 +284,7 @@
                         </div>
 
                         <!-- ==================================
-                             STATE C Ã¢â‚¬â€ COMPLETED (hidden)
+                             STATE C — COMPLETED (hidden)
                              ================================== -->
                         <div id="panel-completed" class="hidden flex flex-col gap-5">
                             <!-- Image viewport -->
@@ -300,19 +300,19 @@
                             <div class="space-y-2 px-1">
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-slate-500 uppercase tracking-wider">Title</span>
-                                    <span id="panel-meta-title" class="text-white font-semibold">Ã¢â‚¬â€</span>
+                                    <span id="panel-meta-title" class="text-white font-semibold">—</span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-slate-500 uppercase tracking-wider">Category</span>
-                                    <span id="panel-meta-tag1" class="text-purple-400 font-semibold">Ã¢â‚¬â€</span>
+                                    <span id="panel-meta-tag1" class="text-purple-400 font-semibold">—</span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-slate-500 uppercase tracking-wider">Lighting</span>
-                                    <span id="panel-meta-tag2" class="text-amber-300 font-semibold">Ã¢â‚¬â€</span>
+                                    <span id="panel-meta-tag2" class="text-amber-300 font-semibold">—</span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-slate-500 uppercase tracking-wider">Ratio</span>
-                                    <span id="panel-meta-ratio" class="text-cyan-400 font-semibold">Ã¢â‚¬â€</span>
+                                    <span id="panel-meta-ratio" class="text-cyan-400 font-semibold">—</span>
                                 </div>
                             </div>
                             <!-- Action buttons -->
@@ -371,10 +371,10 @@
             tag1: 'Studio',
             tag2: 'Soft Light',
             ratio: '1:1',
-            // Reference Image 1 Ã¢â‚¬â€ Subject
+            // Reference Image 1 — Subject
             uploadedImageData1: null,
             uploadedFile1: null,
-            // Reference Image 2 Ã¢â‚¬â€ Background
+            // Reference Image 2 — Background
             uploadedImageData2: null,
             uploadedFile2: null
         };
@@ -659,7 +659,7 @@
             const btn = document.getElementById('factory-generate-btn');
             const btnText = document.getElementById('factory-btn-text');
             if (btn) btn.disabled = true;
-            if (btnText) btnText.innerHTML = '<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> MemprosesÃ¢â‚¬Â¦';
+            if (btnText) btnText.innerHTML = '<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Memproses…';
         }
 
         function unlockGenerateButton() {
@@ -675,7 +675,7 @@
             const allFilters = getAllFilters();
             allFilters.push(filterObject);
             saveAllFilters(allFilters);
-            // Use generation_id for visibility key Ã¢â‚¬â€ matches server database record ID
+            // Use generation_id for visibility key — matches server database record ID
             const visibilityKey = filterObject.generation_id || filterObject.id;
             setFilterVisibilityOff(visibilityKey);
 
@@ -690,7 +690,7 @@
                 localStorage.setItem('all_creations', JSON.stringify(creations));
             } catch (_) {}
 
-            console.log('[Factory BG Campus] Filter saved Ã¢â‚¬â€ visibilityKey:', visibilityKey, '| title:', filterObject.title, '| OFF');
+            console.log('[Factory BG Campus] Filter saved — visibilityKey:', visibilityKey, '| title:', filterObject.title, '| OFF');
         }
 
         // ---- Populate completed panel ----
@@ -705,11 +705,11 @@
             }
             const setMeta = (id, val, cls) => {
                 const el = document.getElementById(id);
-                if (el) { el.textContent = val || 'Ã¢â‚¬â€'; }
+                if (el) { el.textContent = val || '—'; }
             };
             setMeta('panel-meta-title', filterObject.title);
-            setMeta('panel-meta-tag1',  (filterObject.tags && filterObject.tags[0]) ? filterObject.tags[0] : 'Ã¢â‚¬â€');
-            setMeta('panel-meta-tag2',  (filterObject.tags && filterObject.tags[1]) ? filterObject.tags[1] : 'Ã¢â‚¬â€');
+            setMeta('panel-meta-tag1',  (filterObject.tags && filterObject.tags[0]) ? filterObject.tags[0] : '—');
+            setMeta('panel-meta-tag2',  (filterObject.tags && filterObject.tags[1]) ? filterObject.tags[1] : '—');
             setMeta('panel-meta-ratio', filterObject.ratio);
         }
 
@@ -788,7 +788,7 @@
 
             try {
                 // ============================================================
-                //  POST to server Ã¢â‚¬â€ server handles Leonardo securely (.env key)
+                //  POST to server — server handles Leonardo securely (.env key)
                 //  Sends BOTH reference images for dual-image guidance
                 // ============================================================
                 appendLog('Connecting to server proxy...');
@@ -818,7 +818,7 @@
 
                 const { jobId } = await genResp.json();
                 serverJobId = jobId;
-                appendLog('Pipeline initialized Ã¢â‚¬â€ jobId: ' + jobId);
+                appendLog('Pipeline initialized — jobId: ' + jobId);
                 console.log('[Factory BG Campus] Server job accepted:', jobId);
 
                 // ============================================================
@@ -835,7 +835,7 @@
                     try {
                         const pollResp = await fetch(API_BASE + '/api/status/' + serverJobId);
                         if (!pollResp.ok) {
-                            appendLog('Poll ' + attempt + '/' + MAX_POLLS + ' Ã¢â‚¬â€ HTTP ' + pollResp.status);
+                            appendLog('Poll ' + attempt + '/' + MAX_POLLS + ' — HTTP ' + pollResp.status);
                             continue;
                         }
 
@@ -843,13 +843,13 @@
                         const status = (data.status || '').toUpperCase();
 
                         if (attempt % 2 === 0) {
-                            appendLog('Poll ' + attempt + '/' + MAX_POLLS + ' Ã¢â‚¬â€ status: ' + status);
+                            appendLog('Poll ' + attempt + '/' + MAX_POLLS + ' — status: ' + status);
                         }
 
                         if (status === 'COMPLETE') {
                             generatedImageUrl = data.imageUrl || null;
                             if (generatedImageUrl) {
-                                appendLog('Generation complete Ã¢â‚¬â€ dual guidance image received!');
+                                appendLog('Generation complete — dual guidance image received!');
                                 apiSuccess = true;
                             }
                             break;
@@ -863,12 +863,12 @@
                 }
 
                 if (!generatedImageUrl) {
-                    appendLog('Polling finished Ã¢â‚¬â€ no result, falling back to local');
+                    appendLog('Polling finished — no result, falling back to local');
                 }
 
             } catch (err) {
                 console.warn('[Factory BG Campus] Server proxy error:', err.message);
-                appendLog('Server error: ' + (err.message || 'unknown') + ' Ã¢â‚¬â€ falling back to local');
+                appendLog('Server error: ' + (err.message || 'unknown') + ' — falling back to local');
             }
 
             // ============================================================
@@ -914,7 +914,7 @@
                 showToast('Filter "' + title + '" saved with local fallback. Status: OFF.', 'warn');
             }
 
-            console.log('[Factory BG Campus] Filter created Ã¢â‚¬â€ id:', effectiveId,
+            console.log('[Factory BG Campus] Filter created — id:', effectiveId,
                         '| api:', apiSuccess ? 'server-proxy' : 'local-fallback',
                         '| visibility: OFF (filter_visibility_states[' + effectiveId + '] = false)');
         }
@@ -948,7 +948,7 @@
                 // Show download spinner on button
                 const labelEl = btn?.querySelector('span');
                 const iconEl  = btn?.querySelector('i');
-                if (labelEl) labelEl.textContent = 'MengunduhÃ¢â‚¬Â¦';
+                if (labelEl) labelEl.textContent = 'Mengunduh…';
                 if (iconEl)  iconEl.className = 'fa-solid fa-spinner fa-spin text-xs';
 
                 const resp = await fetch(url);
@@ -998,7 +998,7 @@
             const downloadBtn = document.getElementById('panel-download-btn');
             if (downloadBtn) downloadBtn.addEventListener('click', downloadGeneratedImage);
 
-            console.log('Filter Gallery Factory (BG Campus) initialized Ã¢â‚¬â€ dual image guidance ready.');
+            console.log('Filter Gallery Factory (BG Campus) initialized — dual image guidance ready.');
         }
 
         if (document.readyState === 'loading') {

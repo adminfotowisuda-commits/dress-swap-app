@@ -120,7 +120,7 @@
 
     <style>
         /* ============================================================
-           Keyframe Animations ÃƒÂ¢Ã¢â€šÂ¬" DESIGN.md glassmorphic + synthwave feel
+           Keyframe Animations — DESIGN.md glassmorphic + synthwave feel
            ============================================================ */
 
         /* Pulsing glow for the lightning icon */
@@ -208,38 +208,38 @@
         .error-flash {
             animation: errorFlash 0.6s ease-in-out 3;
         }
-        /* Before-After Slideshow Animation Ã¢â‚¬" Cinema Zoom-Out Crossfade (4s cycle) */
+        /* Before-After Slideshow Animation — Cinema Zoom-Out Crossfade (4s cycle) */
         @keyframes zoomOutBefore {
-            /* 0sÃ¢â‚¬"1.5s: Stable BEFORE hold */
+            /* 0s—1.5s: Stable BEFORE hold */
             0%, 37.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 1.5sÃ¢â‚¬"2.0s: Zoom-out + fade out Ã¢â€ â€™ AFTER reveals */
-            /* 2.0sÃ¢â‚¬"3.5s: Fully hidden behind AFTER */
+            /* 1.5s—2.0s: Zoom-out + fade out → AFTER reveals */
+            /* 2.0s—3.5s: Fully hidden behind AFTER */
             50%, 87.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 3.5sÃ¢â‚¬"4.0s: Zoom-in + fade in Ã¢â€ â€™ BEFORE returns */
+            /* 3.5s—4.0s: Zoom-in + fade in → BEFORE returns */
             100% {
                 opacity: 1;
                 transform: scale(1);
             }
         }
         @keyframes zoomOutAfter {
-            /* 0sÃ¢â‚¬"1.5s: Fully hidden behind BEFORE */
+            /* 0s—1.5s: Fully hidden behind BEFORE */
             0%, 37.5% {
                 opacity: 0;
                 transform: scale(1.25);
             }
-            /* 1.5sÃ¢â‚¬"2.0s: Zoom-in + fade in Ã¢â€ â€™ AFTER reveals */
-            /* 2.0sÃ¢â‚¬"3.5s: Stable AFTER hold */
+            /* 1.5s—2.0s: Zoom-in + fade in → AFTER reveals */
+            /* 2.0s—3.5s: Stable AFTER hold */
             50%, 87.5% {
                 opacity: 1;
                 transform: scale(1);
             }
-            /* 3.5sÃ¢â‚¬"4.0s: Fade out Ã¢â€ â€™ BEFORE returns */
+            /* 3.5s—4.0s: Fade out → BEFORE returns */
             100% {
                 opacity: 0;
                 transform: scale(1.25);
@@ -258,7 +258,7 @@
             transform-style: preserve-3d;
         }
 
-        /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Payment UI Ã¢â‚¬" Package Cards Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+        /* ═══ Payment UI — Package Cards ═══ */
         @keyframes successPop {
             0% { transform: scale(0); opacity: 0; }
             60% { transform: scale(1.2); opacity: 1; }
@@ -306,7 +306,7 @@
         @keyframes toastSlideOut{from{opacity:1;transform:translate(-50%, 0)}to{opacity:0;transform:translate(-50%, -24px)}}
         .toast-enter{animation:toastSlideIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards}
         .toast-exit{animation:toastSlideOut 0.3s cubic-bezier(0.4,0,1,1) forwards}
-        /* Filter Gallery bento card â€” horizontal Before-After carousel */
+        /* Filter Gallery bento card — horizontal Before-After carousel */
         @keyframes carouselSlide {
             0%, 42%   { transform: translateX(0); }      /* Hold on BEFORE */
             50%, 92%  { transform: translateX(-50%); }   /* Slide to AFTER and hold */
@@ -321,7 +321,7 @@
 <body class="bg-surface-background text-text-primary font-body-md selection:bg-electric-cyan selection:text-surface-background">
 
     <!-- ============================================================
-         TOP NAVIGATION BAR ÃƒÂ¢Ã¢â€šÂ¬" Full-width, glassmorphic
+         TOP NAVIGATION BAR — Full-width, glassmorphic
          ============================================================ -->
     <header class="fixed top-0 inset-x-0 z-50 bg-surface-background/80 backdrop-blur-xl border-b border-border-subtle flex justify-between items-center h-16 px-6">
         <div class="flex items-center gap-3">
@@ -335,12 +335,12 @@
         
     </header>
 
-    <!-- â•â•â• Unified Sidebar â€” injected by sidebar.js â•â•â• -->
+    <!-- ═══ Unified Sidebar — injected by sidebar.js ═══ -->
     <script src="/sidebar.js"></script>
     <script>document.addEventListener('DOMContentLoaded',function(){initUnifiedSidebar('home');});</script>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-         MAIN WORKSPACE â€” PAS Marketing Landing Page
+    <!-- ════════════════════════════════════════════════════════════
+         MAIN WORKSPACE — PAS Marketing Landing Page
          ============================================================ -->
     <main class="mt-16 ml-0 min-h-[calc(100vh-64px)] bg-surface-background overflow-y-auto">
         <!-- Ambient background glows -->
@@ -350,9 +350,9 @@
 
         <div class="relative z-10 p-6 md:p-12 flex flex-col items-center max-w-7xl mx-auto">
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 HERO â€” Emotional Hook (Problem + Agitation)
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ════════════════════════════════════════════════════
+                 HERO — Emotional Hook (Problem + Agitation)
+                 ════════════════════════════════════════════════════ -->
             <div class="text-center max-w-4xl mx-auto pt-8 md:pt-20 pb-4">
                 <h1 class="gradient-flow bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold text-4xl md:text-6xl leading-tight tracking-tight">
                     Wujudkan Foto Wisuda Impianmu Dalam Hitungan Detik.
@@ -371,9 +371,9 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 PAIN POINTS â€” "Pernah Mengalami Ini?"
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ════════════════════════════════════════════════════
+                 PAIN POINTS — "Pernah Mengalami Ini?"
+                 ════════════════════════════════════════════════════ -->
             <div class="mt-20 w-full max-w-4xl mx-auto">
                 <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-white">
                     Pernah mengalami ini?
@@ -402,12 +402,12 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 THE "WHY" â€” Bento Grid (Solution)
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ════════════════════════════════════════════════════
+                 THE "WHY" — Bento Grid (Solution)
+                 ════════════════════════════════════════════════════ -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16 w-full">
 
-                <!-- â•â•â• CARD 1: Background Change â•â•â• -->
+                <!-- ═══ CARD 1: Background Change ═══ -->
                 <a href="/swap-bg" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
                    class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-cyan-500/40 transition-all duration-300 cursor-pointer no-underline">
                     <!-- Visual -->
@@ -424,11 +424,11 @@
                         Kecewa bayar fotografer mahal tapi gagal foto di spot ikonik gedung kampus karena antrian krodit, atau tiba-tiba hujan badai? Jangan biarkan momen sekali seumur hidupmu rusak. Pindahkan dirimu ke latar belakang mana pun, dengan cuaca cerah sempurna, persis seperti yang kamu impikan.
                     </p>
                     <div class="w-full mt-auto bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 py-3 rounded-xl text-sm font-bold text-center group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                        Coba Background Change â†’
+                        Coba Background Change →
                     </div>
                 </a>
 
-                <!-- â•â•â• CARD 2: Dress Replicate â•â•â• -->
+                <!-- ═══ CARD 2: Dress Replicate ═══ -->
                 <a href="/dress-swap" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
                    class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-purple-500/40 transition-all duration-300 cursor-pointer no-underline">
                     <!-- Visual -->
@@ -445,14 +445,14 @@
                         Ingin tampil memukau dengan kebaya full payet seharga 5 jutaan tapi budget habis untuk Sewa Fotografer & MUA? atau ingin coba kebaya terlalu jauh untuk fitting? Gunakan fitur Dress Try-On. Cobain ratusan kebaya mewah dari kamarmu.
                     </p>
                     <div class="w-full mt-auto bg-purple-500/15 text-purple-400 border border-purple-500/40 py-3 rounded-xl text-sm font-bold text-center group-hover:bg-purple-500 group-hover:text-white transition-all">
-                        Coba Dress Replicate â†’
+                        Coba Dress Replicate →
                     </div>
                 </a>
 
-                <!-- â•â•â• CARD 3: Filter Gallery â•â•â• -->
+                <!-- ═══ CARD 3: Filter Gallery ═══ -->
                 <a href="/filter-gallery" onclick="if(!(localStorage.getItem('active_user_email')||'')){window.location.href='/profile';return false;}"
                    class="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col hover:-translate-y-2 hover:shadow-2xl hover:border-amber-500/40 transition-all duration-300 cursor-pointer no-underline md:col-span-2 lg:col-span-1">
-                    <!-- Visual â€” Before-After carousel -->
+                    <!-- Visual — Before-After carousel -->
                     <div class="rounded-xl overflow-hidden w-full aspect-[4/5] bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-orange-500/20 shrink-0 relative">
                         <div class="flex w-[200%] h-full animate-carousel-slide">
                             <!-- Image 1 (BEFORE) -->
@@ -472,15 +472,15 @@
                         Trend foto wisuda berubah cepat! Dari trend lensa fisheye, strobist, filter anime, sampai studio estetik ala Pinterest. Sewa studio ganti tema butuh biaya besar. Dengan puluhan preset instan kami, wujudkan variasi foto tanpa batas. Tanpa perlu touch-up make-up, apalagi jauh-jauh otw ke pantai.
                     </p>
                     <div class="w-full mt-auto bg-amber-500/15 text-amber-400 border border-amber-500/40 py-3 rounded-xl text-sm font-bold text-center group-hover:bg-amber-500 group-hover:text-white transition-all">
-                        Eksplor Filter Gallery â†’
+                        Eksplor Filter Gallery →
                     </div>
                 </a>
 
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 HOW IT WORKS â€” "Bagaimana Cara Kerjanya?"
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ════════════════════════════════════════════════════
+                 HOW IT WORKS — "Bagaimana Cara Kerjanya?"
+                 ════════════════════════════════════════════════════ -->
             <div class="mt-20 w-full max-w-4xl mx-auto">
                 <h2 class="text-2xl md:text-3xl font-bold text-center mb-10 text-white">
                     Bagaimana cara kerjanya?
@@ -521,9 +521,9 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 CREDIBILITY â€” "Kenapa Memilih Kami?"
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ════════════════════════════════════════════════════
+                 CREDIBILITY — "Kenapa Memilih Kami?"
+                 ════════════════════════════════════════════════════ -->
             <div class="mt-20 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Left: Manifesto -->
                 <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col justify-center">
@@ -558,16 +558,16 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-                 SOCIAL PROOF â€” Testimonial
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+            <!-- ════════════════════════════════════════════════════
+                 SOCIAL PROOF — Testimonial
+                 ════════════════════════════════════════════════════ -->
             <div class="mt-16 w-full max-w-3xl mx-auto text-center">
                 <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-10">
                     <span class="material-symbols-outlined text-4xl text-purple-400/40 mb-4" style="font-variation-settings:'FILL':1;">format_quote</span>
                     <blockquote class="text-text-secondary text-base md:text-lg leading-relaxed italic max-w-2xl mx-auto">
                         "Nangis banget pas wisuda kemaren ujan deres, foto di outdoor gelap semua. Untung nemu fotowisuda.ai, foto di gedung rektorat jadi cerah berasa VIP gak ada orang lewat!"
                     </blockquote>
-                    <p class="text-text-secondary text-sm mt-5 opacity-60 italic">â€” Sarah, Lulusan 2026</p>
+                    <p class="text-text-secondary text-sm mt-5 opacity-60 italic">— Sarah, Lulusan 2026</p>
                     <!-- Trust dots -->
                     <div class="flex items-center justify-center gap-1.5 mt-5">
                         <span class="w-2 h-2 rounded-full bg-cyan-400/60"></span>
@@ -578,9 +578,9 @@
                 </div>
             </div>
 
-            <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            <!-- ════════════════════════════════════════════════════
                  CLOSING QUOTE & CTA
-                 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+                 ════════════════════════════════════════════════════ -->
             <div class="mt-20 w-full max-w-4xl mx-auto text-center bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-10 md:p-14">
                 <blockquote class="gradient-flow text-2xl md:text-3xl font-bold text-center bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent max-w-2xl mx-auto leading-snug">
                     "Membantu setiap wisudawan memiliki foto yang layak dikenang."
@@ -597,9 +597,9 @@
 
         </div>
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        <!-- ════════════════════════════════════════════════════
              FOOTER
-             â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+             ════════════════════════════════════════════════════ -->
         <footer class="relative z-10 w-full max-w-7xl mx-auto mt-16 mb-8 px-6 md:px-12">
             <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-text-secondary text-xs opacity-60">
@@ -659,7 +659,7 @@
         // SIDEBAR ACTIVE STATE
         // =====================================================
 
-        // Active state is handled statically in the HTML Ã¢â‚¬" the active link
+        // Active state is handled statically in the HTML — the active link
         // already has the correct classes. No dynamic init needed.
 
         // =====================================================
@@ -695,7 +695,7 @@
         }
 
         // =====================================================
-        // SIMULATED LOGIN SYSTEM Ã¢â‚¬" localStorage sandbox-safe
+        // SIMULATED LOGIN SYSTEM — localStorage sandbox-safe
         // =====================================================
 
         var safeStorage = {
@@ -754,13 +754,13 @@
             }
         }
 
-        // â•â•â• Custom Toast Notification â•â•â•
+        // ═══ Custom Toast Notification ═══
         function showToast(message, type) {
             type = type || 'success';
             var existing = document.getElementById('custom-toast');
             if (existing) existing.remove();
 
-            var icon = type === 'success' ? 'âœ”' : (type === 'error' ? 'âœ–' : 'âš ');
+            var icon = type === 'success' ? '✔' : (type === 'error' ? '✖' : '⚠');
             var bgColor = type === 'success' ? 'rgba(34,197,94,0.06)' : (type === 'error' ? 'rgba(239,68,68,0.06)' : 'rgba(251,191,36,0.06)');
             var borderColor = type === 'success' ? 'rgba(34,197,94,0.25)' : (type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(251,191,36,0.25)');
             var iconColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#fbbf24');
@@ -790,7 +790,7 @@
             }, delay || 1500);
         }
 
-        // â•â•â• Google Identity Services â€” Sign in with Google â•â•â•
+        // ═══ Google Identity Services — Sign in with Google ═══
         var GOOGLE_CLIENT_ID = '326328933073-ol034jhan4nit06stvc9thltff36313d.apps.googleusercontent.com';
 
         function initGoogleSignIn() {
@@ -874,12 +874,12 @@
             console.log(`API base: ${API_BASE}`);
         }
 
-        // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Credit Balance Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+        // ═══ Credit Balance ═══
         function getActiveEmail() {
             return safeStorage.getItem('active_user_email') || '';
         }
 
-        // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Payment State Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+        // ═══ Payment State ═══
         var _paymentState = {
             invoiceNumber: null,
             vaNumber: null,
@@ -897,13 +897,13 @@
                 var resp = await fetch(`${API_BASE}/api/credits/balance?email=${encodeURIComponent(email)}&_=${Date.now()}`, { cache: 'no-cache' });
                 var data = await resp.json();
                 balance = data.credits_balance || 0;
-            } catch (_) { balance = 'â€”'; }
+            } catch (_) { balance = '—'; }
             if (display) display.textContent = balance;
             // Also refresh the unified sidebar credit display if present
             if (window._refreshCredits) window._refreshCredits();
         }
 
-        // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Package Selection Modal Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+        // ═══ Package Selection Modal ═══
         window.openTopUpModal = function() {
             var email = getActiveEmail();
             if (!email) { triggerGoogleSignIn(); return; }
@@ -922,14 +922,14 @@
                         var priceFormatted = 'Rp ' + pkg.price.toLocaleString('id-ID');
                         var perCredit = (pkg.price / pkg.credits_given).toFixed(0);
                         html += '<div class="pkg-card relative p-4' + (isPopular ? ' popular' : '') + '" onclick="selectPackage(\''+pkg.package_id+'\', '+pkg.price+', '+pkg.credits_given+', \''+pkg.name.replace(/'/g, '\\\'')+'\')">'+
-                            (isPopular ? '<div class="pkg-badge">Ã¢Ëœâ€¦ POPULER</div>' : '') +
+                            (isPopular ? '<div class="pkg-badge">★ POPULER</div>' : '') +
                             '<div class="flex items-center justify-between mb-2">'+
                                 '<span class="text-sm font-bold text-white">'+pkg.name+'</span>'+
                                 '<span class="text-lg font-extrabold text-cyan-400">+'+pkg.credits_given.toLocaleString('id-ID')+'</span>'+
                             '</div>'+
                             '<div class="flex items-center justify-between">'+
                                 '<span class="text-lg font-bold text-white">'+priceFormatted+'</span>'+
-                                '<span class="text-[10px] text-slate-500">Ã¢â€°Ë† Rp '+perCredit+' / kredit</span>'+
+                                '<span class="text-[10px] text-slate-500">≈ Rp '+perCredit+' / kredit</span>'+
                             '</div>'+
                         '</div>';
                     });
@@ -950,7 +950,7 @@
             setTimeout(function() { modal.classList.add('hidden'); }, 200);
         };
 
-        // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Select Package Ã¢â€ â€™ Open Invoice Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+        // ═══ Select Package → Open Invoice ═══
         window.selectPackage = async function(packageId, price, credits, packageName) {
             var email = getActiveEmail();
             if (!email) return;
@@ -983,7 +983,7 @@
                 _paymentState.invoiceNumber = data.invoice_number;
                 _paymentState.vaNumber = data.va_number;
 
-                // If DOKU returned a redirect payment URL, open it directly â€” no invoice modal needed
+                // If DOKU returned a redirect payment URL, open it directly — no invoice modal needed
                 if (data.payment_url) {
                     window.open(data.payment_url, '_blank');
                     if (statusEl) { statusEl.classList.add('hidden'); }
@@ -994,7 +994,7 @@
                 _paymentState.expiresAt = new Date(data.expires_at).getTime();
 
                 // Populate invoice modal
-                document.getElementById('invoice-va').textContent = data.va_number ? formatVA(data.va_number) : 'Ã¢â‚¬"';
+                document.getElementById('invoice-va').textContent = data.va_number ? formatVA(data.va_number) : '—';
                 document.getElementById('invoice-bank').textContent = data.bank_name;
                 document.getElementById('invoice-amount').textContent = data.amount_formatted;
                 document.getElementById('invoice-package').textContent = data.package_name + ' (+' + data.credits_given + ' kredit)';
@@ -1030,7 +1030,7 @@
             }
         };
 
-        // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Invoice Modal Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+        // ═══ Invoice Modal ═══
         window.closeInvoiceModal = function() {
             clearInvoiceCountdown();
             var modal = document.getElementById('invoice-modal');
@@ -1042,7 +1042,7 @@
         };
 
         function formatVA(va) {
-            if (!va) return 'Ã¢â‚¬"';
+            if (!va) return '—';
             return va.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
         }
 
@@ -1101,7 +1101,7 @@
             if (_paymentState.countdownTimer) { clearInterval(_paymentState.countdownTimer); _paymentState.countdownTimer = null; }
         }
 
-        // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â Simulate Successful Payment Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+        // ═══ Simulate Successful Payment ═══
         window.simulatePayment = async function() {
             var btn = document.getElementById('simulate-pay-btn');
             btn.disabled = true;
@@ -1123,11 +1123,11 @@
                     await fetchCreditBalance();
                 } else {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Gagal Ã¢â‚¬" Coba Lagi';
+                    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Gagal — Coba Lagi';
                 }
             } catch (err) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error Ã¢â‚¬" Coba Lagi';
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error — Coba Lagi';
             }
         };
 
@@ -1150,7 +1150,7 @@
 
 </div>
 
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â TOP-UP MODAL Ã¢â‚¬" Package Selection Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+<!-- ═══ TOP-UP MODAL — Package Selection ═══ -->
 <div id="top-up-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
     <div class="bg-[#0B0F19] border border-slate-800/80 shadow-2xl shadow-cyan-500/5 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 transition-all transform scale-95 duration-300" id="top-up-modal-inner">
         <div class="flex items-center justify-between">
@@ -1169,7 +1169,7 @@
     </div>
 </div>
 
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â PAYMENT INVOICE MODAL Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+<!-- ═══ PAYMENT INVOICE MODAL ═══ -->
 <div id="invoice-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
     <div class="bg-[#0B0F19] border border-slate-800/80 shadow-2xl shadow-cyan-500/10 rounded-3xl p-6 max-w-md w-full flex flex-col gap-5 transition-all transform scale-95 duration-300 max-h-[90vh] overflow-y-auto" id="invoice-modal-inner">
         <!-- Header -->
@@ -1205,7 +1205,7 @@
 
                 <div>
                     <p class="text-[9px] text-slate-500 uppercase tracking-wider mb-1.5">Nomor Virtual Account</p>
-                    <div class="va-display" id="invoice-va">Ã¢â‚¬"</div>
+                    <div class="va-display" id="invoice-va">—</div>
                     <button onclick="copyVANumber()" class="mt-2 w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2" id="copy-va-btn">
                         <i class="fa-solid fa-copy text-[10px]"></i> <span>Salin Nomor VA</span>
                     </button>
@@ -1217,7 +1217,7 @@
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-slate-400 text-xs">Paket</span>
-                    <span class="text-slate-300 text-xs" id="invoice-package">Ã¢â‚¬"</span>
+                    <span class="text-slate-300 text-xs" id="invoice-package">—</span>
                 </div>
 
                 <!-- Countdown -->
@@ -1235,7 +1235,7 @@
 
             <!-- Simulate Button -->
             <div class="mt-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
-                <p class="text-[10px] text-amber-400/70 uppercase tracking-wider mb-2">Dev Tool Ã¢â‚¬" Simulasi</p>
+                <p class="text-[10px] text-amber-400/70 uppercase tracking-wider mb-2">Dev Tool — Simulasi</p>
                 <button onclick="simulatePayment()" id="simulate-pay-btn" class="w-full py-3 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
                     <i class="fa-solid fa-flask"></i> Simulate Successful Payment
                 </button>
