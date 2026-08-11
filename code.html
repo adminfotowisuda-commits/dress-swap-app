@@ -854,47 +854,40 @@
         }
 
         // ═══ Protected Navigation — Gate showcase links behind login ═══
-        window.handleProtectedNavigation = function(event, url) {
+        window.handleProtectedNavigation = function(event, destinationUrl) {
             event.preventDefault();
 
-            // Check if the user is a guest (profile section is hidden or doesn't exist)
+            // Check if the user is a guest by checking localStorage and UI state
+            const activeEmail = localStorage.getItem('active_user_email') || (typeof safeStorage !== 'undefined' ? safeStorage.getItem('active_user_email') : null);
             const profileSection = document.getElementById('user-profile-section');
-            const isGuest = !profileSection || profileSection.classList.contains('hidden');
+            const isGuest = !activeEmail && (!profileSection || profileSection.classList.contains('hidden'));
 
             if (isGuest) {
-                // Find the "Profile" menu link in the sidebar dynamically
-                const profileLink = Array.from(document.querySelectorAll('aside a')).find(a =>
-                    a.textContent.trim().toLowerCase() === 'profile' ||
-                    a.href.includes('profile')
-                );
+                // NOT LOGGED IN -> Show Profile / Login Menu
+                if (typeof window.openMockLoginModal === 'function') {
+                    // Open the local login modal directly
+                    window.openMockLoginModal();
 
-                if (profileLink && profileLink.getAttribute('href') && profileLink.getAttribute('href') !== '#') {
-                    // Redirect to the dedicated Profile page
-                    window.location.href = profileLink.getAttribute('href');
+                    // If on mobile, ensure sidebar slides out so the modal isn't blocked
+                    const sidebar = document.querySelector('aside');
+                    const overlay = document.getElementById('sidebar-overlay');
+                    if (sidebar && sidebar.classList.contains('-translate-x-full')) {
+                        sidebar.classList.remove('-translate-x-full');
+                        sidebar.classList.add('translate-x-0');
+                        if (overlay) overlay.classList.remove('hidden');
+                    }
                 } else {
-                    // Fallback: If no dedicated profile page URL is found, default to '/profile'
-                    // or trigger the sidebar login button if the profile is managed inside the sidebar.
+                    // Fallback: click the login button in sidebar
                     const loginBtn = document.getElementById('btn-google-login');
                     if (loginBtn) {
-                        // Open sidebar on mobile
-                        const sidebar = document.querySelector('aside');
-                        const overlay = document.getElementById('sidebar-overlay');
-                        if (sidebar && sidebar.classList.contains('-translate-x-full')) {
-                            sidebar.classList.remove('-translate-x-full');
-                            sidebar.classList.add('translate-x-0');
-                            if (overlay) overlay.classList.remove('hidden');
-                        }
-                        // Highlight and scroll to the login button
-                        loginBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        loginBtn.classList.add('ring-2', 'ring-cyan-500', 'animate-pulse');
-                        setTimeout(() => loginBtn.classList.remove('ring-2', 'ring-cyan-500', 'animate-pulse'), 2000);
+                        loginBtn.click();
                     } else {
-                        window.location.href = '/profile';
+                        window.location.href = '/profile'; // Final fallback
                     }
                 }
             } else {
-                // User is logged in, redirect successfully to the destination
-                window.location.href = url;
+                // LOGGED IN -> Proceed to Filter Gallery
+                window.location.href = destinationUrl;
             }
         };
 
